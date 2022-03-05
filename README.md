@@ -19,10 +19,3 @@ in parallel with one command, or in isolation.
    `npm test`
 
 To run or test the front and backend in isolation, consult the relevant README.
-
-# Troubleshooting
-
-## Pre-commit hook fails
-
-Do the following command:
-`chmod +x .husky/pre-commit`
