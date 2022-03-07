@@ -18,4 +18,4 @@ in parallel with one command, or in isolation.
 2. Test
    `npm test`
 
-To run or test the front and backend in isolation, consult the relevant README.
+To run or test the front and backend in isolation, consult the relevant READMEs.
