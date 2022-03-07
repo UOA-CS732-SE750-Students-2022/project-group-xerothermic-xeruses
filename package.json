@@ -9,9 +9,10 @@
     "prettier": "2.5.1"
   },
   "scripts": {
-    "postinstall": "lerna bootstrap",
     "start": "lerna run --parallel start",
+    "lint": "lint-staged",
     "test": "lerna run --parallel test",
+    "postinstall": "lerna bootstrap",
     "prepare": "husky install"
   },
   "lint-staged": {
