@@ -1,0 +1,21 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^7.0.4",
+    "lerna": "^4.0.0",
+    "lint-staged": "^12.3.5",
+    "prettier": "2.5.1"
+  },
+  "scripts": {
+    "start": "lerna run --parallel start",
+    "lint": "lint-staged",
+    "test": "lerna run --parallel test",
+    "postinstall": "lerna bootstrap",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}

@@ -2,9 +2,10 @@
 
 Fixes/resolves #issue number
 
-*Describe the change here.*
+_Describe the change here._
 
 # Checklist
+
 Check only those that apply.
 
 - [ ] I have written tests for my change

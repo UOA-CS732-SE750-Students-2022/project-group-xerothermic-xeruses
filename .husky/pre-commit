@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+GIT_DIR="$(git rev-parse --show-toplevel)"
+
+. "$GIT_DIR/.husky/_/husky.sh"
+
+if [ ! -d "$GIT_DIR/node_modules/" ]; then
+    echo 'Run `npm install` before committing changes.'
+    exit 1
+fi
+
+npm run lint

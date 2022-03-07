@@ -1,0 +1,8 @@
+{
+  "name": "backend",
+  "private": true,
+  "scripts": {
+    "start": "echo backend",
+    "test": "echo backend test"
+  }
+}
