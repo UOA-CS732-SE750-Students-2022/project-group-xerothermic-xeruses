@@ -1,19 +1,21 @@
-import chalk from 'chalk';
+import chalk, { Chalk } from 'chalk';
 import { createLogger, format, transports } from 'winston';
-import { inspect } from 'util';
-import { SPLAT } from 'triple-beam';
+import { TransformableInfo } from 'logform';
+import { inspect } from 'node:util';
 import jsonStringify_ from 'fast-safe-stringify';
 import 'winston-daily-rotate-file';
 
-const colors = {
-  error: 'redBright',
-  warn: 'yellowBright',
-  info: 'greenBright',
-  http: 'greenBright',
-  verbose: 'cyanBright',
-};
+const logLevels = ['debug', 'verbose', 'info', 'warn', 'error'];
 
-type Colour = keyof typeof colors;
+type LogLevel = 'debug' | 'verbose' | 'info' | 'warn' | 'error';
+
+const colors: { [K in LogLevel]: Chalk } = {
+  error: chalk.bold.redBright,
+  warn: chalk.bold.yellowBright,
+  info: chalk.bold.greenBright,
+  verbose: chalk.bold.cyanBright,
+  debug: chalk.bold.whiteBright,
+};
 
 const isPrimitive = (val: any) => val === null || (typeof val !== 'object' && typeof val !== 'function');
 
@@ -39,12 +41,26 @@ export const colorize = (color: string, s: string): string => {
 
 const jsonStringifyErrors = (_key: string, value: any) => {
   if (value instanceof Error) {
-    return Object.fromEntries(Object.entries(value));
+    const { name, message, stack } = value;
+    return { name, message, stack };
   }
   return value;
 };
 
 const jsonStringify = (obj: any) => jsonStringify_(obj, jsonStringifyErrors);
+
+const MESSAGES = Symbol('MESSAGES');
+
+const extractInfo = (info: TransformableInfo) => {
+  const moreMessages: any[] = info[MESSAGES as any] || [];
+
+  return {
+    label: info.label as string,
+    level: info.level as LogLevel,
+    timestamp: info.timestamp as string,
+    messages: [info.message, ...moreMessages],
+  };
+};
 
 const log = createLogger({
   transports: [
@@ -54,17 +70,7 @@ const log = createLogger({
       maxFiles: '14d',
       format: format.combine(
         format.timestamp(),
-        format.errors({ stack: true }),
-        format.printf((info) => {
-          // SPLAT is always a valid index for TransformableInfo
-          const splatArgs = info[SPLAT as any];
-          if (splatArgs) {
-            const messagesArr = [info.message].concat(splatArgs);
-            // this is NOT a string but jsonStringify isn't fussy
-            info.message = messagesArr as any;
-          }
-          return jsonStringify(info);
-        }),
+        format.printf((info) => jsonStringify(extractInfo(info))),
       ),
     }),
     new transports.Console({
@@ -72,19 +78,21 @@ const log = createLogger({
       format: format.combine(
         format.timestamp({ format: 'MMM DD, HH:mm:ss' }),
         format.printf((info) => {
-          const label: string = info.label ?? '';
-          const coloredLabelLevel = colorize(colors[info.level as Colour], `${label}:${info.level}`);
-          const msg = formatWithInspect(info.message);
-          // SPLAT is always a valid index for TransformableInfo
-          const splatArgs = info[SPLAT as unknown as string] || [];
-          const rest = splatArgs.map(formatWithInspect).join(' ');
-          return `${info.timestamp}  ${coloredLabelLevel}  ${msg} ${rest}`;
+          const { label, level, timestamp, messages } = extractInfo(info);
+          const coloredLabelLevel = colors[level](`${label}:${level}`);
+          const formattedMessages = messages.map(formatWithInspect).join(' ');
+          return `${timestamp}  ${coloredLabelLevel}  ${formattedMessages}`;
         }),
       ),
     }),
   ],
 });
 
-export function getLogger(label: string) {
-  return log.child({ label });
-}
+const getLoggerLevel =
+  (label: string, level: string) =>
+  (message: string, ...more: any[]) => {
+    log.log(level, message, { label, [MESSAGES]: more });
+  };
+
+export const getLogger = (label: string) =>
+  Object.freeze(Object.fromEntries(logLevels.map((lvl) => [lvl, getLoggerLevel(label, lvl)])));
