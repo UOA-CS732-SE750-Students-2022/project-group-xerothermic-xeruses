@@ -11,7 +11,7 @@ module.exports = {
     ecmaVersion: 2021,
   },
   rules: {
-    eqeqeq: ['off', 'smart'],
+    eqeqeq: ['error', 'smart'],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-inferrable-types': [
       'warn',
