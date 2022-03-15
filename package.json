@@ -2,9 +2,11 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.14.0",
-    "@typescript-eslint/parser": "^5.14.0",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "@typescript-eslint/parser": "^5.15.0",
+    "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
     "lerna": "^4.0.0",
     "lint-staged": "^12.3.5",
@@ -12,14 +14,20 @@
     "typescript": "^4.6.2"
   },
   "scripts": {
-    "start": "lerna run --parallel start",
     "build": "lerna run --parallel build",
-    "lint": "lint-staged",
+    "format": "lerna run --parallel format",
+    "format:staged": "lint-staged",
+    "start": "lerna run --parallel start",
+    "start:dev": "lerna run --parallel start:dev",
+    "start:debug": "lerna run --parallel start:debug",
+    "start:prod": "lerna run --parallel start:prod",
+    "lint": "lerna run --parallel lint",
     "test": "lerna run --parallel test",
+    "test:watch": "lerna run --parallel test:watch",
+    "test:cov": "lerna run --parallel test:cov",
+    "test:debug": "lerna run --parallel test:debug",
+    "test:e2e": "lerna run --parallel test:e2e",
     "postinstall": "lerna bootstrap",
     "prepare": "husky install"
-  },
-  "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
   }
 }

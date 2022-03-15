@@ -1,9 +1,0 @@
-# environmental variables
-.env
-
-# build output
-dist/
-
-# log files
-*-audit.json
-*.log
