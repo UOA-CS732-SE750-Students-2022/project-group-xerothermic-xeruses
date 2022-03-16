@@ -3,8 +3,16 @@
   "compilerOptions": {
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-
-    "outDir": "dist"
-  },
-  "include": ["src"]
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "incremental": true
+  }
 }

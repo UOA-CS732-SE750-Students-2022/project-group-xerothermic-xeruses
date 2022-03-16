@@ -1,1 +1,12 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Environmental variables
+.env
+
+# Build output
+dist/
+
+# Log files
+*-audit.json
+*.log

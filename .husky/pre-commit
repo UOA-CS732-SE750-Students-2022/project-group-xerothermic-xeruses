@@ -10,4 +10,4 @@ if [ ! -d "$GIT_DIR/node_modules/" ]; then
     exit 1
 fi
 
-npm run lint
+npm run format:staged
