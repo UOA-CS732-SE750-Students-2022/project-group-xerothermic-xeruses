@@ -18,15 +18,8 @@
     "format": "lerna run --parallel format",
     "format:staged": "lint-staged",
     "start": "lerna run --parallel start",
-    "start:dev": "lerna run --parallel start:dev",
-    "start:debug": "lerna run --parallel start:debug",
-    "start:prod": "lerna run --parallel start:prod",
     "lint": "lerna run --parallel lint",
     "test": "lerna run --parallel test",
-    "test:watch": "lerna run --parallel test:watch",
-    "test:cov": "lerna run --parallel test:cov",
-    "test:debug": "lerna run --parallel test:debug",
-    "test:e2e": "lerna run --parallel test:e2e",
     "postinstall": "lerna bootstrap",
     "prepare": "husky install"
   }
