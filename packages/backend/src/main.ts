@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import { NestFactory } from '@nestjs/core';
 import Graceful from 'node-graceful';
-import { AppModule } from './app.module';
+import { AppModule } from '~/app.module';
 
-import env from './env';
-import { getLogger } from './logger';
+import env from '~/env';
+import { getLogger } from '~/logger';
 import { NestApplicationOptions } from '@nestjs/common';
 
 const log = getLogger('main');
