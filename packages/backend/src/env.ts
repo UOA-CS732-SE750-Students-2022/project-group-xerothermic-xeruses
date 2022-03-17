@@ -1,6 +1,6 @@
-import { accessSync, constants } from 'node:fs';
-import 'dotenv/config';
+import { accessSync, constants } from 'fs';
 import { bool, cleanEnv, makeValidator, port, str } from 'envalid';
+import 'dotenv/config';
 
 const file = makeValidator((x) => (accessSync(x, constants.R_OK), x));
 
