@@ -16,5 +16,4 @@ export const expressConfig = Joi.object<ExpressConfig>({
   SSL_CERT_FILE: Joi.string(),
   SSL_KEY_FILE: Joi.string(),
 }) //
-  .or('PORT', 'SSL_PORT')
   .with('SSL_PORT', ['SSL_CERT_FILE', 'SSL_KEY_FILE']);
