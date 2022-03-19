@@ -1,0 +1,3 @@
+# Enforce Unix newlines
+.gitattributes  text eol=lf
+pre-commit      text eol=lf
