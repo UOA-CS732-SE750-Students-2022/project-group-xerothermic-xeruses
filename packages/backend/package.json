@@ -26,6 +26,7 @@
     "dotenv": "^16.0.0",
     "envalid": "^7.3.0",
     "fast-safe-stringify": "^2.1.1",
+    "firebase": "^9.6.9",
     "joi": "^17.6.0",
     "mongoose": "^6.2.6",
     "node-graceful": "^3.1.0",
