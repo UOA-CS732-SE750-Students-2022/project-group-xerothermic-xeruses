@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, type TestingModule } from '@nestjs/testing';
@@ -11,24 +13,23 @@ const id = (id: string) => {
 };
 
 const mockFlock = (mock?: Partial<Flock>): Flock => ({
+  name: mock?.name || '<flock name Alpha>',
+  users: mock?.users || [],
+});
+
+const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument> => ({
   _id: mock?._id || id('FID_Alpha'),
   name: mock?.name || '<flock name Alpha>',
   users: mock?.users || [],
 });
 
-const mockFlockDocument = (mock?: Partial<Flock>): Partial<FlockDocument> => ({
-  _id: mock?._id || id('FID_Alpha'),
-  name: mock?.name || '<flock name Alpha>',
-  users: mock?.users || [],
-});
-
-const FLOCKS = [
-  mockFlock(),
-  mockFlock({ _id: id('FID_Bravo'), name: '<flock name Bravo>', users: [] }),
-  mockFlock({ _id: id('FID_Charlie'), name: '<flock name Charlie>', users: [] }),
+const FLOCK_DOCUMENTS = [
+  mockFlockDocument(),
+  mockFlockDocument({ _id: id('FID_Bravo'), name: '<flock name Bravo>', users: [] }),
+  mockFlockDocument({ _id: id('FID_Charlie'), name: '<flock name Charlie>', users: [] }),
 ];
 
-const FLOCK_DOCUMENTS = FLOCKS.map(mockFlockDocument);
+const FLOCKS = FLOCK_DOCUMENTS.map(mockFlock);
 
 describe(FlockService.name, () => {
   let service: FlockService;
@@ -47,7 +48,6 @@ describe(FlockService.name, () => {
             static findByIdAndRemove = jest.fn();
             static findByIdAndUpdate = jest.fn();
             static exec = jest.fn();
-            save = jest.fn().mockReturnValue(FLOCK_DOCUMENTS[0]);
           },
         },
       ],
@@ -68,8 +68,9 @@ describe(FlockService.name, () => {
   //
 
   it('should insert a new flock', async () => {
-    const newUser = await service.create(FLOCKS[0]);
-    expect(newUser).toEqual(FLOCK_DOCUMENTS[0]);
+    jest.spyOn(model, 'create').mockReturnValueOnce(FLOCK_DOCUMENTS[0] as any);
+    const newFlock = await service.create(FLOCKS[0]);
+    expect(newFlock).toEqual(FLOCK_DOCUMENTS[0]);
   });
 
   it('should delete a flock successfully', async () => {
@@ -78,7 +79,7 @@ describe(FlockService.name, () => {
         exec: jest.fn().mockResolvedValueOnce(FLOCK_DOCUMENTS[0]),
       }) as any,
     );
-    expect(await service.delete(FLOCKS[0])).toEqual(FLOCK_DOCUMENTS[0]);
+    expect(await service.delete(FLOCK_DOCUMENTS[0]._id!)).toEqual(FLOCK_DOCUMENTS[0]);
   });
 
   it('should return all flocks', async () => {
@@ -95,7 +96,7 @@ describe(FlockService.name, () => {
         exec: jest.fn().mockResolvedValueOnce(mockFlockDocument(FLOCK_DOCUMENTS[0])),
       }) as any,
     );
-    const foundFlock = await service.findOne(FLOCKS[0]._id);
+    const foundFlock = await service.findOne(FLOCK_DOCUMENTS[0]._id!);
     expect(foundFlock).toEqual(FLOCK_DOCUMENTS[0]);
   });
 
@@ -105,7 +106,7 @@ describe(FlockService.name, () => {
         exec: jest.fn().mockResolvedValueOnce(FLOCK_DOCUMENTS[0]),
       }) as any,
     );
-    const updatedFlock = await service.update(FLOCKS[0]);
+    const updatedFlock = await service.update(FLOCK_DOCUMENTS[0]._id!, FLOCKS[0]);
     expect(updatedFlock).toEqual(FLOCK_DOCUMENTS[0]);
   });
 });

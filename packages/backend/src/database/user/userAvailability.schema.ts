@@ -1,54 +1,41 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { type Document, Schema as MSchema } from 'mongoose';
-import { UnreachableError } from '~/common/errors';
+import { type Document, Schema as MSchema, type Types } from 'mongoose';
 
-export interface UserAvailabilityModelICal {
-  type: 'ical';
-  uri: string;
-}
-
-export interface UserAvailabilityModelGoogleCalendar {
+export interface UserAvailabilityGoogleCalendar {
   type: 'googlecalendar';
   refreshToken: string;
   accessToken: string;
   accessTokenExpiration: Date;
 }
 
-export type UserAvailabilityModel = UserAvailabilityModelICal | UserAvailabilityModelGoogleCalendar;
-
-@Schema()
-export class UserAvailability {
-  @Prop({ type: MSchema.Types.String })
-  type: UserAvailabilityModel['type'];
-
-  @Prop()
-  uri?: string;
-
-  @Prop()
-  refreshToken?: string;
-
-  @Prop()
-  accessToken?: string;
-
-  @Prop()
-  accessTokenExpiration?: Date;
-
-  constructor(userAvailability: UserAvailabilityModel) {
-    this.type = userAvailability.type;
-
-    if (userAvailability.type === 'ical') {
-      this.uri = userAvailability.uri;
-      return;
-    }
-    if (userAvailability.type === 'googlecalendar') {
-      this.refreshToken = userAvailability.refreshToken;
-      this.accessToken = userAvailability.accessToken;
-      this.accessTokenExpiration = userAvailability.accessTokenExpiration;
-      return;
-    }
-    throw new UnreachableError(userAvailability);
-  }
+export interface UserAvailabilityICal {
+  type: 'ical';
+  uri: string;
 }
 
-export type UserAvailabilityDocument = UserAvailability & Document;
-export const UserAvailabilitySchema = SchemaFactory.createForClass(UserAvailability);
+export type UserAvailability = UserAvailabilityGoogleCalendar | UserAvailabilityICal;
+
+// Type validation for UserAvailabilityClass.
+// Requires that all attributes from each type of UserAvailability* are present in UserAvailabilityClass.
+type NoType<T> = { [P in keyof Omit<T, 'type'>]: T[P] | undefined };
+type UserAvailabilityClassT = { type: string } & NoType<UserAvailabilityGoogleCalendar> & NoType<UserAvailabilityICal>;
+
+@Schema()
+class UserAvailabilityClass implements UserAvailabilityClassT {
+  type!: string;
+
+  @Prop({ type: MSchema.Types.String })
+  uri: string | undefined;
+
+  @Prop({ type: MSchema.Types.String })
+  refreshToken: string | undefined;
+
+  @Prop({ type: MSchema.Types.String })
+  accessToken: string | undefined;
+
+  @Prop({ type: MSchema.Types.Date })
+  accessTokenExpiration: Date | undefined;
+}
+
+export type UserAvailabilityDocument = UserAvailability & Omit<Document<Types.ObjectId>, 'id'>;
+export const UserAvailabilitySchema = SchemaFactory.createForClass(UserAvailabilityClass);

@@ -1,48 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { type Document, Schema as MSchema, Types } from 'mongoose';
-import { type UserAvailabilityModel, UserAvailabilitySchema } from './userAvailability.schema';
-import { type UserSettingsModel, UserSettingsSchema } from './userSettings.schema';
+import { type Document, Schema as MSchema, type Types } from 'mongoose';
+import { type UserAvailability, UserAvailabilitySchema } from './userAvailability.schema';
+import { type UserSettings, UserSettingsSchema } from './userSettings.schema';
 
 export const USER_MODEL_NAME = 'User';
 
 export interface User {
-  _id: Types.ObjectId;
   name: string;
   flocks: Types.ObjectId[];
   flockInvites: Types.ObjectId[];
-  availability: UserAvailabilityModel[];
-  settings?: UserSettingsModel;
+  availability: UserAvailability[];
+  settings?: UserSettings;
 }
 
 @Schema()
 class UserClass implements User {
   @Prop()
-  _id: Types.ObjectId;
-
-  @Prop()
-  name: string;
+  name!: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flocks: Types.ObjectId[];
+  flocks!: Types.ObjectId[];
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flockInvites: Types.ObjectId[];
+  flockInvites!: Types.ObjectId[];
 
   @Prop({ type: [UserAvailabilitySchema], default: [] })
-  availability: UserAvailabilityModel[];
+  availability!: UserAvailability[];
 
   @Prop({ type: UserSettingsSchema })
-  settings?: UserSettingsModel;
-
-  constructor(user: User) {
-    this._id = user._id;
-    this.name = user.name;
-    this.flocks = user.flocks;
-    this.flockInvites = user.flockInvites;
-    this.availability = user.availability;
-    this.settings = user.settings;
-  }
+  settings?: UserSettings;
 }
 
-export type UserDocument = UserClass & Document;
+export type UserDocument = User & Omit<Document<Types.ObjectId>, 'id'>;
 export const UserSchema = SchemaFactory.createForClass(UserClass);

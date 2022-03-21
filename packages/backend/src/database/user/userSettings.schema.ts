@@ -1,21 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { type Document } from 'mongoose';
+import { type Document, type Types } from 'mongoose';
 
 export type UserSettingsTheme = 'light' | 'dark' | 'system';
 
-export interface UserSettingsModel {
+export interface UserSettings {
   theme?: UserSettingsTheme;
 }
 
 @Schema()
-export class UserSettings implements UserSettingsModel {
+class UserSettingsClass implements UserSettings {
   @Prop()
   theme?: UserSettingsTheme;
-
-  constructor(userSettings: UserSettingsModel) {
-    this.theme = userSettings.theme;
-  }
 }
 
-export type UserSettingsDocument = UserSettings & Document;
-export const UserSettingsSchema = SchemaFactory.createForClass(UserSettings);
+export type UserSettingsDocument = UserSettings & Omit<Document<Types.ObjectId>, 'id'>;
+export const UserSettingsSchema = SchemaFactory.createForClass(UserSettingsClass);

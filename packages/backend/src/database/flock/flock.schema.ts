@@ -4,7 +4,6 @@ import { type Document, Schema as MSchema, type Types } from 'mongoose';
 export const FLOCK_MODEL_NAME = 'Flock';
 
 export interface Flock {
-  _id: Types.ObjectId;
   name: string;
   users: Types.ObjectId[];
 }
@@ -12,20 +11,11 @@ export interface Flock {
 @Schema()
 class FlockClass implements Flock {
   @Prop()
-  _id: Types.ObjectId;
-
-  @Prop()
-  name: string;
+  name!: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', default: [] })
-  users: Types.ObjectId[];
-
-  constructor(flock: Flock) {
-    this._id = flock._id;
-    this.name = flock.name;
-    this.users = flock.users;
-  }
+  users!: Types.ObjectId[];
 }
 
-export type FlockDocument = FlockClass & Document;
+export type FlockDocument = Flock & Omit<Document<Types.ObjectId>, 'id'>;
 export const FlockSchema = SchemaFactory.createForClass(FlockClass);
