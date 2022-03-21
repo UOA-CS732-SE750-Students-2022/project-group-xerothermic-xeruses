@@ -2,7 +2,8 @@ import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Query, Types } from 'mongoose';
-import { FLOCK_MODEL_NAME, FlockDocument, Flock, FlockService } from '.';
+import { Flock, FlockDocument, FLOCK_MODEL_NAME } from './flock.schema';
+import { FlockService } from './flock.service';
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');

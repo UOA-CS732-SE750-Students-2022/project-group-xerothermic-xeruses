@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MSchema, Types } from 'mongoose';
-import type { User } from '../user';
+import { User } from '../user/user.schema';
 
 export const FLOCK_MODEL_NAME = 'Flock';
 
