@@ -1,31 +1,24 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DatabaseConfig, databaseConfig, expressConfig, requireConfig } from '~/config';
+import { DatabaseConfigModule } from '~/config/databaseConfig.module';
+import { DatabaseConfig } from '~/config/databaseConfig.schema';
 import { ExpressConfigModule } from '~/config/expressConfig.module';
 import { LoggerModule } from '~/logger/module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      // expressConfig is required in main.ts
-      validate: requireConfig(expressConfig),
-    }),
+    LoggerModule,
+    ExpressConfigModule,
     MongooseModule.forRootAsync({
-      imports: [
-        ConfigModule.forRoot({
-          validate: requireConfig(databaseConfig),
-        }),
-      ],
+      imports: [DatabaseConfigModule],
       useFactory: (configService: ConfigService<DatabaseConfig, true>) => ({
         uri: configService.get('MONGODB_URI'),
       }),
       inject: [ConfigService],
     }),
-    ExpressConfigModule,
-    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
