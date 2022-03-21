@@ -11,9 +11,7 @@ export interface UserAvailabilityModelGoogleCalendar {
   type: 'googlecalendar';
   refreshToken: string;
   accessToken: string;
-
-  /** Access token expiration, in _seconds_ since Epoch. */
-  accessTokenExpiration: number;
+  accessTokenExpiration: Date;
 }
 
 export type UserAvailabilityModel = UserAvailabilityModelICal | UserAvailabilityModelGoogleCalendar;
@@ -33,7 +31,7 @@ export class UserAvailability {
   accessToken?: string;
 
   @Prop()
-  accessTokenExpiration?: number;
+  accessTokenExpiration?: Date;
 
   constructor(userAvailability: UserAvailabilityModel) {
     this.type = userAvailability.type;
@@ -49,10 +47,6 @@ export class UserAvailability {
       return;
     }
     throw new NeverError(userAvailability);
-  }
-
-  toModel() {
-    return this as UserAvailabilityModel;
   }
 }
 
