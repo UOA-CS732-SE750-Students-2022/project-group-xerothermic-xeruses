@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { initializeApp } from "firebase-admin";
 import { cert, Credential, ServiceAccount } from "firebase-admin/app";
+import { getAuth } from 'firebase-admin/auth';
 import { ExtractJwt, Strategy } from "passport-firebase-jwt";
 
 @Injectable()
@@ -14,7 +15,7 @@ export class FirebaseAuthStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
-    this.defaultApp = initializeApp({
+    initializeApp({
       credential: FirebaseAuthStrategy.getCredentials(),
     });
   }
@@ -25,13 +26,12 @@ export class FirebaseAuthStrategy extends PassportStrategy(
         JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount,
       );
     } else {
-      return cert('../../../keys/firebase.json');
+      return cert('../../keys/firebase.json');
     }
   }
   
   async validate(token: string) {
-    const firebaseUser: any = await this.defaultApp
-      .auth()
+    const firebaseUser: any = await getAuth()
       .verifyIdToken(token, true)
       .catch((error: Error) => {
         throw new UnauthorizedException(error.message);

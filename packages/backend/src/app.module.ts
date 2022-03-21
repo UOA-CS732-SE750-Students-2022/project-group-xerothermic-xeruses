@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { expressConfig, requireConfig } from '~/config';
 import { LoggerService } from '~/logger/service';
 import { PassportModule } from '@nestjs/passport';
+import { FirebaseAuthStrategy } from './firebase/firebase-auth.strategy';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule
   ],
   controllers: [AppController],
-  providers: [AppService, LoggerService],
+  providers: [AppService, LoggerService, FirebaseAuthStrategy],
 })
 export class AppModule {}
