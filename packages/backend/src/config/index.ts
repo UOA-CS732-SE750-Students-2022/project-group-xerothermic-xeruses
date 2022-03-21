@@ -1,5 +1,4 @@
 import { ObjectSchema } from 'joi';
-export * from './database';
 export * from './express';
 
 export function requireConfig<T>(schema: ObjectSchema<T>): (value: Record<string, unknown>) => T;
