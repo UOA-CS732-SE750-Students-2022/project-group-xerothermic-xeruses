@@ -2,12 +2,13 @@ import fs from 'fs';
 import http from 'http';
 import https from 'https';
 import { NestApplicationOptions } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import Graceful from 'node-graceful';
-import { AppModule } from '~/app.module';
-import { requireConfig, expressConfig } from '~/config';
+import { AppModule } from './app.module';
+import { ExpressConfig } from '~/config/expressConfig.schema';
 import { LoggerService } from '~/logger/service';
 
 const log = new LoggerService('Main');
@@ -32,19 +33,19 @@ Graceful.on('exit', (signal, details) => log.info('Exiting.', { signal, details 
     log.info('Closed the app.');
   });
 
-  const config = requireConfig(expressConfig)(process.env);
+  const config = app.get<ConfigService<ExpressConfig, true>>(ConfigService);
 
-  if (config.PORT != null) {
+  if (config.get('PORT') != null) {
     // Listen on specified HTTP port.
-    http.createServer(server).listen(config.PORT);
-    log.info('HTTP listening on port', config.PORT);
+    http.createServer(server).listen(config.get('PORT'));
+    log.info('HTTP listening on port', config.get('PORT'));
   }
 
-  if (config.SSL_PORT != null) {
+  if (config.get('SSL_PORT') != null) {
     // Listen on specified HTTPS port.
-    const key = fs.readFileSync(config.SSL_KEY_FILE, 'utf8');
-    const cert = fs.readFileSync(config.SSL_CERT_FILE, 'utf8');
-    https.createServer({ key, cert }, server).listen(config.SSL_PORT);
-    log.info('HTTPS listening on port', config.PORT);
+    const key = fs.readFileSync(config.get('SSL_KEY_FILE'), 'utf8');
+    const cert = fs.readFileSync(config.get('SSL_CERT_FILE'), 'utf8');
+    https.createServer({ key, cert }, server).listen(config.get('SSL_PORT'));
+    log.info('HTTPS listening on port', config.get('SSL_PORT'));
   }
 })();
