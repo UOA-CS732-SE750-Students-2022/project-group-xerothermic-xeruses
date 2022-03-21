@@ -2,7 +2,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Query, Types } from 'mongoose';
-import { User, UserDocument, UserModel, UserService } from '.';
+import { USER_MODEL_NAME, UserDocument, UserModel, UserService } from '.';
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
@@ -42,7 +42,7 @@ describe(UserService.name, () => {
       providers: [
         UserService,
         {
-          provide: getModelToken(User.name),
+          provide: getModelToken(USER_MODEL_NAME),
           useValue: class {
             static create = jest.fn();
             static find = jest.fn();
@@ -57,7 +57,7 @@ describe(UserService.name, () => {
     }).compile();
 
     service = module.get(UserService);
-    model = module.get(getModelToken(User.name));
+    model = module.get(getModelToken(USER_MODEL_NAME));
   });
 
   it('should be defined', () => {

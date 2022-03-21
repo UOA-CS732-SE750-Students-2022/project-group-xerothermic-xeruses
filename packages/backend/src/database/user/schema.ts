@@ -4,6 +4,8 @@ import { FlockModel } from '../flock';
 import { UserAvailabilityModel, UserAvailabilitySchema } from './availability';
 import { UserSettingsModel, UserSettingsSchema } from './settings';
 
+export const USER_MODEL_NAME = 'User';
+
 export interface UserModel {
   _id: Types.ObjectId;
   name: string;
@@ -14,7 +16,7 @@ export interface UserModel {
 }
 
 @Schema()
-export class User implements UserModel {
+class UserClass implements UserModel {
   @Prop()
   _id: Types.ObjectId;
 
@@ -43,5 +45,5 @@ export class User implements UserModel {
   }
 }
 
-export type UserDocument = User & Document;
-export const UserSchema = SchemaFactory.createForClass(User);
+export type UserDocument = UserClass & Document;
+export const UserSchema = SchemaFactory.createForClass(UserClass);

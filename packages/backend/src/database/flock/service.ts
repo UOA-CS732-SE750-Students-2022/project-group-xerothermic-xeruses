@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Flock, FlockDocument, FlockModel } from '.';
+import { FLOCK_MODEL_NAME, FlockDocument, FlockModel } from '.';
 
 type FlockMaybeId = Omit<FlockModel, '_id'> & Partial<Pick<FlockModel, '_id'>>;
 type FlockWithId = Partial<FlockModel> & Pick<FlockModel, '_id'>;
 
 @Injectable()
 export class FlockService {
-  constructor(@InjectModel(Flock.name) private readonly model: Model<FlockDocument>) {}
+  constructor(@InjectModel(FLOCK_MODEL_NAME) private readonly model: Model<FlockDocument>) {}
 
   async create(flock: FlockMaybeId): Promise<FlockDocument> {
     flock._id ??= new Types.ObjectId();

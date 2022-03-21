@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { User, UserDocument, UserModel } from '.';
+import { USER_MODEL_NAME, UserDocument, UserModel } from '.';
 
 type UserMaybeId = Omit<UserModel, '_id'> & Partial<Pick<UserModel, '_id'>>;
 type UserWithId = Partial<UserModel> & Pick<UserModel, '_id'>;
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) {}
+  constructor(@InjectModel(USER_MODEL_NAME) private readonly model: Model<UserDocument>) {}
 
   async create(user: UserMaybeId): Promise<UserDocument> {
     user._id ??= new Types.ObjectId();

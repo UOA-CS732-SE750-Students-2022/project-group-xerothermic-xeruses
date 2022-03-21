@@ -2,7 +2,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Query, Types } from 'mongoose';
-import { Flock, FlockDocument, FlockModel, FlockService } from '.';
+import { FLOCK_MODEL_NAME, FlockDocument, FlockModel, FlockService } from '.';
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
@@ -38,7 +38,7 @@ describe(FlockService.name, () => {
       providers: [
         FlockService,
         {
-          provide: getModelToken(Flock.name),
+          provide: getModelToken(FLOCK_MODEL_NAME),
           useValue: class {
             static create = jest.fn();
             static find = jest.fn();
@@ -53,7 +53,7 @@ describe(FlockService.name, () => {
     }).compile();
 
     service = module.get(FlockService);
-    model = module.get(getModelToken(Flock.name));
+    model = module.get(getModelToken(FLOCK_MODEL_NAME));
   });
 
   it('should be defined', () => {

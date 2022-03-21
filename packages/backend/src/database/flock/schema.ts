@@ -2,6 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MSchema, Types } from 'mongoose';
 import type { UserModel } from '../user';
 
+export const FLOCK_MODEL_NAME = 'Flock';
+
 export interface FlockModel {
   _id: Types.ObjectId;
   name: string;
@@ -9,7 +11,7 @@ export interface FlockModel {
 }
 
 @Schema()
-export class Flock implements FlockModel {
+class FlockClass implements FlockModel {
   @Prop()
   _id: Types.ObjectId;
 
@@ -19,12 +21,12 @@ export class Flock implements FlockModel {
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', default: [] })
   users: UserModel[];
 
-  constructor(flock: Flock) {
+  constructor(flock: FlockModel) {
     this._id = flock._id;
     this.name = flock.name;
     this.users = flock.users;
   }
 }
 
-export type FlockDocument = Flock & Document;
-export const FlockSchema = SchemaFactory.createForClass(Flock);
+export type FlockDocument = FlockClass & Document;
+export const FlockSchema = SchemaFactory.createForClass(FlockClass);
