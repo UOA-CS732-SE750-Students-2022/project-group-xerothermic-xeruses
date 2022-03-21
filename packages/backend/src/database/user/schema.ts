@@ -1,16 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MSchema, Types } from 'mongoose';
-import { Flock } from '../flock';
-import { UserAvailability, UserAvailabilitySchema } from './availability';
-import { UserSettings, UserSettingsSchema } from './settings';
+import { FlockModel } from '../flock';
+import { UserAvailabilityModel, UserAvailabilitySchema } from './availability';
+import { UserSettingsModel, UserSettingsSchema } from './settings';
 
 export interface UserModel {
   _id: Types.ObjectId;
   name: string;
-  flocks: Flock[];
-  flockInvites: Flock[];
-  availability: UserAvailability[];
-  settings?: UserSettings;
+  flocks: FlockModel[];
+  flockInvites: FlockModel[];
+  availability: UserAvailabilityModel[];
+  settings?: UserSettingsModel;
 }
 
 @Schema()
@@ -22,16 +22,16 @@ export class User implements UserModel {
   name: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flocks: Flock[];
+  flocks: FlockModel[];
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flockInvites: Flock[];
+  flockInvites: FlockModel[];
 
   @Prop({ type: [UserAvailabilitySchema], default: [] })
-  availability: UserAvailability[];
+  availability: UserAvailabilityModel[];
 
   @Prop({ type: UserSettingsSchema })
-  settings?: UserSettings;
+  settings?: UserSettingsModel;
 
   constructor(user: UserModel) {
     this._id = user._id;
