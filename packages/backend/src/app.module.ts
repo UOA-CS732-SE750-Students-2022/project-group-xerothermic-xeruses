@@ -4,7 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseConfig, databaseConfig, expressConfig, requireConfig } from '~/config';
-import { LoggerService } from '~/logger/service';
+import { ExpressConfigModule } from '~/config/expressConfig.module';
+import { LoggerModule } from '~/logger/module';
 
 @Module({
   imports: [
@@ -23,8 +24,10 @@ import { LoggerService } from '~/logger/service';
       }),
       inject: [ConfigService],
     }),
+    ExpressConfigModule,
+    LoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService, LoggerService],
+  providers: [AppService],
 })
 export class AppModule {}
