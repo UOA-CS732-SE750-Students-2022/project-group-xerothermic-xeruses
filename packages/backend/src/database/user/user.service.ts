@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { User, USER_MODEL_NAME, UserDocument } from './user.schema';
+import { type Model, Types } from 'mongoose';
+import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
 
 type UserMaybeId = Omit<User, '_id'> & Partial<Pick<User, '_id'>>;
 type UserWithId = Partial<User> & Pick<User, '_id'>;

@@ -1,8 +1,8 @@
 import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
-import { Model, Query, Types } from 'mongoose';
-import { Flock, FlockDocument, FLOCK_MODEL_NAME } from './flock.schema';
+import { Test, type TestingModule } from '@nestjs/testing';
+import { type Model, type Query, Types } from 'mongoose';
+import { type Flock, type FlockDocument, FLOCK_MODEL_NAME } from './flock.schema';
 import { FlockService } from './flock.service';
 
 const id = (id: string) => {

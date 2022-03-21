@@ -1,8 +1,8 @@
 import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
-import { Model, Query, Types } from 'mongoose';
-import { User, UserDocument, USER_MODEL_NAME } from './user.schema';
+import { Test, type TestingModule } from '@nestjs/testing';
+import { type Model, type Query, Types } from 'mongoose';
+import { type User, type UserDocument, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
 
 const id = (id: string) => {

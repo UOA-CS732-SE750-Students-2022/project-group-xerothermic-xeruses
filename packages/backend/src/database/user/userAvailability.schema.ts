@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MSchema } from 'mongoose';
+import { type Document, Schema as MSchema } from 'mongoose';
 import { UnreachableError } from '~/common/errors';
 
 export interface UserAvailabilityModelICal {

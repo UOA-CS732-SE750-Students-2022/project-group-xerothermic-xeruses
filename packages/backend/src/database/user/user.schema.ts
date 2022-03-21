@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MSchema, Types } from 'mongoose';
 import { Flock } from '../flock/flock.schema';
-import { UserAvailabilityModel, UserAvailabilitySchema } from './userAvailability.schema';
-import { UserSettingsModel, UserSettingsSchema } from './userSettings.schema';
+import { type Document, Schema as MSchema, Types } from 'mongoose';
+import { type UserAvailabilityModel, UserAvailabilitySchema } from './userAvailability.schema';
+import { type UserSettingsModel, UserSettingsSchema } from './userSettings.schema';
 
 export const USER_MODEL_NAME = 'User';
 
