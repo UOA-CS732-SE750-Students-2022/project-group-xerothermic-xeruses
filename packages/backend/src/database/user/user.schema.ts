@@ -5,6 +5,9 @@ import { type UserSettings, UserSettingsSchema } from './userSettings.schema';
 
 export const USER_MODEL_NAME = 'User';
 
+/**
+ * A User represents a single unique person with their Flocks, availability & settings.
+ */
 export interface User {
   name: string;
   flocks: Types.ObjectId[];
@@ -31,5 +34,12 @@ class UserClass implements User {
   settings?: UserSettings;
 }
 
+/**
+ * A User represents a single unique person with their Flocks, availability & settings.
+ */
 export type UserDocument = User & Omit<Document<Types.ObjectId>, 'id'>;
+
+/**
+ * A User represents a single unique person with their Flocks, availability & settings.
+ */
 export const UserSchema = SchemaFactory.createForClass(UserClass);

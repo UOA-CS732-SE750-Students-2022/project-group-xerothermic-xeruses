@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { type Document, Schema as MSchema, type Types } from 'mongoose';
 
+/**
+ * Google Calendar datasource for user availability.
+ */
 export interface UserAvailabilityGoogleCalendar {
   type: 'googlecalendar';
   refreshToken: string;
@@ -8,11 +11,17 @@ export interface UserAvailabilityGoogleCalendar {
   accessTokenExpiration: Date;
 }
 
+/**
+ * ICal format URI datasource for user availability.
+ */
 export interface UserAvailabilityICal {
   type: 'ical';
   uri: string;
 }
 
+/**
+ * UserAvailability is a datasource for a user availability schedule.
+ */
 export type UserAvailability = UserAvailabilityGoogleCalendar | UserAvailabilityICal;
 
 // Type validation for UserAvailabilityClass.
@@ -37,5 +46,12 @@ class UserAvailabilityClass implements UserAvailabilityClassT {
   accessTokenExpiration: Date | undefined;
 }
 
+/**
+ * UserAvailability is a datasource for a user availability schedule.
+ */
 export type UserAvailabilityDocument = UserAvailability & Omit<Document<Types.ObjectId>, 'id'>;
+
+/**
+ * UserAvailability is a datasource for a user availability schedule.
+ */
 export const UserAvailabilitySchema = SchemaFactory.createForClass(UserAvailabilityClass);

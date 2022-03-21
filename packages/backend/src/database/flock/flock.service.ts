@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { FLOCK_MODEL_NAME, type Flock, type FlockDocument } from './flock.schema';
+
+/**
+ * Service for managing Flocks in the database.
+ * A Flock represents a multi-user ('flock') availability schedule.
+ */
 @Injectable()
 export class FlockService {
   constructor(@InjectModel(FLOCK_MODEL_NAME) private readonly model: Model<FlockDocument>) {}

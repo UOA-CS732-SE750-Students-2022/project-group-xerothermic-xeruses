@@ -3,6 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
 
+/**
+ * Service for managing Users in the database.
+ * A User represents a single unique person with their Flocks, availability & settings.
+ */
 @Injectable()
 export class UserService {
   constructor(@InjectModel(USER_MODEL_NAME) private readonly model: Model<UserDocument>) {}

@@ -4,6 +4,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseConfigModule } from '~/config/databaseConfig.module';
 import { type DatabaseConfig } from '~/config/databaseConfig.schema';
 
+/**
+ * Module that initializes the database.
+ */
 @Module({
   imports: [
     MongooseModule.forRootAsync({
