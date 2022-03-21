@@ -1,33 +1,31 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
-import { initializeApp } from "firebase-admin";
 import { cert, Credential, ServiceAccount } from "firebase-admin/app";
 import { getAuth } from 'firebase-admin/auth';
 import { ExtractJwt, Strategy } from "passport-firebase-jwt";
+// Do not destructure imports from firebase-admin otherwise it will break :(
+import admin from 'firebase-admin'
+import { FirebaseConfig } from "~/config";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class FirebaseAuthStrategy extends PassportStrategy(
   Strategy,
   'firebase-auth',
 ) {
-  private defaultApp: any;
-  constructor() {
+  constructor(private readonly configService: ConfigService<FirebaseConfig, true>) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
-    initializeApp({
-      credential: FirebaseAuthStrategy.getCredentials(),
+    admin.initializeApp({
+      credential: this.getCredentials(),
     });
   }
 
-  private static getCredentials(): Credential {
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) { // this will be needed when we deploy
-      return cert(
-        JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount,
-      );
-    } else {
-      return cert('../../keys/firebase.json');
-    }
+  private getCredentials(): Credential {
+    return cert(
+      JSON.parse(this.configService.get('FIREBASE_SERVICE_ACCOUNT')) as ServiceAccount,
+    );
   }
   
   async validate(token: string) {

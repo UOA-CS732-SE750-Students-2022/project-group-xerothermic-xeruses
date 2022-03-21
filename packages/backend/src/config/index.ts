@@ -1,5 +1,6 @@
 import { ObjectSchema } from 'joi';
 export * from './express';
+export * from './firebase';
 
 export function requireConfig<T>(schema: ObjectSchema<T>): (value: Record<string, unknown>) => T;
 export function requireConfig<T>(...schemas: ObjectSchema[]): (value: Record<string, unknown>) => T;

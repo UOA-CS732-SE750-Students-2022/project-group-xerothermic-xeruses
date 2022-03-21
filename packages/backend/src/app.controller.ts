@@ -3,7 +3,6 @@ import { AppService } from './app.service';
 import { Auth } from './decorators/auth.decorator';
 
 @Controller()
-@Auth()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
@@ -13,6 +12,7 @@ export class AppController {
   }
 
   @Get('/auth')
+  @Auth()
   auth(): string {
     return "Hello with Auth"
   }
