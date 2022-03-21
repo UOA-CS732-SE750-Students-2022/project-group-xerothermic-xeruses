@@ -2,14 +2,14 @@ import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Query, Types } from 'mongoose';
-import { USER_MODEL_NAME, UserDocument, UserModel, UserService } from '.';
+import { USER_MODEL_NAME, UserDocument, User, UserService } from '.';
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
   return new Types.ObjectId(id.padEnd(12, '_'));
 };
 
-const mockUser = (mock?: Partial<UserModel>): UserModel => ({
+const mockUser = (mock?: Partial<User>): User => ({
   _id: mock?._id || id('UID_Alpha'),
   name: mock?.name || '<user name Alpha>',
   flocks: [],
@@ -17,7 +17,7 @@ const mockUser = (mock?: Partial<UserModel>): UserModel => ({
   availability: [],
 });
 
-const mockUserDocument = (mock?: Partial<UserModel>): Partial<UserDocument> => ({
+const mockUserDocument = (mock?: Partial<User>): Partial<UserDocument> => ({
   _id: mock?._id || id('UID_Alpha'),
   name: mock?.name || '<user name Alpha>',
   flocks: mock?.flocks || [],

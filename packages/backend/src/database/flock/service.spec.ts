@@ -2,20 +2,20 @@ import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Query, Types } from 'mongoose';
-import { FLOCK_MODEL_NAME, FlockDocument, FlockModel, FlockService } from '.';
+import { FLOCK_MODEL_NAME, FlockDocument, Flock, FlockService } from '.';
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
   return new Types.ObjectId(id.padEnd(12, '_'));
 };
 
-const mockFlock = (mock?: Partial<FlockModel>): FlockModel => ({
+const mockFlock = (mock?: Partial<Flock>): Flock => ({
   _id: mock?._id || id('FID_Alpha'),
   name: mock?.name || '<flock name Alpha>',
   users: mock?.users || [],
 });
 
-const mockFlockDocument = (mock?: Partial<FlockModel>): Partial<FlockDocument> => ({
+const mockFlockDocument = (mock?: Partial<Flock>): Partial<FlockDocument> => ({
   _id: mock?._id || id('FID_Alpha'),
   name: mock?.name || '<flock name Alpha>',
   users: mock?.users || [],

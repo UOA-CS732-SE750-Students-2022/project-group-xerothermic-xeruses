@@ -1,22 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MSchema, Types } from 'mongoose';
-import { FlockModel } from '../flock';
+import { Flock } from '../flock';
 import { UserAvailabilityModel, UserAvailabilitySchema } from './availability';
 import { UserSettingsModel, UserSettingsSchema } from './settings';
 
 export const USER_MODEL_NAME = 'User';
 
-export interface UserModel {
+export interface User {
   _id: Types.ObjectId;
   name: string;
-  flocks: FlockModel[];
-  flockInvites: FlockModel[];
+  flocks: Flock[];
+  flockInvites: Flock[];
   availability: UserAvailabilityModel[];
   settings?: UserSettingsModel;
 }
 
 @Schema()
-class UserClass implements UserModel {
+class UserClass implements User {
   @Prop()
   _id: Types.ObjectId;
 
@@ -24,10 +24,10 @@ class UserClass implements UserModel {
   name: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flocks: FlockModel[];
+  flocks: Flock[];
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flockInvites: FlockModel[];
+  flockInvites: Flock[];
 
   @Prop({ type: [UserAvailabilitySchema], default: [] })
   availability: UserAvailabilityModel[];
@@ -35,7 +35,7 @@ class UserClass implements UserModel {
   @Prop({ type: UserSettingsSchema })
   settings?: UserSettingsModel;
 
-  constructor(user: UserModel) {
+  constructor(user: User) {
     this._id = user._id;
     this.name = user.name;
     this.flocks = user.flocks;

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { FLOCK_MODEL_NAME, FlockDocument, FlockModel } from '.';
+import { FLOCK_MODEL_NAME, FlockDocument, Flock } from '.';
 
-type FlockMaybeId = Omit<FlockModel, '_id'> & Partial<Pick<FlockModel, '_id'>>;
-type FlockWithId = Partial<FlockModel> & Pick<FlockModel, '_id'>;
+type FlockMaybeId = Omit<Flock, '_id'> & Partial<Pick<Flock, '_id'>>;
+type FlockWithId = Partial<Flock> & Pick<Flock, '_id'>;
 
 @Injectable()
 export class FlockService {

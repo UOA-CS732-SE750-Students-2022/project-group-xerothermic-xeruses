@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { USER_MODEL_NAME, UserDocument, UserModel } from '.';
+import { USER_MODEL_NAME, UserDocument, User } from '.';
 
-type UserMaybeId = Omit<UserModel, '_id'> & Partial<Pick<UserModel, '_id'>>;
-type UserWithId = Partial<UserModel> & Pick<UserModel, '_id'>;
+type UserMaybeId = Omit<User, '_id'> & Partial<Pick<User, '_id'>>;
+type UserWithId = Partial<User> & Pick<User, '_id'>;
 
 @Injectable()
 export class UserService {
