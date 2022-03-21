@@ -1,5 +1,6 @@
 {
   "extends": "@tsconfig/node16/tsconfig.json",
+  "include": ["src"],
   "compilerOptions": {
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
@@ -13,7 +14,6 @@
     "baseUrl": "./",
     "paths": {
       "~/*": ["src/*"]
-    },
-    "incremental": true
+    }
   }
 }
