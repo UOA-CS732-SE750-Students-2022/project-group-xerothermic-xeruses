@@ -4,13 +4,13 @@ import { type Document } from 'mongoose';
 export type UserSettingsTheme = 'light' | 'dark' | 'system';
 
 export interface UserSettingsModel {
-  theme: UserSettingsTheme;
+  theme?: UserSettingsTheme;
 }
 
 @Schema()
 export class UserSettings implements UserSettingsModel {
   @Prop()
-  theme: UserSettingsTheme;
+  theme?: UserSettingsTheme;
 
   constructor(userSettings: UserSettingsModel) {
     this.theme = userSettings.theme;

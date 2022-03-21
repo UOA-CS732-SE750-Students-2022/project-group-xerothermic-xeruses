@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Flock } from '../flock/flock.schema';
 import { type Document, Schema as MSchema, Types } from 'mongoose';
 import { type UserAvailabilityModel, UserAvailabilitySchema } from './userAvailability.schema';
 import { type UserSettingsModel, UserSettingsSchema } from './userSettings.schema';
@@ -9,8 +8,8 @@ export const USER_MODEL_NAME = 'User';
 export interface User {
   _id: Types.ObjectId;
   name: string;
-  flocks: Flock[];
-  flockInvites: Flock[];
+  flocks: Types.ObjectId[];
+  flockInvites: Types.ObjectId[];
   availability: UserAvailabilityModel[];
   settings?: UserSettingsModel;
 }
@@ -24,10 +23,10 @@ class UserClass implements User {
   name: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flocks: Flock[];
+  flocks: Types.ObjectId[];
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
-  flockInvites: Flock[];
+  flockInvites: Types.ObjectId[];
 
   @Prop({ type: [UserAvailabilitySchema], default: [] })
   availability: UserAvailabilityModel[];
