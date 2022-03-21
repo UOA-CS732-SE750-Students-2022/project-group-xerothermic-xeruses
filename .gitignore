@@ -10,5 +10,3 @@ dist/
 # Log files
 *-audit.json
 *.log
-
-firebase.json
