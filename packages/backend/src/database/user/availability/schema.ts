@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MSchema } from 'mongoose';
-import { NeverError } from '~/common/errors';
+import { UnreachableError } from '~/common/errors';
 
 export interface UserAvailabilityModelICal {
   type: 'ical';
@@ -46,7 +46,7 @@ export class UserAvailability {
       this.accessTokenExpiration = userAvailability.accessTokenExpiration;
       return;
     }
-    throw new NeverError(userAvailability);
+    throw new UnreachableError(userAvailability);
   }
 }
 

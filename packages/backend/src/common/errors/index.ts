@@ -1,1 +1,1 @@
-export * from './NeverError';
+export * from './UnreachableError';
