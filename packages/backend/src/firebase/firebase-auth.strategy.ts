@@ -5,8 +5,8 @@ import { getAuth } from 'firebase-admin/auth';
 import { ExtractJwt, Strategy } from "passport-firebase-jwt";
 // Do not destructure imports from firebase-admin otherwise it will break :(
 import admin from 'firebase-admin'
-import { FirebaseConfig } from "~/config";
 import { ConfigService } from "@nestjs/config";
+import { FirebaseConfig } from "~/config/firebaseConfig.schema";
 
 @Injectable()
 export class FirebaseAuthStrategy extends PassportStrategy(
