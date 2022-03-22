@@ -1,0 +1,44 @@
+name: Format Lint Typecheck Test
+
+on:
+  # Run on each push to main
+  push:
+    branches: [main]
+
+  # Run on each push to a PR
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  format-lint-typecheck-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node LTS
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+          cache: ${{ !env.ACT && 'npm' || '' }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: ⚡ Format
+        run: |
+          npm run format
+          git diff --exit-code
+
+      - name: ⚡ Lint
+        run: |
+          npm run lint
+          git diff --exit-code
+
+      - name: ⚡ Typecheck
+        run: npm run typecheck
+
+      - name: ⚡ Test
+        run: npm run test
