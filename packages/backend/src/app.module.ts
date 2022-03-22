@@ -5,7 +5,7 @@ import { ExpressConfigModule } from '~/config/expressConfig.module';
 import { LoggerModule } from '~/logger/module';
 
 @Module({
-  imports: [LoggerModule, ExpressConfigModule],
+  imports: [ExpressConfigModule, LoggerModule],
   controllers: [AppController],
   providers: [AppService],
 })
