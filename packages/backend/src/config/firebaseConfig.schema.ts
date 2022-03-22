@@ -6,5 +6,5 @@ export interface FirebaseConfig {
 }
 
 export const firebaseConfig = Joi.object<FirebaseConfig>({
-  FIREBASE_SERVICE_ACCOUNT: Joi.string(),
+  FIREBASE_SERVICE_ACCOUNT: Joi.string().required(),
 });

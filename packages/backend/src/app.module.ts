@@ -3,9 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { expressConfig, requireConfig } from '~/config';
 import { FirebaseConfigModule } from '~/config/firebaseConfig.module';
 import { FirebaseAuthStrategy } from '~/firebase/firebase-auth.strategy';
-import { expressConfig, requireConfig } from '~/config';
 import { LoggerService } from '~/logger/service';
 
 @Module({
