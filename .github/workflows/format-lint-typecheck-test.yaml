@@ -1,4 +1,4 @@
-name: Format Lint TypeCheck Test
+name: Format Lint Typecheck Test
 
 on:
   # Run on each push to main
@@ -27,18 +27,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Check - format
+      - name: ⚡ Format
         run: |
           npm run format
           git diff --exit-code
 
-      - name: Check - lint
+      - name: ⚡ Lint
         run: |
           npm run lint
           git diff --exit-code
 
-      - name: Check - types
+      - name: ⚡ Typecheck
         run: npm run typecheck
 
-      - name: Test
+      - name: ⚡ Test
         run: npm run test
