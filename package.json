@@ -21,6 +21,7 @@
     "format:staged": "lint-staged",
     "start": "lerna run --parallel start",
     "lint": "lerna run --parallel lint",
+    "typecheck": "lerna run --parallel typecheck",
     "test": "lerna run --parallel test",
     "postinstall": "lerna bootstrap",
     "prepare": "husky install"
