@@ -1,4 +1,4 @@
-name: Format Lint TypeCheck
+name: Format Lint TypeCheck Test
 
 on:
   # Run on each push to main
@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  format-lint-typecheck:
+  format-lint-typecheck-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,7 +25,7 @@ jobs:
           cache: ${{ !env.ACT && 'npm' || '' }}
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm install
 
       - name: Check - format
         run: |
@@ -39,3 +39,6 @@ jobs:
 
       - name: Check - types
         run: npm run typecheck
+
+      - name: Test
+        run: npm run test
