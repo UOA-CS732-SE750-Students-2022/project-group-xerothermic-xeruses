@@ -14,6 +14,6 @@ export class AppController {
   @Get('/auth')
   @Auth()
   auth(): string {
-    return "Hello with Auth"
+    return 'Hello with Auth';
   }
 }
