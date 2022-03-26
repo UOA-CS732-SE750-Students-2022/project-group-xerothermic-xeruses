@@ -27,7 +27,8 @@ export type UserAvailability = UserAvailabilityGoogleCalendar | UserAvailability
 // Type validation for UserAvailabilityClass.
 // Requires that all attributes from each type of UserAvailability* are present in UserAvailabilityClass.
 type NoType<T> = { [P in keyof Omit<T, 'type'>]: T[P] | undefined };
-type UserAvailabilityClassT = { type: string } & NoType<UserAvailabilityGoogleCalendar> & NoType<UserAvailabilityICal>;
+export type UserAvailabilityClassT = { type: string } & NoType<UserAvailabilityGoogleCalendar> &
+  NoType<UserAvailabilityICal>;
 
 @Schema()
 class UserAvailabilityClass implements UserAvailabilityClassT {

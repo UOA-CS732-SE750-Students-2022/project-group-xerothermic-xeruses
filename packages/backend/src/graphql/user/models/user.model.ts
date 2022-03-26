@@ -1,22 +1,23 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { type Types } from 'mongoose';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Types } from 'mongoose';
 import { User } from '~/database/user/user.schema';
 import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserAvailabilityGraphqlSchema } from './userAvailability.model';
 
 @ObjectType()
 export class UserGraphqlSchema implements User {
-  @Field(() => Int)
+  @Field(() => ID)
   id!: number;
 
   @Field()
   name!: string;
 
-  @Field()
+  @Field(() => [ID])
   flocks!: Types.ObjectId[];
 
-  @Field()
+  @Field(() => [ID])
   flockInvites!: Types.ObjectId[];
 
-  @Field()
+  @Field(() => [UserAvailabilityGraphqlSchema])
   availability!: UserAvailability[];
 }
