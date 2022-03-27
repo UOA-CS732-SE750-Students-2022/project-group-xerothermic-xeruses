@@ -1,4 +1,5 @@
-import { Resolver, Int, Args, Query } from '@nestjs/graphql';
+import { Resolver, Args, Query } from '@nestjs/graphql';
+import { GraphQLString } from 'graphql';
 import { UserGraphQLModel } from './models/user.model';
 import { UserService } from '~/database/user/user.service';
 
@@ -6,13 +7,13 @@ import { UserService } from '~/database/user/user.service';
 export class UserResolver {
   constructor(private userService: UserService) {}
 
-  @Query(() => UserGraphQLModel, { name: 'user' })
-  async getUser(@Args('id', { type: () => Int }) _id: number) {
-    throw new Error('Stub');
+  @Query(() => UserGraphQLModel)
+  async getUser(@Args('id', { type: () => GraphQLString }) id: string) {
+    return this.userService.findOne(id);
   }
 
   @Query(() => [UserGraphQLModel])
-  async users() {
-    throw new Error('Stub');
+  async getUsers() {
+    return this.userService.findAll();
   }
 }

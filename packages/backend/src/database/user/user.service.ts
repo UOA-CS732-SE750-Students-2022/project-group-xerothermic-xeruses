@@ -15,7 +15,7 @@ export class UserService {
     return this.model.create(user);
   }
 
-  async delete(_id: Types.ObjectId): Promise<UserDocument | null> {
+  async delete(_id: Types.ObjectId | string): Promise<UserDocument | null> {
     return this.model.findByIdAndRemove({ _id }).exec();
   }
 
@@ -23,11 +23,11 @@ export class UserService {
     return this.model.find().exec();
   }
 
-  async findOne(_id: Types.ObjectId): Promise<UserDocument | null> {
+  async findOne(_id: Types.ObjectId | string): Promise<UserDocument | null> {
     return this.model.findById({ _id }).exec();
   }
 
-  async update(_id: Types.ObjectId, user: Partial<User>): Promise<UserDocument | null> {
+  async update(_id: Types.ObjectId | string, user: Partial<User>): Promise<UserDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, user).exec();
   }
 }
