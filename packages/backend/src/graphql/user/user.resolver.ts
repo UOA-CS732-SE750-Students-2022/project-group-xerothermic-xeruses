@@ -1,13 +1,13 @@
 import { Resolver, Int, Args, Query } from '@nestjs/graphql';
-import { UserService } from '~/database/user/user.service';
 import { UserGraphqlSchema } from './models/user.model';
+import { UserService } from '~/database/user/user.service';
 
 @Resolver(() => UserGraphqlSchema)
 export class UserResolver {
   constructor(private userService: UserService) {}
 
   @Query(() => UserGraphqlSchema, { name: 'user' })
-  async getUser(@Args('id', { type: () => Int }) id: number) {
+  async getUser(@Args('id', { type: () => Int }) _id: number) {
     throw new Error('Stub');
   }
 

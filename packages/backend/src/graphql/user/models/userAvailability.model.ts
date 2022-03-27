@@ -1,4 +1,4 @@
-import { createUnionType, Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
+import { createUnionType, Field, ObjectType } from '@nestjs/graphql';
 import { UserAvailabilityClassT } from '~/database/user/userAvailability.schema';
 
 @ObjectType()
