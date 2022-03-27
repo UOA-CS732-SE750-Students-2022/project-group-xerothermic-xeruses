@@ -12,12 +12,15 @@ export class UserGraphQLModel implements User {
   @Field()
   name!: string;
 
+  // TODO: this should resolve to a populated Flock.
   @Field(() => [ID])
   flocks!: Types.ObjectId[];
 
+  // TODO: this should resolve to populated Flocks.
   @Field(() => [ID])
   flockInvites!: Types.ObjectId[];
 
+  // TODO(mattm): this should never be exposed to any user since it contains secrets.
   @Field(() => [UserAvailabilityGraphQLModel])
   availability!: UserAvailability[];
 }

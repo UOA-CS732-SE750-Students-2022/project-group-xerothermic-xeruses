@@ -7,15 +7,15 @@ export class UserAvailabilityGraphQLModel implements UserAvailabilityPartial {
   @Field({ nullable: false })
   type!: string;
 
-  @Field(() => GraphQLString)
+  @Field(() => GraphQLString, { nullable: true })
   uri: string | undefined;
 
-  @Field(() => GraphQLString)
+  @Field(() => GraphQLString, { nullable: true })
   refreshToken: string | undefined;
 
-  @Field(() => GraphQLString)
+  @Field(() => GraphQLString, { nullable: true })
   accessToken: string | undefined;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   accessTokenExpiration: Date | undefined;
 }
