@@ -1,13 +1,15 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 import { UserAvailabilityGraphQLModel } from './userAvailability.model';
+import { UserSettingsGraphQLModel } from './userSettings.model';
 import { User } from '~/database/user/user.schema';
 import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserSettings } from '~/database/user/userSettings.schema';
 
 @ObjectType()
 export class UserGraphQLModel implements User {
   @Field(() => ID)
-  id!: number;
+  id!: Types.ObjectId | undefined;
 
   @Field()
   name!: string;
@@ -23,4 +25,7 @@ export class UserGraphQLModel implements User {
   // TODO(mattm): this should never be exposed to any user since it contains secrets.
   @Field(() => [UserAvailabilityGraphQLModel])
   availability!: UserAvailability[];
+
+  @Field(() => UserSettingsGraphQLModel, { nullable: true })
+  settings: UserSettings | undefined;
 }
