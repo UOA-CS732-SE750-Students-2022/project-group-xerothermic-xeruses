@@ -20,7 +20,20 @@ module.exports = {
     '@typescript-eslint/no-inferrable-types': ['warn', { ignoreParameters: true }],
     'no-mixed-operators': 'error',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_+', varsIgnorePattern: '^_+' }],
-    'import/order': ['warn', { alphabetize: { order: 'asc', caseInsensitive: true }, 'newlines-between': 'never' }],
+    'import/order': [
+      'warn',
+      {
+        alphabetize: { order: 'asc', caseInsensitive: true },
+        'newlines-between': 'never',
+        pathGroups: [
+          {
+            pattern: '~/**',
+            group: 'external',
+            position: 'after',
+          },
+        ],
+      },
+    ],
     'prefer-destructuring': 'warn',
     'prefer-template': 'warn',
   },
