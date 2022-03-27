@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { type Document, Schema as MSchema, type Types } from 'mongoose';
-import { type UserAvailability, UserAvailabilitySchema } from './userAvailability.schema';
+import {
+  type UserAvailability,
+  UserAvailabilitySchema,
+  registerUserAvailabilityDiscriminators,
+} from './userAvailability.schema';
 import { type UserSettings, UserSettingsSchema } from './userSettings.schema';
 
 export const USER_MODEL_NAME = 'User';
@@ -43,3 +47,4 @@ export type UserDocument = User & Omit<Document<Types.ObjectId>, 'id'>;
  * A User represents a single unique person with their Flocks, availability & settings.
  */
 export const UserSchema = SchemaFactory.createForClass(UserClass);
+registerUserAvailabilityDiscriminators(UserSchema.path('availability'));
