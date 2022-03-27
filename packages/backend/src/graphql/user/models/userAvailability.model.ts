@@ -1,25 +1,21 @@
-import { createUnionType, Field, ObjectType } from '@nestjs/graphql';
-import { UserAvailabilityClassT } from '~/database/user/userAvailability.schema';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { GraphQLString } from 'graphql';
+import { UserAvailabilityPartial } from '~/database/user/userAvailability.schema';
 
 @ObjectType()
-export class UserAvailabilityGraphqlSchema implements UserAvailabilityClassT {
-  @Field()
+export class UserAvailabilityGraphQLModel implements UserAvailabilityPartial {
+  @Field({ nullable: false })
   type!: string;
 
-  @Field()
+  @Field(() => GraphQLString)
   uri: string | undefined;
 
-  @Field()
+  @Field(() => GraphQLString)
   refreshToken: string | undefined;
 
-  @Field()
+  @Field(() => GraphQLString)
   accessToken: string | undefined;
 
-  @Field(() => UserAvailabilityDateUnion)
+  @Field(() => Date)
   accessTokenExpiration: Date | undefined;
 }
-
-const UserAvailabilityDateUnion = createUnionType({
-  name: 'UserAvailabilityDate',
-  types: () => [Date, undefined] as const,
-});
