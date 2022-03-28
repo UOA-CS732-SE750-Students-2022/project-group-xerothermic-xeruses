@@ -7,9 +7,9 @@ import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import Graceful from 'node-graceful';
-import { AppModule } from './app.module';
 import { ExpressConfig } from '~/config/expressConfig.schema';
 import { LoggerService } from '~/logger/service';
+import { AppModule } from './app.module';
 
 const log = new LoggerService('Main');
 
