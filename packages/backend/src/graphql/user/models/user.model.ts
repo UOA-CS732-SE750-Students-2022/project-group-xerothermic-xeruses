@@ -1,10 +1,10 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Types } from 'mongoose';
-import { UserAvailabilityGraphQLModel } from './userAvailability.model';
-import { UserSettingsGraphQLModel } from './userSettings.model';
 import { User } from '~/database/user/user.schema';
 import { UserAvailability } from '~/database/user/userAvailability.schema';
 import { UserSettings } from '~/database/user/userSettings.schema';
+import { UserAvailabilityGraphQLModel } from './userAvailability.model';
+import { UserSettingsGraphQLModel } from './userSettings.model';
 
 @ObjectType()
 export class UserGraphQLModel implements User {
