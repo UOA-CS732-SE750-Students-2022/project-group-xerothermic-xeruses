@@ -1,15 +1,25 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
 import { PassportModule } from '@nestjs/passport';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ExpressConfigModule } from '~/config/expressConfig.module';
 import { FirebaseConfigModule } from '~/config/firebaseConfig.module';
 import { FirebaseAuthStrategy } from '~/firebase/firebase-auth.strategy';
+import { UserGraphqlModule } from '~/graphql/user/user.module';
 import { LoggerModule } from '~/logger/module';
 
 @Module({
-  imports: [ExpressConfigModule, LoggerModule, FirebaseConfigModule, PassportModule],
-  controllers: [AppController],
-  providers: [AppService, FirebaseAuthStrategy],
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+    }),
+    ExpressConfigModule,
+    LoggerModule,
+    FirebaseConfigModule,
+    PassportModule,
+    UserGraphqlModule,
+  ],
+  providers: [FirebaseAuthStrategy],
 })
 export class AppModule {}

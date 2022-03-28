@@ -15,7 +15,7 @@ export class FlockService {
     return this.model.create(flock);
   }
 
-  async delete(_id: Types.ObjectId): Promise<FlockDocument | null> {
+  async delete(_id: Types.ObjectId | string): Promise<FlockDocument | null> {
     return this.model.findByIdAndRemove({ _id }).exec();
   }
 
@@ -23,11 +23,11 @@ export class FlockService {
     return this.model.find().exec();
   }
 
-  async findOne(_id: Types.ObjectId): Promise<FlockDocument | null> {
+  async findOne(_id: Types.ObjectId | string): Promise<FlockDocument | null> {
     return this.model.findById({ _id }).exec();
   }
 
-  async update(_id: Types.ObjectId, flock: Partial<Flock>): Promise<FlockDocument | null> {
+  async update(_id: Types.ObjectId | string, flock: Partial<Flock>): Promise<FlockDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, flock).exec();
   }
 }

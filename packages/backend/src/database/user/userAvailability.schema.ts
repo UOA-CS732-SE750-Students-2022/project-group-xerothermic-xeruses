@@ -1,22 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { type Document, Schema as MSchema, type Types } from 'mongoose';
+import {
+  UserAvailabilityGoogleCalendar,
+  UserAvailabilityGoogleCalendarSchema,
+  USER_AVAILABILITY_GOOGLE_CALENDAR,
+} from './userAvailabilityGoogleCalendar.schema';
+import {
+  UserAvailabilityICal,
+  UserAvailabilityICalSchema,
+  USER_AVAILABILITY_ICAL,
+} from './userAvailabilityICal.schema';
+
+const userAvailabilityDiscriminators: Record<string, MSchema<Document>> = {
+  [USER_AVAILABILITY_GOOGLE_CALENDAR]: UserAvailabilityGoogleCalendarSchema,
+  [USER_AVAILABILITY_ICAL]: UserAvailabilityICalSchema,
+};
 
 /**
- * Google Calendar datasource for user availability.
+ * This function must be called to register discriminators for each array of UserAvailability.
  */
-export interface UserAvailabilityGoogleCalendar {
-  type: 'googlecalendar';
-  refreshToken: string;
-  accessToken: string;
-  accessTokenExpiration: Date;
-}
-
-/**
- * ICal format URI datasource for user availability.
- */
-export interface UserAvailabilityICal {
-  type: 'ical';
-  uri: string;
+export function registerUserAvailabilityDiscriminators(array: MSchema.Types.DocumentArray): void {
+  Object.entries(userAvailabilityDiscriminators).forEach(([key, schema]) => array.discriminator(key, schema));
 }
 
 /**
@@ -24,26 +28,16 @@ export interface UserAvailabilityICal {
  */
 export type UserAvailability = UserAvailabilityGoogleCalendar | UserAvailabilityICal;
 
-// Type validation for UserAvailabilityClass.
-// Requires that all attributes from each type of UserAvailability* are present in UserAvailabilityClass.
+// Type validation for UserAvailability.
+// Requires that all attributes from each type of UserAvailability* are present in UserAvailabilityPartial.
 type NoType<T> = { [P in keyof Omit<T, 'type'>]: T[P] | undefined };
-type UserAvailabilityClassT = { type: string } & NoType<UserAvailabilityGoogleCalendar> & NoType<UserAvailabilityICal>;
+export type UserAvailabilityPartial = { type: string } & NoType<UserAvailabilityGoogleCalendar> &
+  NoType<UserAvailabilityICal>;
 
-@Schema()
-class UserAvailabilityClass implements UserAvailabilityClassT {
+@Schema({ discriminatorKey: 'type' })
+class UserAvailabilityClass /* implements UserAvailability */ {
+  @Prop({ type: String, required: true, enum: Object.keys(userAvailabilityDiscriminators) })
   type!: string;
-
-  @Prop({ type: MSchema.Types.String })
-  uri: string | undefined;
-
-  @Prop({ type: MSchema.Types.String })
-  refreshToken: string | undefined;
-
-  @Prop({ type: MSchema.Types.String })
-  accessToken: string | undefined;
-
-  @Prop({ type: MSchema.Types.Date })
-  accessTokenExpiration: Date | undefined;
 }
 
 /**
