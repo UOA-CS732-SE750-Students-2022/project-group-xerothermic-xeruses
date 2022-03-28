@@ -9,7 +9,7 @@ import { UserSettings } from '~/database/user/userSettings.schema';
 @ObjectType()
 export class UserGraphQLModel implements User {
   @Field(() => ID)
-  id!: Types.ObjectId | undefined;
+  id!: Types.ObjectId;
 
   @Field()
   name!: string;

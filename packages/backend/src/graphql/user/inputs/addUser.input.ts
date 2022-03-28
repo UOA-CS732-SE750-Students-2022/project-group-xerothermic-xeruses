@@ -11,13 +11,13 @@ export class AddUserInput implements User {
   @Field()
   name!: string;
 
-  @Field(() => [ID])
+  @Field(() => [ID], { nullable: true })
   flocks!: Types.ObjectId[];
 
-  @Field(() => [ID])
+  @Field(() => [ID], { nullable: true })
   flockInvites!: Types.ObjectId[];
 
-  @Field(() => [UserAvailabilityInput])
+  @Field(() => [UserAvailabilityInput], { nullable: true })
   availability!: UserAvailability[];
 
   @Field(() => UserSettingsInput, { nullable: true })
