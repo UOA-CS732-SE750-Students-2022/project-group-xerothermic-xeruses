@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 
 const firebaseConfigEnv = process.env.REACT_APP_FIREBASE_CONFIG_JSON;
 if (!firebaseConfigEnv) {
-  throw new ReferenceError('FIREBASE_CONFIG_JSON is not defined.');
+  throw new ReferenceError('REACT_APP_FIREBASE_CONFIG_JSON is not defined.');
 }
 
 const firebaseConfig = JSON.parse(firebaseConfigEnv);
