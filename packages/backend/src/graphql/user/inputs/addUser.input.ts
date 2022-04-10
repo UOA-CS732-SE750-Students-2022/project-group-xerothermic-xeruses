@@ -8,7 +8,7 @@ import { UserSettingsInput } from './common/userSettings.input';
 
 @InputType()
 export class AddUserInput implements User {
-  @Field()
+  @Field({ nullable: false })
   name!: string;
 
   @Field(() => [ID], { nullable: true })
