@@ -21,5 +21,5 @@ export class AddUserInput implements User {
   availability!: UserAvailability[];
 
   @Field(() => UserSettingsInput, { nullable: true })
-  settings: UserSettings | undefined;
+  settings?: UserSettings;
 }
