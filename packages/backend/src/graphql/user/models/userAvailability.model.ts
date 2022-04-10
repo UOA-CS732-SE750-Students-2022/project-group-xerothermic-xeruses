@@ -4,7 +4,7 @@ import { UserAvailabilityPartial } from '~/database/user/userAvailability.schema
 
 @ObjectType()
 export class UserAvailabilityGraphQLModel implements UserAvailabilityPartial {
-  @Field({ nullable: false })
+  @Field()
   type!: string;
 
   @Field(() => GraphQLString, { nullable: true })
