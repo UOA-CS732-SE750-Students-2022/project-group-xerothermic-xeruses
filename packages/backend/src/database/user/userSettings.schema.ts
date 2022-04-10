@@ -19,7 +19,7 @@ export interface UserSettings {
 
 @Schema()
 class UserSettingsClass implements UserSettings {
-  @Prop()
+  @Prop({ required: false })
   theme?: UserSettingsTheme;
 }
 

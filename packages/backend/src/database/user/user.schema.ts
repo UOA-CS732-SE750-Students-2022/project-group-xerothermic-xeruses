@@ -22,7 +22,7 @@ export interface User {
 
 @Schema()
 class UserClass implements User {
-  @Prop()
+  @Prop({ required: true })
   name!: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
@@ -34,7 +34,7 @@ class UserClass implements User {
   @Prop({ type: [UserAvailabilitySchema], default: [] })
   availability!: UserAvailability[];
 
-  @Prop({ type: UserSettingsSchema })
+  @Prop({ type: UserSettingsSchema, required: false })
   settings?: UserSettings;
 }
 

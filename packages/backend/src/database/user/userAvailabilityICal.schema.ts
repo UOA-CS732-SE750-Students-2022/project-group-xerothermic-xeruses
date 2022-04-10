@@ -18,7 +18,7 @@ export interface UserAvailabilityICal {
 class UserAvailabilityICalClass implements UserAvailabilityICal {
   type: typeof USER_AVAILABILITY_ICAL = USER_AVAILABILITY_ICAL;
 
-  @Prop()
+  @Prop({ required: true })
   uri!: string;
 }
 
