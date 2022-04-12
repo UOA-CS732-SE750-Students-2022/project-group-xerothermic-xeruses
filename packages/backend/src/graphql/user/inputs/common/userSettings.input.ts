@@ -1,8 +1,12 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 import { UserSettings, UserSettingsTheme } from '~/database/user/userSettings.schema';
+
+registerEnumType(UserSettingsTheme, {
+  name: 'UserSettingsTheme',
+});
 
 @InputType()
 export class UserSettingsInput implements UserSettings {
-  @Field({ nullable: false })
-  theme!: UserSettingsTheme;
+  @Field(() => UserSettingsTheme, { nullable: true })
+  theme?: UserSettingsTheme;
 }

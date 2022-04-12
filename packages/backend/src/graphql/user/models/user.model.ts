@@ -8,22 +8,22 @@ import { UserSettingsGraphQLModel } from './userSettings.model';
 
 @ObjectType()
 export class UserGraphQLModel implements User {
-  @Field(() => ID)
+  @Field(() => ID, { nullable: false })
   id!: Types.ObjectId;
 
-  @Field()
+  @Field({ nullable: false })
   name!: string;
 
   // TODO: this should resolve to a populated Flock.
-  @Field(() => [ID])
+  @Field(() => [ID], { nullable: false })
   flocks!: Types.ObjectId[];
 
   // TODO: this should resolve to populated Flocks.
-  @Field(() => [ID])
+  @Field(() => [ID], { nullable: false })
   flockInvites!: Types.ObjectId[];
 
   // TODO(mattm): this should never be exposed to any user since it contains secrets.
-  @Field(() => [UserAvailabilityGraphQLModel])
+  @Field(() => [UserAvailabilityGraphQLModel], { nullable: false })
   availability!: UserAvailability[];
 
   @Field(() => UserSettingsGraphQLModel, { nullable: true })

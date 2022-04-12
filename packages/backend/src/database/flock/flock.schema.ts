@@ -13,10 +13,10 @@ export interface Flock {
 
 @Schema()
 class FlockClass implements Flock {
-  @Prop()
+  @Prop({ required: true })
   name!: string;
 
-  @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', default: [] })
+  @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', required: true })
   users!: Types.ObjectId[];
 }
 

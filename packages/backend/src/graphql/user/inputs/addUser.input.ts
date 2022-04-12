@@ -8,7 +8,7 @@ import { UserSettingsInput } from './common/userSettings.input';
 
 @InputType()
 export class AddUserInput implements User {
-  @Field()
+  @Field({ nullable: false })
   name!: string;
 
   @Field(() => [ID], { nullable: true })
@@ -21,5 +21,5 @@ export class AddUserInput implements User {
   availability!: UserAvailability[];
 
   @Field(() => UserSettingsInput, { nullable: true })
-  settings: UserSettings | undefined;
+  settings?: UserSettings;
 }

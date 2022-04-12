@@ -20,13 +20,13 @@ export interface UserAvailabilityGoogleCalendar {
 class UserAvailabilityGoogleCalendarClass implements UserAvailabilityGoogleCalendar {
   type: typeof USER_AVAILABILITY_GOOGLE_CALENDAR = USER_AVAILABILITY_GOOGLE_CALENDAR;
 
-  @Prop()
+  @Prop({ required: true })
   refreshToken!: string;
 
-  @Prop()
+  @Prop({ required: true })
   accessToken!: string;
 
-  @Prop()
+  @Prop({ required: true })
   accessTokenExpiration!: Date;
 }
 

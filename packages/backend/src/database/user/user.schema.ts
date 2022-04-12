@@ -22,19 +22,19 @@ export interface User {
 
 @Schema()
 class UserClass implements User {
-  @Prop()
+  @Prop({ required: true })
   name!: string;
 
-  @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
+  @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', required: true })
   flocks!: Types.ObjectId[];
 
-  @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', default: [] })
+  @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', required: true })
   flockInvites!: Types.ObjectId[];
 
-  @Prop({ type: [UserAvailabilitySchema], default: [] })
+  @Prop({ type: [UserAvailabilitySchema], required: true })
   availability!: UserAvailability[];
 
-  @Prop({ type: UserSettingsSchema })
+  @Prop({ type: UserSettingsSchema, required: false })
   settings?: UserSettings;
 }
 
