@@ -23,6 +23,14 @@ export class FlockService {
     return this.model.find().exec();
   }
 
+  async findMany(_ids: (Types.ObjectId | string)[]): Promise<FlockDocument[]> {
+    return this.model
+      .find({
+        _id: { $in: _ids },
+      })
+      .exec();
+  }
+
   async findOne(_id: Types.ObjectId | string): Promise<FlockDocument | null> {
     return this.model.findById({ _id }).exec();
   }
