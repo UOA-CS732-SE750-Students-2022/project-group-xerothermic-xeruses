@@ -1,12 +1,12 @@
-import { UserSettings, UserSettingsTheme } from '@flocker/api-types';
+import { UserSettingsDTO, UserSettingsThemeDTO } from '@flocker/api-types';
 import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 
-registerEnumType(UserSettingsTheme, {
+registerEnumType(UserSettingsThemeDTO, {
   name: 'UserSettingsTheme',
 });
 
 @InputType()
-export class UserSettingsInput implements UserSettings {
-  @Field(() => UserSettingsTheme, { nullable: true })
-  theme?: UserSettingsTheme;
+export class UserSettingsInput implements Partial<UserSettingsDTO> {
+  @Field(() => UserSettingsThemeDTO, { nullable: true })
+  theme?: UserSettingsThemeDTO;
 }

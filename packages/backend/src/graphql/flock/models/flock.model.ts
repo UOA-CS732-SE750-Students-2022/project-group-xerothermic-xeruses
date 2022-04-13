@@ -1,9 +1,9 @@
-import type { Flock, User } from '@flocker/api-types';
+import type { FlockDTO, UserDTO } from '@flocker/api-types';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { UserGraphQLModel } from '../../user/models/user.model';
 
 @ObjectType()
-export class FlockGraphQLModel implements Flock {
+export class FlockGraphQLModel implements FlockDTO {
   @Field({ nullable: false })
   id!: string;
 
@@ -11,5 +11,5 @@ export class FlockGraphQLModel implements Flock {
   name!: string;
 
   @Field(() => [UserGraphQLModel], { nullable: false })
-  users!: User[];
+  users!: UserDTO[];
 }

@@ -1,9 +1,9 @@
-import { UserAvailability } from '@flocker/api-types';
+import { UserAvailabilityDTO } from '@flocker/api-types';
 import { Field, InputType } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql';
 
 @InputType()
-export class UserAvailabilityInput implements UserAvailabilityPartial {
+export class UserAvailabilityInput implements Partial<Omit<UserAvailabilityDTO, 'type'>> {
   @Field({ nullable: false })
   type!: string;
 

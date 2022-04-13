@@ -1,15 +1,15 @@
-import type { Flock } from './flock';
-import type { UserAvailability } from './useravailability';
-import type { UserSettings } from './usersettings';
+import type { FlockDTO } from './flock';
+import type { UserAvailabilityDTO } from './useravailability';
+import type { UserSettingsDTO } from './usersettings';
 
 /**
  * A User represents a single unique person with their Flocks, availability & settings.
  */
-export interface User {
+export interface UserDTO {
   id: string;
   name: string;
-  flocks: Flock[];
-  flockInvites: Flock[];
-  availability: UserAvailability[];
-  settings?: UserSettings;
+  flocks: FlockDTO[];
+  flockInvites: FlockDTO[];
+  availability: UserAvailabilityDTO[];
+  settings?: UserSettingsDTO;
 }

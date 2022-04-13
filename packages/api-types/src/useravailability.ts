@@ -1,10 +1,10 @@
-import type { UserAvailabilityGoogleCalendar } from './useravailabilitygooglecalendar';
-import type { UserAvailabilityICal } from './useravailabilityical';
+import type { UserAvailabilityGoogleCalendarDTO } from './useravailabilitygooglecalendar';
+import type { UserAvailabilityICalDTO } from './useravailabilityical';
 
-export type UserAvailability = UserAvailabilityGoogleCalendar | UserAvailabilityICal;
+export type UserAvailabilityDTO = UserAvailabilityGoogleCalendarDTO | UserAvailabilityICalDTO;
 
 // Type validation for UserAvailability.
 // Requires that all attributes from each type of UserAvailability* are present in UserAvailabilityPartial.
 type NoType<T> = { [P in keyof Omit<T, 'type'>]: T[P] | undefined };
-export type UserAvailabilityPartial = { type: string } & NoType<UserAvailabilityGoogleCalendar> &
-  NoType<UserAvailabilityICal>;
+export type UserAvailabilityPartialDTO = { type: string } & NoType<UserAvailabilityGoogleCalendarDTO> &
+  NoType<UserAvailabilityICalDTO>;
