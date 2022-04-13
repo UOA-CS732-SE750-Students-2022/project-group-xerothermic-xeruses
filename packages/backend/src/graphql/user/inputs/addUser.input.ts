@@ -1,23 +1,8 @@
-import { InputType, Field, ID } from '@nestjs/graphql';
-import { Types } from 'mongoose';
-import { UserAvailabilityInput } from './common/userAvailability.input';
-import { User, UserSettings } from '@flocker/api-types';
-import { UserSettingsInput } from './common/userSettings.input';
+import { AddUserInputDTO } from '@flocker/api-types';
+import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
-export class AddUserInput implements User {
+export class AddUserInput implements AddUserInputDTO {
   @Field({ nullable: false })
   name!: string;
-
-  @Field(() => [ID], { nullable: true })
-  flocks!: Types.ObjectId[];
-
-  @Field(() => [ID], { nullable: true })
-  flockInvites!: Types.ObjectId[];
-
-  @Field(() => [UserAvailabilityInput], { nullable: true })
-  availability!: UserAvailability[];
-
-  @Field(() => UserSettingsInput, { nullable: true })
-  settings?: UserSettings;
 }

@@ -1,12 +1,8 @@
-import { InputType, Field, ID } from '@nestjs/graphql';
-import { Types } from 'mongoose';
-import { Flock } from '@flocker/api-types';
+import { AddFlockInputDTO } from '@flocker/api-types';
+import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
-export class AddFlockInput implements Flock {
+export class AddFlockInput implements AddFlockInputDTO {
   @Field({ nullable: false })
   name!: string;
-
-  @Field(() => [ID], { nullable: true })
-  users!: Types.ObjectId[];
 }

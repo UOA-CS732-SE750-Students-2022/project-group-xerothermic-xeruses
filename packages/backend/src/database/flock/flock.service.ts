@@ -11,8 +11,8 @@ import { FLOCK_MODEL_NAME, type Flock, type FlockDocument } from './flock.schema
 export class FlockService {
   constructor(@InjectModel(FLOCK_MODEL_NAME) private readonly model: Model<FlockDocument>) {}
 
-  async create(flock: Flock): Promise<FlockDocument> {
-    return this.model.create(flock);
+  async create(flock: Omit<Flock, 'users'>): Promise<FlockDocument> {
+    return this.model.create({ ...flock, users: [] });
   }
 
   async delete(_id: Types.ObjectId | string): Promise<FlockDocument | null> {
