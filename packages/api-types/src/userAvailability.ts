@@ -1,5 +1,5 @@
-import type { UserAvailabilityGoogleCalendarDTO } from './useravailabilitygooglecalendar';
-import type { UserAvailabilityICalDTO } from './useravailabilityical';
+import type { UserAvailabilityGoogleCalendarDTO } from './userAvailabilityGoogleCalendar';
+import type { UserAvailabilityICalDTO } from './userAvailabilityICal';
 
 export type UserAvailabilityDTO = UserAvailabilityGoogleCalendarDTO | UserAvailabilityICalDTO;
 
