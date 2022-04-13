@@ -1,12 +1,12 @@
+import { UserSettingsDTO, UserSettingsThemeDTO } from '@flocker/api-types';
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { UserSettings, UserSettingsTheme } from '~/database/user/userSettings.schema';
 
-registerEnumType(UserSettingsTheme, {
+registerEnumType(UserSettingsThemeDTO, {
   name: 'UserSettingsTheme',
 });
 
 @ObjectType()
-export class UserSettingsGraphQLModel implements UserSettings {
-  @Field(() => UserSettingsTheme, { nullable: true })
-  theme?: UserSettingsTheme;
+export class UserSettingsGraphQLModel implements UserSettingsDTO {
+  @Field(() => UserSettingsThemeDTO, { nullable: true })
+  theme?: UserSettingsThemeDTO;
 }

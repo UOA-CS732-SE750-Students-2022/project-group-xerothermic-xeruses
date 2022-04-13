@@ -1,8 +1,8 @@
-import { AddUserInputDTO } from '@flocker/api-types';
+import { AddFlockInputDTO } from '@flocker/api-types';
 import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
-export class AddUserInput implements AddUserInputDTO {
+export class AddFlockInput implements AddFlockInputDTO {
   @Field({ nullable: false })
   name!: string;
 }

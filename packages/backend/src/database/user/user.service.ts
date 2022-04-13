@@ -11,8 +11,8 @@ import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
 export class UserService {
   constructor(@InjectModel(USER_MODEL_NAME) private readonly model: Model<UserDocument>) {}
 
-  async create(user: User): Promise<UserDocument> {
-    return this.model.create(user);
+  async create(user: Omit<User, 'flocks' | 'flockInvites' | 'availability' | 'settings'>): Promise<UserDocument> {
+    return this.model.create({ ...user, flocks: [], flockInvites: [], availability: [], settings: {} });
   }
 
   async delete(_id: Types.ObjectId | string): Promise<UserDocument | null> {
@@ -21,6 +21,14 @@ export class UserService {
 
   async findAll(): Promise<UserDocument[]> {
     return this.model.find().exec();
+  }
+
+  async findMany(_ids: (Types.ObjectId | string)[]): Promise<UserDocument[]> {
+    return this.model
+      .find({
+        _id: { $in: _ids },
+      })
+      .exec();
   }
 
   async findOne(_id: Types.ObjectId | string): Promise<UserDocument | null> {

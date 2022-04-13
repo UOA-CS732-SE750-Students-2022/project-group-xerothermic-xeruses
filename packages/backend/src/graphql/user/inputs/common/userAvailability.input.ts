@@ -1,21 +1,21 @@
+import { UserAvailabilityCombinedDTO } from '@flocker/api-types';
 import { Field, InputType } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql';
-import { UserAvailabilityPartial } from '~/database/user/userAvailability.schema';
 
 @InputType()
-export class UserAvailabilityInput implements UserAvailabilityPartial {
+export class UserAvailabilityInput implements Partial<UserAvailabilityCombinedDTO> {
   @Field({ nullable: false })
   type!: string;
 
   @Field(() => GraphQLString, { nullable: true })
-  uri: string | undefined;
+  uri?: string;
 
   @Field(() => GraphQLString, { nullable: true })
-  refreshToken: string | undefined;
+  refreshToken?: string;
 
   @Field(() => GraphQLString, { nullable: true })
-  accessToken: string | undefined;
+  accessToken?: string;
 
   @Field(() => Date, { nullable: true })
-  accessTokenExpiration: Date | undefined;
+  accessTokenExpiration?: Date;
 }
