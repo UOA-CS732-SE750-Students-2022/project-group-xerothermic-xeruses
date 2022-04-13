@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "description": "Typings for the frontend/backend API.",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "prebuild": "rimraf dist",
     "build": "tsc",
+    "clean": "rimraf dist",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "typecheck": "tsc --noEmit"
