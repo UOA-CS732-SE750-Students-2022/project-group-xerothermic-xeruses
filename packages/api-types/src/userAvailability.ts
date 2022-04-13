@@ -1,10 +1,13 @@
+import { MaybeUndefined } from './common';
 import type { UserAvailabilityGoogleCalendarDTO } from './userAvailabilityGoogleCalendar';
 import type { UserAvailabilityICalDTO } from './userAvailabilityICal';
 
 export type UserAvailabilityDTO = UserAvailabilityGoogleCalendarDTO | UserAvailabilityICalDTO;
 
-// Type validation for UserAvailability.
-// Requires that all attributes from each type of UserAvailability* are present in UserAvailabilityPartial.
-type NoType<T> = { [P in keyof Omit<T, 'type'>]: T[P] | undefined };
-export type UserAvailabilityPartialDTO = { type: string } & NoType<UserAvailabilityGoogleCalendarDTO> &
+// Requires that all attributes from UserAvailability* are present in UserAvailabilityCombined.
+type NoType<T> = Omit<T, 'type'>;
+export type UserAvailabilityCombinedDTO = { type: string } & NoType<UserAvailabilityGoogleCalendarDTO> &
   NoType<UserAvailabilityICalDTO>;
+
+// Requires that all attributes from UserAvailabilityCombined are present or explicitly undefined in UserAvailabilityPartial.
+export type UserAvailabilityPartialDTO = { type: string } & MaybeUndefined<UserAvailabilityCombinedDTO>;
