@@ -37,6 +37,7 @@
     "joi": "^17.6.0",
     "mongoose": "^6.2.6",
     "node-graceful": "^3.1.0",
+    "node-ical": "^0.15.1",
     "passport": "^0.5.2",
     "passport-firebase-jwt": "^1.2.1",
     "reflect-metadata": "^0.1.13",
