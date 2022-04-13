@@ -1,6 +1,6 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
 import { Types } from 'mongoose';
-import { Flock } from '~/database/flock/flock.schema';
+import { Flock } from '@flocker/api-types';
 
 @InputType()
 export class AddFlockInput implements Flock {

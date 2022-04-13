@@ -1,6 +1,6 @@
 import type { Flock, User, UserAvailability, UserSettings } from '@flocker/api-types';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { FlockGraphQLModel } from '~/graphql/flock/models/flock.model';
+import { FlockGraphQLModel } from '../../flock/models/flock.model';
 import { UserAvailabilityGraphQLModel } from './userAvailability.model';
 import { UserSettingsGraphQLModel } from './userSettings.model';
 

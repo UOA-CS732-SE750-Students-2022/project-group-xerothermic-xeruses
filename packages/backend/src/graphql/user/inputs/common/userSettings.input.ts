@@ -1,5 +1,5 @@
+import { UserSettings, UserSettingsTheme } from '@flocker/api-types';
 import { Field, InputType, registerEnumType } from '@nestjs/graphql';
-import { UserSettings, UserSettingsTheme } from '~/database/user/userSettings.schema';
 
 registerEnumType(UserSettingsTheme, {
   name: 'UserSettingsTheme',

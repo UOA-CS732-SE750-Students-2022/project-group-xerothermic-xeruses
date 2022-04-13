@@ -1,6 +1,6 @@
+import { UserAvailability } from '@flocker/api-types';
 import { Field, InputType } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql';
-import { UserAvailabilityPartial } from '~/database/user/userAvailability.schema';
 
 @InputType()
 export class UserAvailabilityInput implements UserAvailabilityPartial {
