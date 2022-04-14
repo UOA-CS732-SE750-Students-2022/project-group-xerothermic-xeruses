@@ -1,0 +1,15 @@
+{
+  "name": "@flocker/api-types",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Typings for the frontend/backend API.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "typecheck": "tsc --noEmit"
+  }
+}

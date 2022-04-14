@@ -1,31 +1,27 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Types } from 'mongoose';
-import { User } from '~/database/user/user.schema';
-import { UserAvailability } from '~/database/user/userAvailability.schema';
-import { UserSettings } from '~/database/user/userSettings.schema';
+import type { FlockDTO, UserDTO, UserAvailabilityDTO, UserSettingsDTO } from '@flocker/api-types';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { FlockGraphQLModel } from '../../flock/models/flock.model';
 import { UserAvailabilityGraphQLModel } from './userAvailability.model';
 import { UserSettingsGraphQLModel } from './userSettings.model';
 
 @ObjectType()
-export class UserGraphQLModel implements User {
-  @Field(() => ID, { nullable: false })
-  id!: Types.ObjectId;
+export class UserGraphQLModel implements UserDTO {
+  @Field({ nullable: false })
+  id!: string;
 
   @Field({ nullable: false })
   name!: string;
 
-  // TODO: this should resolve to a populated Flock.
-  @Field(() => [ID], { nullable: false })
-  flocks!: Types.ObjectId[];
+  @Field(() => [FlockGraphQLModel], { nullable: false })
+  flocks!: FlockDTO[];
 
-  // TODO: this should resolve to populated Flocks.
-  @Field(() => [ID], { nullable: false })
-  flockInvites!: Types.ObjectId[];
+  @Field(() => [FlockGraphQLModel], { nullable: false })
+  flockInvites!: FlockDTO[];
 
   // TODO(mattm): this should never be exposed to any user since it contains secrets.
   @Field(() => [UserAvailabilityGraphQLModel], { nullable: false })
-  availability!: UserAvailability[];
+  availability!: UserAvailabilityDTO[];
 
   @Field(() => UserSettingsGraphQLModel, { nullable: true })
-  settings: UserSettings | undefined;
+  settings: UserSettingsDTO | undefined;
 }

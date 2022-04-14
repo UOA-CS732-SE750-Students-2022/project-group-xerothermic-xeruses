@@ -1,8 +1,11 @@
 import { BadRequestException } from '@nestjs/common';
-import { Resolver, Args, Query, Mutation } from '@nestjs/graphql';
+import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
+
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { GraphQLString } from 'graphql';
+import { FlockService } from '~/database/flock/flock.service';
+import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { UserAvailability } from '~/database/user/userAvailability.schema';
 import { Auth } from '~/decorators/auth.decorator';
@@ -16,7 +19,21 @@ import { UserInterval } from './models/userInterval.model';
 
 @Resolver(() => UserGraphQLModel)
 export class UserResolver {
-  constructor(private userService: UserService, private calendarUtil: CalendarUtil) {}
+  constructor(
+    private flockService: FlockService,
+    private userService: UserService,
+    private calendarUtil: CalendarUtil,
+  ) {}
+
+  @ResolveField()
+  async flocks(@Parent() user: UserDocument) {
+    return this.flockService.findMany(user.flocks);
+  }
+
+  @ResolveField()
+  async flockInvites(@Parent() user: UserDocument) {
+    return this.flockService.findMany(user.flockInvites);
+  }
 
   @Query(() => UserGraphQLModel)
   async getUser(@Args('id', { type: () => GraphQLString }) id: string) {

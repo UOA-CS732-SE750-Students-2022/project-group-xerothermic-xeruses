@@ -24,14 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: ⚡ Typecheck
-        run: npm run typecheck
+      - name: 🛠️ Build
+        run: npm run build
 
       - name: ⚡ Test
         run: npm run test
-
-      - name: 🛠️ Build
-        run: npm run build
 
       - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
