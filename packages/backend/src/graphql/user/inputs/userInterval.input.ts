@@ -1,7 +1,8 @@
+import { UserIntervalInputDTO } from '@flocker/api-types';
 import { InputType, Field, GraphQLISODateTime } from '@nestjs/graphql';
 
 @InputType()
-export class UserIntervalInput {
+export class UserIntervalInput implements UserIntervalInputDTO {
   @Field(() => GraphQLISODateTime, { nullable: false })
   startDate!: Date;
 

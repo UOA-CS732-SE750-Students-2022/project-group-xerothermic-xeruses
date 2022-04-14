@@ -1,6 +1,6 @@
+import { UserIntervalDTO } from '@flocker/api-types';
 import { Injectable } from '@nestjs/common';
 import { async as icalParser, VEvent } from 'node-ical';
-import { UserInterval } from '~/graphql/user/models/userInterval.model';
 
 const INTERVAL_DURATION = 15;
 
@@ -12,23 +12,22 @@ export class CalendarUtil {
     endDate: Date,
     startHour: number,
     endHour: number,
-  ): Promise<UserInterval[]> {
+  ): Promise<UserIntervalDTO[]> {
     const events = [];
     for (const uri of uris) {
       const parsedIcal = await icalParser.fromURL(uri);
       events.push(...Object.values(parsedIcal));
     }
+
     const currentDateStart = this.mutateDate(startDate, startHour);
     const currentDateEnd = this.mutateDate(startDate, endHour);
-
     const endDateWithHour = this.mutateDate(endDate, endHour);
 
     const numberOfIntervals = (endHour - startHour) * 4;
-
-    const userIntervals: UserInterval[] = [];
+    const userIntervals: UserIntervalDTO[] = [];
 
     while (currentDateStart < endDateWithHour) {
-      const availabilityIntervals: Boolean[] = new Array(numberOfIntervals).fill(true);
+      const availabilityIntervals: boolean[] = new Array(numberOfIntervals).fill(true);
 
       const allOccurences: Date[] = [];
       for (const event of Object.values(events)) {
@@ -62,21 +61,13 @@ export class CalendarUtil {
                 allOccurences.push(...eventsAtInterval);
               } else {
                 allOccurences.forEach((event) => {
-                  if (availabilityIntervals[i]) {
-                    if (
-                      event.getTime() <= intervalStart.getTime() &&
-                      event.getTime() + eventDuration > intervalStart.getTime()
-                    ) {
-                      availabilityIntervals[i] = false;
-                    }
+                  if (availabilityIntervals[i] && this.isDuringInterval(event, intervalStart, eventDuration)) {
+                    availabilityIntervals[i] = false;
                   }
                 });
               }
             } else {
-              if (
-                event.start.getTime() <= intervalStart.getTime() &&
-                event.start.getTime() + eventDuration > intervalStart.getTime()
-              ) {
+              if (this.isDuringInterval(event.start, intervalStart, eventDuration)) {
                 availabilityIntervals[i] = false;
               }
             }
@@ -111,5 +102,9 @@ export class CalendarUtil {
     return new Date(
       Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes()),
     );
+  }
+
+  private isDuringInterval(event: Date, intervalStart: Date, eventDuration: number): boolean {
+    return event.getTime() <= intervalStart.getTime() && event.getTime() + eventDuration > intervalStart.getTime();
   }
 }

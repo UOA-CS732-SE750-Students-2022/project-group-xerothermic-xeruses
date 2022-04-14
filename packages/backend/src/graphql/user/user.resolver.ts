@@ -1,13 +1,11 @@
 import { BadRequestException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
-
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { GraphQLString } from 'graphql';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
-import { UserAvailability } from '~/database/user/userAvailability.schema';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
@@ -15,7 +13,6 @@ import { AddUserInput } from './inputs/addUser.input';
 import { UserIntervalInput } from './inputs/userInterval.input';
 import { UserGraphQLModel } from './models/user.model';
 import { UserAvailabilityIntervalGraphQLModel } from './models/userAvailabilityInterval.model';
-import { UserInterval } from './models/userInterval.model';
 
 @Resolver(() => UserGraphQLModel)
 export class UserResolver {
