@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { async as icalParser, VEvent } from 'node-ical';
 
 const INTERVAL_DURATION = 15;
+const INTERVALS_IN_HOUR = 4;
 
 @Injectable()
 export class CalendarUtil {
@@ -23,7 +24,7 @@ export class CalendarUtil {
     const currentDateEnd = this.mutateDate(startDate, endHour);
     const endDateWithHour = this.mutateDate(endDate, endHour);
 
-    const numberOfIntervals = (endHour - startHour) * 4;
+    const numberOfIntervals = (endHour - startHour) * INTERVALS_IN_HOUR;
     const userIntervals: UserIntervalDTO[] = [];
 
     while (currentDateStart < endDateWithHour) {

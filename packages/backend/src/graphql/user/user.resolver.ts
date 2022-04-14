@@ -14,6 +14,10 @@ import { UserIntervalInput } from './inputs/userInterval.input';
 import { UserGraphQLModel } from './models/user.model';
 import { UserAvailabilityIntervalGraphQLModel } from './models/userAvailabilityInterval.model';
 
+const MIN_HOUR = 0;
+const MAX_HOUR = 24;
+const ICAL = 'ical';
+
 @Resolver(() => UserGraphQLModel)
 export class UserResolver {
   constructor(
@@ -62,8 +66,8 @@ export class UserResolver {
     if (
       startDate > endDate ||
       availabilityStartHour >= availabilityEndHour ||
-      availabilityStartHour < 0 ||
-      availabilityEndHour > 24
+      availabilityStartHour < MIN_HOUR ||
+      availabilityEndHour > MAX_HOUR
     ) {
       return new BadRequestException('Invalid date/time');
     }
@@ -73,7 +77,7 @@ export class UserResolver {
     if (user?.availability.length) {
       const calendarUris: string[] = [];
       user.availability.forEach((availability) => {
-        if (availability.type === 'ical') {
+        if (availability.type === ICAL) {
           calendarUris.push(availability.uri);
         }
       });

@@ -9,9 +9,9 @@ export class UserIntervalInput implements UserIntervalInputDTO {
   @Field(() => GraphQLISODateTime, { nullable: false })
   endDate!: Date;
 
-  @Field({ nullable: true })
+  @Field({ nullable: false })
   availabilityStartHour!: number;
 
-  @Field({ nullable: true })
+  @Field({ nullable: false })
   availabilityEndHour!: number;
 }
