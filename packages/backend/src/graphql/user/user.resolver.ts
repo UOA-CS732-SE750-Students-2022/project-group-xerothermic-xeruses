@@ -1,8 +1,10 @@
+import { BadRequestException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { GraphQLString } from 'graphql';
 import { UserService } from '~/database/user/user.service';
+import { UserAvailability } from '~/database/user/userAvailability.schema';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
@@ -10,6 +12,7 @@ import { AddUserInput } from './inputs/addUser.input';
 import { UserIntervalInput } from './inputs/userInterval.input';
 import { UserGraphQLModel } from './models/user.model';
 import { UserAvailabilityIntervalGraphQLModel } from './models/userAvailabilityInterval.model';
+import { UserInterval } from './models/userInterval.model';
 
 @Resolver(() => UserGraphQLModel)
 export class UserResolver {
@@ -37,32 +40,43 @@ export class UserResolver {
   }
 
   @Query(() => UserAvailabilityIntervalGraphQLModel)
-  async getUserIntervals() {
-    // const user = await this.userService.findOne(id);
-    // if (user?.availability.length) {
-    //   user.availability.forEach((availability) => {
-    //     if (availability.type === 'ical') {
-    //       availability.availability = this.calendarUtil.convertIcalToIntervals(
-    //         availability.uri,
-    //         availability.startDate,
-    //         availability.endDate,
-    //         availability.startHour,
-    //         availability.endHour,
-    //       );
-    //     }
-    //   });
-    // }
-    const intervals = this.calendarUtil.convertIcalToIntervals(
-      [
-        'https://uoacal.auckland.ac.nz/calendar/9929cd053ae1b4460709d83892ba6c9a54ed82462b9a57a42175e4108153db82347dc343b606f36ccfbc39461655af724244990173293d57a8d786a002fc4904',
-      ],
-      new Date(Date.UTC(2022, 9, 3)),
-      new Date(Date.UTC(2022, 9, 6)),
-      0,
-      5,
-    );
+  async getUserIntervals(
+    @Args('id', { type: () => GraphQLString }) id: string,
+    @Args('userIntervalInput', { type: () => UserIntervalInput }) userIntervalInput: UserIntervalInput,
+  ) {
+    const { startDate, endDate, availabilityStartHour, availabilityEndHour } = userIntervalInput;
+    if (
+      startDate > endDate ||
+      availabilityStartHour >= availabilityEndHour ||
+      availabilityStartHour < 0 ||
+      availabilityEndHour > 24
+    ) {
+      return new BadRequestException('Invalid date/time');
+    }
+
+    const user = await this.userService.findOne(id);
+
+    if (user?.availability.length) {
+      const calendarUris: string[] = [];
+      user.availability.forEach((availability) => {
+        if (availability.type === 'ical') {
+          calendarUris.push(availability.uri);
+        }
+      });
+
+      return {
+        intervals: this.calendarUtil.convertIcalToIntervals(
+          calendarUris,
+          startDate,
+          endDate,
+          availabilityStartHour,
+          availabilityEndHour,
+        ),
+      };
+    }
+
     return {
-      intervals: intervals,
+      intervals: [],
     };
   }
 }

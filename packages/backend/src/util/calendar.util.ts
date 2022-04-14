@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { async as icalParser, VEvent, CalendarComponent } from 'node-ical';
+import { async as icalParser, VEvent } from 'node-ical';
 import { UserInterval } from '~/graphql/user/models/userInterval.model';
 
 const INTERVAL_DURATION = 15;
@@ -18,7 +18,6 @@ export class CalendarUtil {
       const parsedIcal = await icalParser.fromURL(uri);
       events.push(...Object.values(parsedIcal));
     }
-
     const currentDateStart = this.mutateDate(startDate, startHour);
     const currentDateEnd = this.mutateDate(startDate, endHour);
 
@@ -36,7 +35,6 @@ export class CalendarUtil {
         if (event.type === 'VEVENT') {
           const vevent = event as VEvent;
 
-          console.log(event.summary);
           const intervalStart = this.mutateDate(currentDateStart);
           for (let i = 0; i < numberOfIntervals; i++) {
             const intervalEnd = this.mutateDate(
@@ -44,8 +42,13 @@ export class CalendarUtil {
               undefined,
               intervalStart.getUTCMinutes() + INTERVAL_DURATION,
             );
+
             const eventDuration = event.end.getTime() - event.start.getTime();
-            if (vevent.rrule) {
+
+            // If the event is date only, it means it is an all day event e.g. Christmas
+            if ((event.start as any).dateOnly) {
+              availabilityIntervals[i] = false;
+            } else if (vevent.rrule) {
               const eventsAtInterval = vevent.rrule.between(intervalStart, intervalEnd, true);
 
               // If there are one or more events, then the user is unavailable
@@ -55,6 +58,7 @@ export class CalendarUtil {
                     availabilityIntervals[i] = false;
                   }
                 });
+
                 allOccurences.push(...eventsAtInterval);
               } else {
                 allOccurences.forEach((event) => {
@@ -64,7 +68,6 @@ export class CalendarUtil {
                       event.getTime() + eventDuration > intervalStart.getTime()
                     ) {
                       availabilityIntervals[i] = false;
-                      console.log(' From all ', allOccurences, intervalStart, availabilityIntervals[i], eventDuration);
                     }
                   }
                 });
@@ -75,7 +78,6 @@ export class CalendarUtil {
                 event.start.getTime() + eventDuration > intervalStart.getTime()
               ) {
                 availabilityIntervals[i] = false;
-                console.log(' From all ', allOccurences, intervalStart, intervalEnd, availabilityIntervals[i]);
               }
             }
             intervalStart.setMinutes(intervalStart.getUTCMinutes() + INTERVAL_DURATION);
@@ -94,6 +96,9 @@ export class CalendarUtil {
     return userIntervals;
   }
 
+  /**
+   * Used to return a new date of an existing date, preserving UTC format, additionally with hours or minutes if supplied
+   */
   private mutateDate(date: Date, hours?: number, minutes?: number): Date {
     if (hours) {
       return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hours));
@@ -102,6 +107,7 @@ export class CalendarUtil {
         Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), minutes),
       );
     }
+
     return new Date(
       Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes()),
     );
