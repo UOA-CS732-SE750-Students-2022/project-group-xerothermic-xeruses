@@ -7,5 +7,5 @@ export class UserIntervalGraphQLModel implements UserIntervalDTO {
   date!: Date;
 
   @Field(() => [Boolean], { nullable: false })
-  availability!: boolean[];
+  intervals!: boolean[];
 }

@@ -10,8 +10,8 @@ export class UserIntervalInput implements UserIntervalInputDTO {
   endDate!: Date;
 
   @Field({ nullable: false })
-  availabilityStartHour!: number;
+  startHour!: number;
 
   @Field({ nullable: false })
-  availabilityEndHour!: number;
+  endHour!: number;
 }

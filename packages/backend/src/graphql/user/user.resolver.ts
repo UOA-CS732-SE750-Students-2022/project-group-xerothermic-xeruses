@@ -6,6 +6,7 @@ import { GraphQLString } from 'graphql';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
+import { UserAvailabilityICal, USER_AVAILABILITY_ICAL } from '~/database/user/userAvailabilityICal.schema';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
@@ -16,7 +17,6 @@ import { UserAvailabilityIntervalGraphQLModel } from './models/userAvailabilityI
 
 const MIN_HOUR = 0;
 const MAX_HOUR = 24;
-const ICAL = 'ical';
 
 @Resolver(() => UserGraphQLModel)
 export class UserResolver {
@@ -62,39 +62,25 @@ export class UserResolver {
     @Args('id', { type: () => GraphQLString }) id: string,
     @Args('userIntervalInput', { type: () => UserIntervalInput }) userIntervalInput: UserIntervalInput,
   ) {
-    const { startDate, endDate, availabilityStartHour, availabilityEndHour } = userIntervalInput;
-    if (
-      startDate > endDate ||
-      availabilityStartHour >= availabilityEndHour ||
-      availabilityStartHour < MIN_HOUR ||
-      availabilityEndHour > MAX_HOUR
-    ) {
+    const { startDate, endDate, startHour, endHour } = userIntervalInput;
+    if (startDate > endDate || startHour >= endHour || startHour < MIN_HOUR || endHour > MAX_HOUR) {
       return new BadRequestException('Invalid date/time');
     }
 
     const user = await this.userService.findOne(id);
 
     if (user?.availability.length) {
-      const calendarUris: string[] = [];
-      user.availability.forEach((availability) => {
-        if (availability.type === ICAL) {
-          calendarUris.push(availability.uri);
-        }
-      });
+      const calendarUris: string[] = user.availability
+        .filter((availability) => availability.type === USER_AVAILABILITY_ICAL)
+        .map((availability) => (availability as UserAvailabilityICal).uri);
 
       return {
-        intervals: this.calendarUtil.convertIcalToIntervals(
-          calendarUris,
-          startDate,
-          endDate,
-          availabilityStartHour,
-          availabilityEndHour,
-        ),
+        availability: this.calendarUtil.convertIcalToIntervals(calendarUris, startDate, endDate, startHour, endHour),
       };
     }
 
     return {
-      intervals: [],
+      availability: [],
     };
   }
 }
