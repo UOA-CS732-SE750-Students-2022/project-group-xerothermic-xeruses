@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -11,12 +10,9 @@ import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
 import { AddUserInput } from './inputs/addUser.input';
-import { UserIntervalInput } from './inputs/userInterval.input';
+import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
 import { UserGraphQLModel } from './models/user.model';
 import { UserAvailabilityIntervalGraphQLModel } from './models/userAvailabilityInterval.model';
-
-const MIN_HOUR = 0;
-const MAX_HOUR = 24;
 
 @Resolver(() => UserGraphQLModel)
 export class UserResolver {
@@ -60,13 +56,9 @@ export class UserResolver {
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals(
     @Args('id', { type: () => GraphQLString }) id: string,
-    @Args('userIntervalInput', { type: () => UserIntervalInput }) userIntervalInput: UserIntervalInput,
+    @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
+    userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
-    const { startDate, endDate, startHour, endHour } = userIntervalInput;
-    if (startDate > endDate || startHour >= endHour || startHour < MIN_HOUR || endHour > MAX_HOUR) {
-      return new BadRequestException('Invalid date/time');
-    }
-
     const user = await this.userService.findOne(id);
 
     if (user?.availability.length) {
@@ -75,7 +67,7 @@ export class UserResolver {
         .map((availability) => (availability as UserAvailabilityICal).uri);
 
       return {
-        availability: this.calendarUtil.convertIcalToIntervals(calendarUris, startDate, endDate, startHour, endHour),
+        availability: this.calendarUtil.convertIcalToIntervals(calendarUris, userAvailabilityIntervalInput.intervals),
       };
     }
 

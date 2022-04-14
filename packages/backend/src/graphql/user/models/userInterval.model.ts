@@ -4,8 +4,11 @@ import { Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class UserIntervalGraphQLModel implements UserIntervalDTO {
   @Field(() => GraphQLISODateTime, { nullable: false })
-  date!: Date;
+  start!: Date;
 
-  @Field(() => [Boolean], { nullable: false })
-  intervals!: boolean[];
+  @Field(() => GraphQLISODateTime, { nullable: false })
+  end!: Date;
+
+  @Field(() => Boolean, { nullable: false })
+  available!: boolean;
 }

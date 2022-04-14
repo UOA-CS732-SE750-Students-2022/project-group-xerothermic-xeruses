@@ -4,14 +4,8 @@ import { InputType, Field, GraphQLISODateTime } from '@nestjs/graphql';
 @InputType()
 export class UserIntervalInput implements UserIntervalInputDTO {
   @Field(() => GraphQLISODateTime, { nullable: false })
-  startDate!: Date;
+  start!: Date;
 
   @Field(() => GraphQLISODateTime, { nullable: false })
-  endDate!: Date;
-
-  @Field({ nullable: false })
-  startHour!: number;
-
-  @Field({ nullable: false })
-  endHour!: number;
+  end!: Date;
 }
