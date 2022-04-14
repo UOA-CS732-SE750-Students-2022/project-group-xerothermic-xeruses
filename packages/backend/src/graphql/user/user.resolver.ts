@@ -38,8 +38,24 @@ export class UserResolver {
 
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals() {
+    // const user = await this.userService.findOne(id);
+    // if (user?.availability.length) {
+    //   user.availability.forEach((availability) => {
+    //     if (availability.type === 'ical') {
+    //       availability.availability = this.calendarUtil.convertIcalToIntervals(
+    //         availability.uri,
+    //         availability.startDate,
+    //         availability.endDate,
+    //         availability.startHour,
+    //         availability.endHour,
+    //       );
+    //     }
+    //   });
+    // }
     const intervals = this.calendarUtil.convertIcalToIntervals(
-      'https://uoacal.auckland.ac.nz/calendar/9929cd053ae1b4460709d83892ba6c9a54ed82462b9a57a42175e4108153db82347dc343b606f36ccfbc39461655af724244990173293d57a8d786a002fc4904',
+      [
+        'https://uoacal.auckland.ac.nz/calendar/9929cd053ae1b4460709d83892ba6c9a54ed82462b9a57a42175e4108153db82347dc343b606f36ccfbc39461655af724244990173293d57a8d786a002fc4904',
+      ],
       new Date(Date.UTC(2022, 9, 3)),
       new Date(Date.UTC(2022, 9, 6)),
       0,
