@@ -9,7 +9,7 @@ export class CalendarUtil {
       Object.values(event),
     );
 
-    const allOccurences: Date[] = [];
+    let allOccurences: Date[] = [];
     const availabilityIntervals: boolean[] = new Array(intervals.length).fill(true);
     for (const event of events) {
       if (event.type !== 'VEVENT') {
@@ -54,6 +54,8 @@ export class CalendarUtil {
           }
         }
       });
+
+      allOccurences = [];
     }
 
     return intervals.map((interval, index) => {
