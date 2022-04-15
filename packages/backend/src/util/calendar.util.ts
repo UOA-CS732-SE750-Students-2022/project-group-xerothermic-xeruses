@@ -1,18 +1,17 @@
-import { UserIntervalDTO } from '@flocker/api-types';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { UserIntervalDTO, UserIntervalInputDTO } from '@flocker/api-types';
+import { Injectable } from '@nestjs/common';
 import { async as icalParser, VEvent } from 'node-ical';
-import { UserIntervalInput } from '~/graphql/user/inputs/userInterval.input';
 
 @Injectable()
 export class CalendarUtil {
-  async convertIcalToIntervals(uris: string[], intervals: UserIntervalInput[]): Promise<UserIntervalDTO[]> {
+  async convertIcalToIntervals(uris: string[], intervals: UserIntervalInputDTO[]): Promise<UserIntervalDTO[]> {
     const events = (await Promise.all(uris.map((uri) => icalParser.fromURL(uri)))).flatMap((event) =>
       Object.values(event),
     );
 
     const allOccurences: Date[] = [];
     const availabilityIntervals: boolean[] = new Array(intervals.length).fill(true);
-    for (const event of Object.values(events)) {
+    for (const event of events) {
       if (event.type !== 'VEVENT') {
         continue;
       }
@@ -20,10 +19,6 @@ export class CalendarUtil {
       const vevent = event as VEvent;
       intervals.forEach((interval, index) => {
         const { start, end } = interval;
-        // Ensure the start is after the end of the interval. Everything else should be handled since we are receiving valid dates
-        if (start >= end) {
-          throw new BadRequestException('Invalid interval(s)');
-        }
 
         const eventDuration = event.end.getTime() - event.start.getTime();
 

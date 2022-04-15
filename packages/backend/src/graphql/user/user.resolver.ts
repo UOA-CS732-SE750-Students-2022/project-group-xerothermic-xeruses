@@ -1,3 +1,4 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -61,18 +62,25 @@ export class UserResolver {
   ) {
     const user = await this.userService.findOne(id);
 
-    if (user?.availability.length) {
-      const calendarUris: string[] = user.availability
-        .filter((availability) => availability.type === USER_AVAILABILITY_ICAL)
-        .map((availability) => (availability as UserAvailabilityICal).uri);
-
-      return {
-        availability: this.calendarUtil.convertIcalToIntervals(calendarUris, userAvailabilityIntervalInput.intervals),
-      };
+    if (!user) {
+      throw new NotFoundException('Invalid user id');
     }
 
+    const { intervals } = userAvailabilityIntervalInput;
+    intervals.forEach((interval) => {
+      const { start, end } = interval;
+      // Ensure the start is after the end of the interval. Everything else should be handled since we are receiving valid dates
+      if (start >= end) {
+        throw new BadRequestException('Invalid interval(s)');
+      }
+    });
+
+    const calendarUris: string[] = user!.availability
+      .filter((availability) => availability.type === USER_AVAILABILITY_ICAL)
+      .map((availability) => (availability as UserAvailabilityICal).uri);
+
     return {
-      availability: [],
+      availability: this.calendarUtil.convertIcalToIntervals(calendarUris, intervals),
     };
   }
 }
