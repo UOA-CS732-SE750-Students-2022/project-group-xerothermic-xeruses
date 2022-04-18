@@ -1,5 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Poppins:wght@300;400;500;700&display=swap');
+
+
+:root {
+  /* Colors */
+  --flocker-color-primary: #0353A4;
+  --flocker-color-secondary: #FFAF76;
+
+  /* Font families */
+  --flocker-font-family-text: Poppins;
+  --flocker-font-family-logo: Chewy;
+
+  /* Font weights */
+  --flocker-font-weight-light: 300;
+  --flocker-font-weight-regular: 400;
+  --flocker-font-weight-medium: 500;
+  --flocker-font-weight-bold: 700;
+
+  /* Font sizes */
+  --flocker-font-size-body: 1.5rem;
+  --flocker-font-size-display: 4rem;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: var(--flocker-font-family-text);
+  font-size: var(--flocker-font-size-body);
 }
