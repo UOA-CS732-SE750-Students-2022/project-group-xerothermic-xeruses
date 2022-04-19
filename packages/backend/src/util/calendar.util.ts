@@ -1,15 +1,16 @@
-import { UserIntervalDTO, UserIntervalInputDTO } from '@flocker/api-types';
 import { Injectable } from '@nestjs/common';
 import { async as icalParser, VEvent } from 'node-ical';
+import { UserAvailabilityInterval, UserInterval } from './models';
+
+const MILLISECONDS_IN_ONE_DAY = 86400000;
 
 @Injectable()
 export class CalendarUtil {
-  async convertIcalToIntervals(uris: string[], intervals: UserIntervalInputDTO[]): Promise<UserIntervalDTO[]> {
+  async convertIcalToIntervals(uris: string[], intervals: UserInterval[]): Promise<UserAvailabilityInterval[]> {
     const events = (await Promise.all(uris.map((uri) => icalParser.fromURL(uri)))).flatMap((event) =>
       Object.values(event),
     );
 
-    let allOccurences: Date[] = [];
     const availabilityIntervals: boolean[] = new Array(intervals.length).fill(true);
     for (const event of events) {
       if (event.type !== 'VEVENT') {
@@ -17,15 +18,16 @@ export class CalendarUtil {
       }
 
       const vevent = event as VEvent;
+
+      const allOccurences: Date[] = [];
       intervals.forEach((interval, index) => {
         const { start, end } = interval;
 
-        const eventDuration = event.end.getTime() - event.start.getTime();
+        const eventDuration = vevent.end.getTime() - vevent.start.getTime();
 
         // If the event is date only, it means it is an all day event e.g. Christmas
-        if ((event.start as any).dateOnly && this.isOnDay(event.start, start)) {
+        if ((event.start as any).dateOnly && this.isDuringInterval(vevent.start, start, end, MILLISECONDS_IN_ONE_DAY)) {
           availabilityIntervals[index] = false;
-
           // If the event is recurring, we need to check if it occurs during the interval
         } else if (vevent.rrule) {
           const eventsAtInterval = vevent.rrule.between(start, end, true);
@@ -41,21 +43,16 @@ export class CalendarUtil {
             allOccurences.push(...eventsAtInterval);
           } else {
             allOccurences.forEach((recurringEvent) => {
-              if (this.isDuringInterval(recurringEvent, start, eventDuration)) {
+              if (this.startsBeforeOrAtInterval(recurringEvent, start, eventDuration)) {
                 availabilityIntervals[index] = false;
               }
             });
           }
-
           // If the event is not recurring check if it occurs during the interval
-        } else {
-          if (this.isDuringInterval(event.start, start, eventDuration)) {
-            availabilityIntervals[index] = false;
-          }
+        } else if (this.isDuringInterval(vevent.start, start, end, eventDuration)) {
+          availabilityIntervals[index] = false;
         }
       });
-
-      allOccurences = [];
     }
 
     return intervals.map((interval, index) => {
@@ -66,15 +63,11 @@ export class CalendarUtil {
     });
   }
 
-  private isDuringInterval(event: Date, intervalStart: Date, eventDuration: number): boolean {
+  private startsBeforeOrAtInterval(event: Date, intervalStart: Date, eventDuration: number): boolean {
     return event.getTime() <= intervalStart.getTime() && event.getTime() + eventDuration > intervalStart.getTime();
   }
 
-  private isOnDay(event: Date, intervalStart: Date): boolean {
-    return (
-      event.getUTCFullYear() === intervalStart.getUTCFullYear() &&
-      event.getUTCMonth() === intervalStart.getUTCMonth() &&
-      event.getUTCDate() === intervalStart.getUTCDate()
-    );
+  private isDuringInterval(event: Date, intervalStart: Date, intervalEnd: Date, eventDuration: number): boolean {
+    return event.getTime() < intervalEnd.getTime() && event.getTime() + eventDuration > intervalStart.getTime();
   }
 }

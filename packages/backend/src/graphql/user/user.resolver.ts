@@ -75,7 +75,7 @@ export class UserResolver {
       }
     });
 
-    const calendarUris: string[] = user!.availability
+    const calendarUris: string[] = user.availability
       .filter((availability) => availability.type === USER_AVAILABILITY_ICAL)
       .map((availability) => (availability as UserAvailabilityICal).uri);
 
