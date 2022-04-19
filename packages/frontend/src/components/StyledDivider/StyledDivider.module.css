@@ -1,0 +1,16 @@
+.divider{
+  color: white;
+  border-color:white;
+}
+
+.divider::before, .divider::after{
+  border-top: thin solid white;
+}
+
+.main{
+  width: 40rem;
+}
+
+.side{
+  width: 20rem;
+}
