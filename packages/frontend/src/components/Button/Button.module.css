@@ -1,0 +1,38 @@
+.button {
+  padding: 0.5em 1.5em;
+  border: none;
+  border-radius: 2em;
+  font-weight: var(--flocker-font-weight-light);
+  transition: ease-in-out 0.2s;
+}
+
+.button:hover {
+  cursor: pointer;
+  transform: scale(1.01);
+}
+
+.primary {
+  --button-color: var(--flocker-color-primary);
+  --filled-text-color: white;
+}
+
+.white {
+  --button-color: white;
+  --filled-text-color: black;
+}
+
+.black {
+  --button-color: black;
+  --filled-text-color: white;
+}
+
+.filled {
+  background-color: var(--button-color);
+  color: var(--filled-text-color);
+}
+
+.outlined {
+  background-color: unset;
+  border: var(--button-color) 1px solid;
+  color: var(--button-color);
+}
