@@ -6,7 +6,6 @@ import { GraphQLString } from 'graphql';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
-import { UserAvailabilityICal, USER_AVAILABILITY_ICAL } from '~/database/user/userAvailabilityICal.schema';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
