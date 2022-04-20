@@ -7,7 +7,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@flocker/api-types": "^0.1.0",
+    "@flocker/api-types": "file:../api-types",
     "@mui/material": "^5.6.2",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.3",
