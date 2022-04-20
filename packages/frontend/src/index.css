@@ -17,6 +17,7 @@
 
   /* Font sizes */
   --flocker-font-size-body: 1rem;
+  --flocker-font-size-small: 0.8rem;
   --flocker-font-size-display: 4rem;
 }
 
@@ -25,5 +26,4 @@
   padding: 0;
   box-sizing: border-box;
   font-family: var(--flocker-font-family-text);
-  font-size: var(--flocker-font-size-body);
 }
