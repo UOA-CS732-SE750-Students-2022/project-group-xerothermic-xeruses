@@ -57,6 +57,7 @@ export class UserResolver {
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals(
     @Args('id', { type: () => GraphQLString }) id: string,
+    @Args('calendarUris', { type: () => [GraphQLString] }) calendarUris: string[],
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
@@ -74,10 +75,6 @@ export class UserResolver {
         throw new BadRequestException('Invalid interval(s)');
       }
     });
-
-    const calendarUris: string[] = user.availability
-      .filter((availability) => availability.type === USER_AVAILABILITY_ICAL)
-      .map((availability) => (availability as UserAvailabilityICal).uri);
 
     return {
       availability: this.calendarUtil.convertIcalToIntervals(calendarUris, intervals),
