@@ -6,8 +6,11 @@ type LineProps = {
 };
 
 const Line = ({ text = '' }: LineProps) => {
-  if (text) return <Divider className={`${styles.divider}`}>{text}</Divider>;
-  return <Divider className={`${styles.divider}`} />;
+  return (
+    <div>
+      {text ? <Divider className={`${styles.divider}`}>{text}</Divider> : <Divider className={`${styles.divider}`} />}
+    </div>
+  );
 };
 
 export default Line;
