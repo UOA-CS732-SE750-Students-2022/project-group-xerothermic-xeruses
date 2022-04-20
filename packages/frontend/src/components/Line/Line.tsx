@@ -1,23 +1,13 @@
-import styles from './StyledDivider.module.css'
+import styles from './Line.module.css'
 import Divider from '@mui/material/Divider'
 
 type LineProps = {
-  orText?: Boolean;
-  size: LineSize;
+  text?: string;
 };
 
-type LineSize = 'main' | 'side';
-
-const computeSizeClass = (type: LineSize): string => {
-  if (type === 'main') return styles.main;
-  if (type === 'side') return styles.side;
-  return '';
-}
-
-const Line = ({ orText=false, size }: LineProps) => {
-  const sizeClass = computeSizeClass(size);
-  if (orText) return <Divider className={`${styles.divider} ${sizeClass}`}>or</Divider>;
-  return <Divider className={`${styles.divider} ${sizeClass}`}/>;
+const Line = ({ text="" }: LineProps) => {
+  if (text) return <Divider className={`${styles.divider}`}>{text}</Divider>;
+  return <Divider className={`${styles.divider} ${styles.content}`}/>;
 }
 
 export default Line;
