@@ -1,0 +1,9 @@
+.divider {
+  color: white;
+  border-color: white;
+}
+
+.divider::before,
+.divider::after {
+  border-top: thin solid white;
+}
