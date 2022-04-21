@@ -1,5 +1,6 @@
 import { sync as icalParser } from 'node-ical';
 import { CalendarUtil } from './calendar.util';
+import { UserInterval } from './models';
 
 interface FakeEvent {
   id: number;
@@ -55,6 +56,13 @@ function createIntervalsWithAvailability(start: Date, availablility: boolean[], 
   });
 }
 
+/**
+ * Keep only defined fields in intervals.
+ */
+function sanitizeIntervals(intervals: UserInterval[]): UserInterval[] {
+  return intervals.map(({ start, end }) => ({ start, end }));
+}
+
 const UTC = (Y: number, M = 1, D = 1, h = 0, m = 0, s = 0, ms = 0) => new Date(Date.UTC(Y, M - 1, D, h, m, s, ms));
 
 describe(CalendarUtil.name, () => {
@@ -73,7 +81,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([]);
     const interval = createIntervalWithAvailability(new Date(0), true);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response.length).toBe(1);
     expect(response).toEqual([interval]);
   });
@@ -82,7 +90,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13), durationMinutes: 60 }]);
     const interval = createIntervalWithAvailability(UTC(2023, 0), true);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -90,7 +98,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12, 59), durationMinutes: 5 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), false);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -98,7 +106,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13), durationMinutes: 1 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), false);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -106,7 +114,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13, 2), durationMinutes: 60 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), false);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -114,7 +122,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13, 20), durationMinutes: 1 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), true);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -122,7 +130,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13, 2), durationMinutes: 1 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), false);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -130,7 +138,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12, 59), durationMinutes: 60 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), false);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -138,7 +146,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12), durationMinutes: 5 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), true);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -146,7 +154,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12, 59), durationMinutes: 1 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), true);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -154,7 +162,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12, 59), durationMinutes: 5 }]);
     const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), false);
 
-    const response = calUtil.convertIcalToIntervals([calendar], [interval]);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals([interval]));
     expect(response).toEqual([interval]);
   });
 
@@ -166,7 +174,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12, 45), durationMinutes: 60 }]);
     const intervals = createIntervalsWithAvailability(UTC(2021, 11, 1, 13), [false, false]);
 
-    const response = calUtil.convertIcalToIntervals([calendar], intervals);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals(intervals));
     expect(response).toEqual(intervals);
   });
 
@@ -178,7 +186,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13, 10), durationMinutes: 10 }]);
     const intervals = createIntervalsWithAvailability(UTC(2021, 11, 1, 13), [false, false]);
 
-    const response = calUtil.convertIcalToIntervals([calendar], intervals);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals(intervals));
     expect(response).toEqual(intervals);
   });
 
@@ -190,7 +198,7 @@ describe(CalendarUtil.name, () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13, 25), durationMinutes: 10 }]);
     const intervals = createIntervalsWithAvailability(UTC(2021, 11, 1, 13), [true, false]);
 
-    const response = calUtil.convertIcalToIntervals([calendar], intervals);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals(intervals));
     expect(response).toEqual(intervals);
   });
 
@@ -205,7 +213,7 @@ describe(CalendarUtil.name, () => {
     ]);
     const intervals = createIntervalsWithAvailability(UTC(2021, 11, 1, 13), [true, true]);
 
-    const response = calUtil.convertIcalToIntervals([calendar], intervals);
+    const response = calUtil.convertIcalToIntervals([calendar], sanitizeIntervals(intervals));
     expect(response).toEqual(intervals);
   });
 });
