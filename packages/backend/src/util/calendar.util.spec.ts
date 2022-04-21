@@ -152,9 +152,9 @@ describe(CalendarUtil.name, () => {
     expect(response).toEqual([interval]);
   });
 
-  it('1event_1interval_0available_endsAtInterval', () => {
+  it('1event_1interval_1available_endsAtInterval', () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12, 59), durationMinutes: 1 }]);
-    const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), false);
+    const interval = createIntervalWithAvailability(UTC(2021, 11, 1, 13), true);
 
     const response = calUtil.convertIcalToIntervals([calendar], [interval]);
     expect(response).toEqual([interval]);
@@ -168,7 +168,11 @@ describe(CalendarUtil.name, () => {
     expect(response).toEqual([interval]);
   });
 
-  it('1event_2intervals_0available', () => {
+  /**
+   * |-------------------------EVENT_1--------------------------|
+   *                |-INTERVAL_1--||-INTERVAL_2--|
+   */
+  it('1event_2intervals_0available_longEvent', () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 12, 45), durationMinutes: 60 }]);
     const intervals = createIntervalsWithAvailability(UTC(2021, 11, 1, 13), [false, false]);
 
@@ -176,14 +180,34 @@ describe(CalendarUtil.name, () => {
     expect(response).toEqual(intervals);
   });
 
-  it('1event_2intervals_1available', () => {
+  /**
+   *           |EVENT_1-|
+   * |-INTERVAL_1--||-INTERVAL_2--|
+   */
+  it('1event_2intervals_0available', () => {
     const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13, 10), durationMinutes: 10 }]);
+    const intervals = createIntervalsWithAvailability(UTC(2021, 11, 1, 13), [false, false]);
+
+    const response = calUtil.convertIcalToIntervals([calendar], intervals);
+    expect(response).toEqual(intervals);
+  });
+
+  /**
+   *                          |EVENT_1-|
+   * |-INTERVAL_1--||-INTERVAL_2--|
+   */
+  it('1event_2intervals_1available', () => {
+    const calendar = createCalendar([{ start: UTC(2021, 11, 1, 13, 25), durationMinutes: 10 }]);
     const intervals = createIntervalsWithAvailability(UTC(2021, 11, 1, 13), [true, false]);
 
     const response = calUtil.convertIcalToIntervals([calendar], intervals);
     expect(response).toEqual(intervals);
   });
 
+  /**
+   * |EVENT_1-|                              |EVENT_1-|
+   *           |-INTERVAL_1--||-INTERVAL_2--|
+   */
   it('2event_2intervals_2available', () => {
     const calendar = createCalendar([
       { start: UTC(2021, 11, 1, 12, 50), durationMinutes: 10 },
