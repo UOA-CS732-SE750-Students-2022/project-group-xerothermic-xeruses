@@ -26,7 +26,7 @@ export class CalendarUtil {
         const eventDuration = vevent.end.getTime() - vevent.start.getTime();
 
         // If the event is date only, it means it is an all day event e.g. Christmas
-        if ((event.start as any).dateOnly && this.isDuringInterval(vevent.start, start, end, MILLISECONDS_IN_ONE_DAY)) {
+        if (event.datetype === 'date' && this.isDuringInterval(vevent.start, start, end, MILLISECONDS_IN_ONE_DAY)) {
           availabilityIntervals[index] = false;
           // If the event is recurring, we need to check if it occurs during the interval
         } else if (vevent.rrule) {

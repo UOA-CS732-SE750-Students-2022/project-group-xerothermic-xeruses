@@ -6,6 +6,8 @@ import { GraphQLString } from 'graphql';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
+import { UserAvailabilityDocument } from '~/database/user/userAvailability.schema';
+import { UserAvailabilityICal } from '~/database/user/userAvailabilityICal.schema';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
@@ -56,15 +58,27 @@ export class UserResolver {
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals(
     @Args('id', { type: () => GraphQLString }) id: string,
-    @Args('calendarUris', { type: () => [GraphQLString] }) calendarUris: string[],
+    @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
     const user = await this.userService.findOne(id);
-
     if (!user) {
       throw new NotFoundException('Invalid user id');
     }
+
+    const calendarUris = (
+      await Promise.all(
+        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(id, availabilityId)),
+      )
+    )
+      .flatMap((userDocument) => (userDocument ? userDocument.availability : []))
+      .flatMap((availability) => {
+        if (availability.type === 'ical') {
+          return availability.uri;
+        }
+        return [];
+      });
 
     const { intervals } = userAvailabilityIntervalInput;
     intervals.forEach((interval) => {

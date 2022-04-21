@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
+import { UserAvailability } from './userAvailability.schema';
 
 /**
  * Service for managing Users in the database.
@@ -37,5 +38,12 @@ export class UserService {
 
   async update(_id: Types.ObjectId | string, user: Partial<User>): Promise<UserDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, user).exec();
+  }
+
+  async findUserAvailability(
+    userId: Types.ObjectId | string,
+    availabilityId: Types.ObjectId | string,
+  ): Promise<UserDocument | null> {
+    return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
   }
 }
