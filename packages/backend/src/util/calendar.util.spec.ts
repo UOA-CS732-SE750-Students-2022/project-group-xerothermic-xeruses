@@ -10,17 +10,7 @@ interface FakeEvent {
 }
 
 function createEvent(ev: FakeEvent) {
-  const toDateStr = (d: Date) =>
-    [
-      d.getUTCFullYear().toString().padStart(4, '0'),
-      (d.getUTCMonth() + 1).toString().padStart(2, '0'),
-      d.getUTCDate().toString().padStart(2, '0'),
-      'T',
-      d.getUTCHours().toString().padStart(2, '0'),
-      d.getUTCMinutes().toString().padStart(2, '0'),
-      d.getUTCSeconds().toString().padStart(2, '0'),
-      ev.tz ? '' : 'Z',
-    ].join('');
+  const toDateStr = (d: Date) => d.toISOString().replace(/\.\d+|\W/g, '');
   const durationMillisecs = ev.durationMinutes * 60 * 1000;
 
   return [
