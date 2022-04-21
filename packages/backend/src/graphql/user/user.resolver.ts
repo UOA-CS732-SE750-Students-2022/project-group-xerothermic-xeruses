@@ -33,7 +33,7 @@ export class UserResolver {
   }
 
   @Query(() => UserGraphQLModel)
-  async getUser(@Args('id', { type: () => GraphQLString }) id: string) {
+  async getUserById(@Args('id', { type: () => GraphQLString }) id: string) {
     return this.userService.findOne(id);
   }
 
@@ -42,35 +42,39 @@ export class UserResolver {
     return this.userService.findAll();
   }
 
-  @Mutation(() => UserGraphQLModel)
-  async addUser(@Args('addUserInput') addUserInput: AddUserInput) {
-    return this.userService.create(addUserInput);
+  @Auth()
+  @Query(() => UserGraphQLModel)
+  async getCurrentUser(@User() user: DecodedIdToken) {
+    return this.userService.findOneByFirebaseId(user.uid);
   }
 
   @Auth()
-  @Query(() => GraphQLString)
-  getFirebaseId(@User() user: DecodedIdToken) {
-    return user.uid;
+  @Mutation(() => UserGraphQLModel)
+  async addUser(@User() user: DecodedIdToken, @Args('addUserInput') addUserInput: AddUserInput) {
+    return this.userService.create({ ...addUserInput, firebaseId: user.uid });
   }
 
+  @Auth()
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals(
-    @Args('id', { type: () => GraphQLString }) id: string,
+    @User() user: DecodedIdToken,
     @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
-    const user = await this.userService.findOne(id);
-    if (!user) {
+    const firebaseId = user.uid;
+    const userDocument = await this.userService.findOneByFirebaseId(firebaseId);
+
+    if (!userDocument) {
       throw new NotFoundException('Invalid user id');
     }
 
     const calendarUris = (
       await Promise.all(
-        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(id, availabilityId)),
+        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(firebaseId, availabilityId)),
       )
     )
-      .flatMap((userDocument) => (userDocument ? userDocument.availability : []))
+      .flatMap((userDoc) => (userDoc ? userDoc.availability : []))
       .flatMap((availability) => {
         if (availability.type === 'ical') {
           return availability.uri;

@@ -35,14 +35,20 @@ export class UserService {
     return this.model.findById({ _id }).exec();
   }
 
+  async findOneByFirebaseId(firebaseId: string): Promise<UserDocument | null> {
+    return this.model.findOne({ firebaseId: firebaseId }).exec();
+  }
+
   async update(_id: Types.ObjectId | string, user: Partial<User>): Promise<UserDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, user).exec();
   }
 
   async findUserAvailability(
-    userId: Types.ObjectId | string,
+    firebaseId: string,
     availabilityId: Types.ObjectId | string,
   ): Promise<UserDocument | null> {
-    return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
+    return this.model
+      .findOne({ firebaseId: firebaseId, 'availability._id': availabilityId }, { 'availability.$': 1 })
+      .exec();
   }
 }

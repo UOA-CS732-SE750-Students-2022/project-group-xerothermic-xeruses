@@ -14,6 +14,7 @@ export const USER_MODEL_NAME = 'User';
  */
 export interface User {
   name: string;
+  firebaseId: string;
   flocks: Types.ObjectId[];
   flockInvites: Types.ObjectId[];
   availability: UserAvailability[];
@@ -24,6 +25,9 @@ export interface User {
 class UserClass implements User {
   @Prop({ required: true })
   name!: string;
+
+  @Prop({ required: true })
+  firebaseId!: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'Flock', required: true })
   flocks!: Types.ObjectId[];
