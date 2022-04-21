@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
-import { UserAvailability } from './userAvailability.schema';
 
 /**
  * Service for managing Users in the database.
