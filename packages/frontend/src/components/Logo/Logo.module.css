@@ -1,0 +1,17 @@
+.logo {
+  font-family: var(--flocker-font-family-logo);
+  color: white;
+  font-size: 5rem;
+}
+
+.colored {
+  color: var(--flocker-color-primary);
+}
+
+.display {
+  font-size: 5rem;
+}
+
+.footer {
+  font-size: 1rem;
+}

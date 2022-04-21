@@ -1,1 +1,1 @@
-export { default } from "./{{pascalcase name}}";
+export { default } from './{{pascalcase name}}';
