@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { async as icalParser, VEvent } from 'node-ical';
+import { async as icalParser, type CalendarResponse, type VEvent } from 'node-ical';
 import { UserAvailabilityInterval, UserInterval } from './models';
 
 const MILLISECONDS_IN_ONE_DAY = 86400000;
 
 @Injectable()
 export class CalendarUtil {
-  async convertIcalToIntervals(uris: string[], intervals: UserInterval[]): Promise<UserAvailabilityInterval[]> {
-    const events = (await Promise.all(uris.map((uri) => icalParser.fromURL(uri)))).flatMap((event) =>
-      Object.values(event),
-    );
+  async convertIcalToIntervalsFromUris(uris: string[], intervals: UserInterval[]): Promise<UserAvailabilityInterval[]> {
+    const calendars = await Promise.all(uris.map((uri) => icalParser.fromURL(uri)));
+    return this.convertIcalToIntervals(calendars, intervals);
+  }
+
+  convertIcalToIntervals(calendars: CalendarResponse[], intervals: UserInterval[]): UserAvailabilityInterval[] {
+    const events = calendars.flatMap((event) => Object.values(event));
 
     const availabilityIntervals: boolean[] = new Array(intervals.length).fill(true);
     for (const event of events) {

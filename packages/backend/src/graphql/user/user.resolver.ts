@@ -88,7 +88,7 @@ export class UserResolver {
     });
 
     return {
-      availability: this.calendarUtil.convertIcalToIntervals(calendarUris, intervals),
+      availability: this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals),
     };
   }
 }
