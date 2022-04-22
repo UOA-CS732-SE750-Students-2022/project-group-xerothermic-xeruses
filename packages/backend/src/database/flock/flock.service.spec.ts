@@ -14,12 +14,22 @@ const id = (id: string) => {
 
 const mockFlock = (mock?: Partial<Flock>): Flock => ({
   name: mock?.name || '<flock name Alpha>',
+  startDate: mock?.startDate || new Date(Date.UTC(2022, 9, 2)),
+  endDate: mock?.endDate || new Date(Date.UTC(2022, 9, 4)),
+  startHour: mock?.startHour || 10,
+  endHour: mock?.endHour || 14,
+  flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
 });
 
 const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument> => ({
   _id: mock?._id || id('FID_Alpha'),
   name: mock?.name || '<flock name Alpha>',
+  startDate: mock?.startDate || new Date(Date.UTC(2022, 9, 2)),
+  endDate: mock?.endDate || new Date(Date.UTC(2022, 9, 4)),
+  startHour: mock?.startHour || 10,
+  endHour: mock?.endHour || 14,
+  flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
 });
 
