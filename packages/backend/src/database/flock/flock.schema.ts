@@ -8,6 +8,11 @@ export const FLOCK_MODEL_NAME = 'Flock';
  */
 export interface Flock {
   name: string;
+  startDate: Date;
+  endDate: Date;
+  startHour: number;
+  endHour: number;
+  flockCode: string;
   users: Types.ObjectId[];
 }
 
@@ -15,6 +20,21 @@ export interface Flock {
 class FlockClass implements Flock {
   @Prop({ required: true })
   name!: string;
+
+  @Prop({ required: true })
+  startDate!: Date;
+
+  @Prop({ required: true })
+  endDate!: Date;
+
+  @Prop({ required: true })
+  startHour!: number;
+
+  @Prop({ required: true })
+  endHour!: number;
+
+  @Prop({ required: true })
+  flockCode!: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', required: true })
   users!: Types.ObjectId[];

@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Resolver, Args, Query, Parent, ResolveField, Mutation } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -7,12 +8,17 @@ import { FlockService } from '~/database/flock/flock.service';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
+import { FlockUtil } from '~/util/flock.util';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockGraphQLModel } from './models/flock.model';
 
+const MIN_HOUR = 0;
+const MAX_HOUR = 24;
+const FLOCK_CODE_LENGTH = 8;
+
 @Resolver(() => FlockGraphQLModel)
 export class FlockResolver {
-  constructor(private flockService: FlockService, private userService: UserService) {}
+  constructor(private flockService: FlockService, private userService: UserService, private flockUtil: FlockUtil) {}
 
   @ResolveField()
   async users(@Parent() flock: FlockDocument) {
@@ -31,7 +37,13 @@ export class FlockResolver {
 
   @Mutation(() => FlockGraphQLModel)
   async addFlock(@Args('addFlockInput') addFlockInput: AddFlockInput) {
-    return this.flockService.create(addFlockInput);
+    const { startDate, endDate, startHour, endHour } = addFlockInput;
+    if (startDate > endDate || startHour >= endHour || startHour < MIN_HOUR || endHour > MAX_HOUR) {
+      return new BadRequestException('Invalid date or hours');
+    }
+
+    const flockCode = this.flockUtil.generateFlockCode(FLOCK_CODE_LENGTH);
+    return this.flockService.create({ ...addFlockInput, flockCode });
   }
 
   @Auth()
