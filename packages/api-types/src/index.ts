@@ -5,5 +5,6 @@ export * from './userAvailability';
 export * from './userAvailabilityGoogleCalendar';
 export * from './userAvailabilityICal';
 export * from './userSettings';
+export * from './userInterval';
 
 export * from './mutations/index';

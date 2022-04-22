@@ -38,4 +38,11 @@ export class UserService {
   async update(_id: Types.ObjectId | string, user: Partial<User>): Promise<UserDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, user).exec();
   }
+
+  async findUserAvailability(
+    userId: Types.ObjectId | string,
+    availabilityId: Types.ObjectId | string,
+  ): Promise<UserDocument | null> {
+    return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
+  }
 }
