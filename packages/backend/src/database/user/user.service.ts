@@ -44,11 +44,9 @@ export class UserService {
   }
 
   async findUserAvailability(
-    firebaseId: string,
+    userId: Types.ObjectId | undefined,
     availabilityId: Types.ObjectId | string,
   ): Promise<UserDocument | null> {
-    return this.model
-      .findOne({ firebaseId: firebaseId, 'availability._id': availabilityId }, { 'availability.$': 1 })
-      .exec();
+    return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
   }
 }

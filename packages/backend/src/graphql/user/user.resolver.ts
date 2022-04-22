@@ -71,7 +71,9 @@ export class UserResolver {
 
     const calendarUris = (
       await Promise.all(
-        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(firebaseId, availabilityId)),
+        availabilityIds.map((availabilityId) =>
+          this.userService.findUserAvailability(userDocument._id, availabilityId),
+        ),
       )
     )
       .flatMap((userDoc) => (userDoc ? userDoc.availability : []))
