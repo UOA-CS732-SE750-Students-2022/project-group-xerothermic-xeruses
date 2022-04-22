@@ -8,17 +8,21 @@ import { FlockService } from '~/database/flock/flock.service';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
+import { CalendarUtil } from '~/util/calendar.util';
 import { FlockUtil } from '~/util/flock.util';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockGraphQLModel } from './models/flock.model';
 
-const MIN_HOUR = 0;
-const MAX_HOUR = 24;
 const FLOCK_CODE_LENGTH = 8;
 
 @Resolver(() => FlockGraphQLModel)
 export class FlockResolver {
-  constructor(private flockService: FlockService, private userService: UserService, private flockUtil: FlockUtil) {}
+  constructor(
+    private flockService: FlockService,
+    private userService: UserService,
+    private flockUtil: FlockUtil,
+    private calendarUtil: CalendarUtil,
+  ) {}
 
   @ResolveField()
   async users(@Parent() flock: FlockDocument) {
@@ -37,9 +41,14 @@ export class FlockResolver {
 
   @Mutation(() => FlockGraphQLModel)
   async addFlock(@Args('addFlockInput') addFlockInput: AddFlockInput) {
-    const { startDate, endDate, startHour, endHour } = addFlockInput;
-    if (startDate > endDate || startHour >= endHour || startHour < MIN_HOUR || endHour > MAX_HOUR) {
-      return new BadRequestException('Invalid date or hours');
+    for (const flockDay of addFlockInput.flockDays) {
+      const { start, end } = flockDay;
+
+      if (!this.calendarUtil.isValidISOString(start) || !this.calendarUtil.isValidISOString(end)) {
+        throw new BadRequestException('Invalid date format');
+      } else if (start >= end) {
+        return new BadRequestException('Invalid start and end date(s)');
+      }
     }
 
     const flockCode = this.flockUtil.generateFlockCode(FLOCK_CODE_LENGTH);

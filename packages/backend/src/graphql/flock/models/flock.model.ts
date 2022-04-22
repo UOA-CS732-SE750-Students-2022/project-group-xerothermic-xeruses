@@ -1,6 +1,7 @@
-import type { FlockDTO, UserDTO } from '@flocker/api-types';
-import { Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
+import type { FlockDayDTO, FlockDTO, UserDTO } from '@flocker/api-types';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { UserGraphQLModel } from '../../user/models/user.model';
+import { FlockDayGraphQLModel } from './flockDay.model';
 
 @ObjectType()
 export class FlockGraphQLModel implements FlockDTO {
@@ -10,17 +11,8 @@ export class FlockGraphQLModel implements FlockDTO {
   @Field({ nullable: false })
   name!: string;
 
-  @Field(() => GraphQLISODateTime, { nullable: false })
-  startDate!: Date;
-
-  @Field(() => GraphQLISODateTime, { nullable: false })
-  endDate!: Date;
-
-  @Field({ nullable: false })
-  startHour!: number;
-
-  @Field({ nullable: false })
-  endHour!: number;
+  @Field(() => [FlockDayGraphQLModel], { nullable: false })
+  flockDays!: FlockDayDTO[];
 
   @Field({ nullable: false })
   flockCode!: string;

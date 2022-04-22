@@ -7,6 +7,13 @@ import { type Model, type Query, Types } from 'mongoose';
 import { type Flock, type FlockDocument, FLOCK_MODEL_NAME } from './flock.schema';
 import { FlockService } from './flock.service';
 
+const mockFlockDays = [
+  {
+    start: new Date(Date.UTC(2022, 9, 2, 10)).toISOString(),
+    end: new Date(Date.UTC(2022, 9, 2, 16)).toISOString(),
+  },
+];
+
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
   return new Types.ObjectId(id.padEnd(12, '_'));
@@ -14,10 +21,7 @@ const id = (id: string) => {
 
 const mockFlock = (mock?: Partial<Flock>): Flock => ({
   name: mock?.name || '<flock name Alpha>',
-  startDate: mock?.startDate || new Date(Date.UTC(2022, 9, 2)),
-  endDate: mock?.endDate || new Date(Date.UTC(2022, 9, 4)),
-  startHour: mock?.startHour || 10,
-  endHour: mock?.endHour || 14,
+  flockDays: mock?.flockDays || mockFlockDays,
   flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
 });
@@ -25,10 +29,7 @@ const mockFlock = (mock?: Partial<Flock>): Flock => ({
 const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument> => ({
   _id: mock?._id || id('FID_Alpha'),
   name: mock?.name || '<flock name Alpha>',
-  startDate: mock?.startDate || new Date(Date.UTC(2022, 9, 2)),
-  endDate: mock?.endDate || new Date(Date.UTC(2022, 9, 4)),
-  startHour: mock?.startHour || 10,
-  endHour: mock?.endHour || 14,
+  flockDays: mock?.flockDays || mockFlockDays,
   flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
 });

@@ -1,20 +1,12 @@
-import { AddFlockInputDTO } from '@flocker/api-types';
-import { InputType, Field, GraphQLISODateTime } from '@nestjs/graphql';
+import { AddFlockInputDTO, FlockDayDTO } from '@flocker/api-types';
+import { InputType, Field } from '@nestjs/graphql';
+import { FlockDayInput } from './flockDay.input';
 
 @InputType()
 export class AddFlockInput implements AddFlockInputDTO {
   @Field({ nullable: false })
   name!: string;
 
-  @Field(() => GraphQLISODateTime, { nullable: false })
-  startDate!: Date;
-
-  @Field(() => GraphQLISODateTime, { nullable: false })
-  endDate!: Date;
-
-  @Field({ nullable: false })
-  startHour!: number;
-
-  @Field({ nullable: false })
-  endHour!: number;
+  @Field(() => [FlockDayInput], { nullable: false })
+  flockDays!: FlockDayDTO[];
 }

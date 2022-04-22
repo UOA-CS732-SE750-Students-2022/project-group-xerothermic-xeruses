@@ -6,9 +6,11 @@ import type { UserDTO } from './user';
 export interface FlockDTO {
   id: string;
   name: string;
-  startDate: Date;
-  endDate: Date;
-  startHour: number;
-  endHour: number;
+  flockDays: FlockDayDTO[];
   users: UserDTO[];
+}
+
+export interface FlockDayDTO {
+  start: string;
+  end: string;
 }
