@@ -33,7 +33,7 @@ class FlockClass implements Flock {
   @Prop({ required: true })
   endHour!: number;
 
-  @Prop({ required: true })
+  @Prop({ unique: true, required: true })
   flockCode!: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', required: true })
