@@ -13,11 +13,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 2;
 }
 
 .subtitle {
   color: white;
   font-size: var(--flocker-font-size-subtitle);
+  text-align: center;
 }
 
 .buttons {
@@ -25,8 +27,27 @@
   flex-direction: column;
   align-items: center;
   gap: 0.4em;
+  z-index: 2;
 }
 
 .divider {
   width: 150%;
+}
+
+.goose {
+  position: fixed;
+  width: 40vmax;
+  max-width: 500px;
+}
+
+.goose1 {
+  transform: rotate(200deg);
+  left: clamp(-100px, -15vw, 0px);
+  top: -10vh;
+}
+
+.goose2 {
+  transform: rotate(30deg);
+  right: clamp(-100px, -15vw, 0px);
+  bottom: -5vh;
 }

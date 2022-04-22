@@ -32,6 +32,16 @@ const HomeView = () => {
           Continue as Guest
         </Button>
       </div>
+      <img
+        className={`${styles.goose} ${styles.goose1}`}
+        src={`${process.env.PUBLIC_URL}/assets/images/flocker-goose.png`}
+        alt="logo"
+      />
+      <img
+        className={`${styles.goose} ${styles.goose2}`}
+        src={`${process.env.PUBLIC_URL}/assets/images/flocker-goose.png`}
+        alt="logo"
+      />
     </div>
   );
 };
