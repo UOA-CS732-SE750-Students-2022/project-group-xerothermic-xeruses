@@ -23,7 +23,7 @@ class FlockClass implements Flock {
 /**
  * A Flock represents a multi-user ('flock') availability schedule.
  */
-export type FlockDocument = Flock & Omit<Document<Types.ObjectId>, 'id'>;
+export type FlockDocument = Flock & Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * A Flock represents a multi-user ('flock') availability schedule.

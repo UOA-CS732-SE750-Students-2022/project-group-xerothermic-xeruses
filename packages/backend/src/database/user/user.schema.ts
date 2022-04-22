@@ -45,7 +45,7 @@ class UserClass implements User {
 /**
  * A User represents a single unique person with their Flocks, availability & settings.
  */
-export type UserDocument = User & Omit<Document<Types.ObjectId>, 'id'>;
+export type UserDocument = User & Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * A User represents a single unique person with their Flocks, availability & settings.
