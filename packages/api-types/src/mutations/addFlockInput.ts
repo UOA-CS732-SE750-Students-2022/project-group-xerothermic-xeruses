@@ -5,4 +5,8 @@ import { FlockDTO } from '../flock';
  */
 export interface AddFlockInputDTO extends Partial<FlockDTO> {
   name: string;
+  startDate: Date;
+  endDate: Date;
+  startHour: number;
+  endHour: number;
 }
