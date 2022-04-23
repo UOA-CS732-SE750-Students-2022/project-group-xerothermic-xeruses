@@ -4,7 +4,9 @@ import customStyles from './Datepicker.module.css';
 import { DayPicker } from 'react-day-picker';
 
 /* Empty type needed due to Typescript's checker.ts */
-type DatepickerProps = {};
+type DatepickerProps = {
+  datesPicked: (dates: Date[]) => Date[] | undefined;
+};
 
 // eslint-disable-next-line no-empty-pattern
 const Datepicker = ({}: DatepickerProps, datesPicked: (dates: Date[]) => Date[] | undefined) => {
