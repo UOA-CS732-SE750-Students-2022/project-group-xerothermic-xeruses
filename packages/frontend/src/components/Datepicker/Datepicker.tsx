@@ -3,7 +3,7 @@ import styles from 'react-day-picker/dist/style.module.css';
 import customStyles from './Datepicker.module.css';
 import { DayPicker } from 'react-day-picker';
 
-const Datepicker = (datesPicked) => {
+const Datepicker = () => {
   const initialDays: Date[] = [];
   const [days, setDays] = useState<Date[] | undefined>(initialDays);
 
