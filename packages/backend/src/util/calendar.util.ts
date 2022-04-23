@@ -73,11 +73,4 @@ export class CalendarUtil {
   private isDuringInterval(event: Date, intervalStart: Date, intervalEnd: Date, eventDuration: number): boolean {
     return event.getTime() < intervalEnd.getTime() && event.getTime() + eventDuration > intervalStart.getTime();
   }
-
-  isValidISOString(date: string): boolean {
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(date)) {
-      return false;
-    }
-    return true;
-  }
 }

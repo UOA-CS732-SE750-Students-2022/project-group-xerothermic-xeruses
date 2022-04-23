@@ -11,6 +11,6 @@ export interface FlockDTO {
 }
 
 export interface FlockDayDTO {
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
 }

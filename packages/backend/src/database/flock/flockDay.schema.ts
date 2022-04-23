@@ -4,17 +4,17 @@ import { type Document, type Types } from 'mongoose';
  * A Flock represents a multi-user ('flock') availability schedule.
  */
 export interface FlockDay {
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
 }
 
 @Schema()
 class FlockDayClass implements FlockDay {
   @Prop({ required: true })
-  start!: string;
+  start!: Date;
 
   @Prop({ required: true })
-  end!: string;
+  end!: Date;
 }
 
 /**

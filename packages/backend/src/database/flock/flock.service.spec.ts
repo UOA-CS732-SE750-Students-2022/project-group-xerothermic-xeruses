@@ -9,8 +9,8 @@ import { FlockService } from './flock.service';
 
 const mockFlockDays = [
   {
-    start: new Date(Date.UTC(2022, 9, 2, 10)).toISOString(),
-    end: new Date(Date.UTC(2022, 9, 2, 16)).toISOString(),
+    start: new Date(Date.UTC(2022, 9, 2, 10)),
+    end: new Date(Date.UTC(2022, 9, 2, 16)),
   },
 ];
 

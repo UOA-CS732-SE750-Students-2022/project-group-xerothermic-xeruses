@@ -44,9 +44,7 @@ export class FlockResolver {
     for (const flockDay of addFlockInput.flockDays) {
       const { start, end } = flockDay;
 
-      if (!this.calendarUtil.isValidISOString(start) || !this.calendarUtil.isValidISOString(end)) {
-        throw new BadRequestException('Invalid date format');
-      } else if (start >= end) {
+      if (start >= end) {
         return new BadRequestException('Invalid start and end date(s)');
       }
     }
