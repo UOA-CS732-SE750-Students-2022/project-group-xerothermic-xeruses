@@ -23,10 +23,16 @@ function getHours() {
   return hours;
 }
 
-const Timepicker = ({ label }: TimepickerProps) => {
+const Timepicker = ({ label }: TimepickerProps, timeChanged: (date: Date) => Date) => {
   const [time, setTime] = useState('');
   const handleChange = (event: SelectChangeEvent) => {
     setTime(event.target.value as string);
+    const timeAsDate = new Date(new Date().setHours(parseInt(event.target.value.charAt(0)), 0, 0, 0));
+    timeChanged(timeAsDate);
+  };
+
+  timeChanged = (date: Date): Date => {
+    return new Date(date);
   };
 
   const hours = getHours();
