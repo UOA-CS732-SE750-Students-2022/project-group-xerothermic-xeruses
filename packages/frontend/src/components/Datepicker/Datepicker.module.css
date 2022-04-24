@@ -1,0 +1,8 @@
+.selected:not([disabled]),
+.selected:focus:not([disabled]),
+.selected:active:not([disabled]),
+.selected:hover:not([disabled]) {
+  border-color: var(--flocker-color-primary);
+  background-color: var(--flocker-color-primary);
+  color: white;
+}
