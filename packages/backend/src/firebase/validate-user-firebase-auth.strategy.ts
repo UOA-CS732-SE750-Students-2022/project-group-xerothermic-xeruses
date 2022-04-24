@@ -5,7 +5,7 @@ import { DecodedIdToken, getAuth } from 'firebase-admin/auth';
 import { ExtractJwt, Strategy } from 'passport-firebase-jwt';
 
 @Injectable()
-export class ValidateFirebaseAuthStrategy extends PassportStrategy(Strategy, 'validate-firebase-auth') {
+export class ValidateUserFirebaseAuthStrategy extends PassportStrategy(Strategy, 'validate-user-firebase-auth') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
