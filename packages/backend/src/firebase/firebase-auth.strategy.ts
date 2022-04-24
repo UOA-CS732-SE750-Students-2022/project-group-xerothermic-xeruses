@@ -43,7 +43,7 @@ export class FirebaseAuthStrategy extends PassportStrategy(Strategy, 'firebase-a
 
     const user = await this.userService.findOneByFirebaseId(firebaseUser.uid);
 
-    // If the user cannot be found, then return the firebase id so that the user can be created
+    // If the user cannot be found, then return the firebase id so that the user can be created.
     if (!user) {
       return firebaseUser;
     }
