@@ -31,3 +31,10 @@ it('should be able to select multiple days', () => {
   const selectedMessage = screen.getAllByText(/2 day/i);
   expect(selectedMessage).toHaveLength(1);
 });
+
+it('should call datesPicked callback function when date(s) selected', () => {
+  render(<Datepicker datesPicked={mockDatesPicked} />);
+  const buttons = screen.getAllByRole('button');
+  fireEvent.click(buttons[2]);
+  expect(mockDatesPicked).toBeCalledTimes(1);
+});

@@ -3,12 +3,10 @@ import styles from 'react-day-picker/dist/style.module.css';
 import customStyles from './Datepicker.module.css';
 import { DayPicker } from 'react-day-picker';
 
-/* Empty type needed due to Typescript's checker.ts */
 type DatepickerProps = {
   datesPicked: (dates: Date[]) => void;
 };
 
-// eslint-disable-next-line no-empty-pattern
 const Datepicker = ({ datesPicked }: DatepickerProps) => {
   const initialDays: Date[] = [];
   const [days, setDays] = useState<Date[] | undefined>(initialDays);
