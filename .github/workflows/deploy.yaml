@@ -27,11 +27,13 @@ jobs:
       - name: 🛠️ Build
         env:
           REACT_APP_FIREBASE_CONFIG_JSON: ${{ secrets.FIREBASE_CONFIG_JSON }}
+          REACT_APP_SERVER_URI: http://localhost:9001/graphql
         run: npm run build
 
       - name: ⚡ Test
         env:
           REACT_APP_FIREBASE_CONFIG_JSON: ${{ secrets.FIREBASE_CONFIG_JSON }}
+          REACT_APP_SERVER_URI: http://localhost:9001/graphql
         run: npm run test
 
       - name: 🚀 Deploy to GitHub Pages
