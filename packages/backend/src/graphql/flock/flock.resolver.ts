@@ -1,10 +1,9 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Args, Query, Parent, ResolveField, Mutation } from '@nestjs/graphql';
-// eslint-disable-next-line import/no-unresolved
-import { DecodedIdToken } from 'firebase-admin/auth';
 import { GraphQLString } from 'graphql';
 import { FlockDocument } from '~/database/flock/flock.schema';
 import { FlockService } from '~/database/flock/flock.service';
+import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
@@ -44,25 +43,18 @@ export class FlockResolver {
 
   @Auth()
   @Mutation(() => FlockGraphQLModel)
-  async joinFlock(@Args('flockCode', { type: () => GraphQLString }) flockCode: string, @User() user: DecodedIdToken) {
-    const firebaseId = user.uid;
-    const userDocument = await this.userService.findOneByFirebaseId(firebaseId);
-
-    if (!userDocument) {
-      throw new NotFoundException('Invalid user id');
-    }
-
+  async joinFlock(@Args('flockCode', { type: () => GraphQLString }) flockCode: string, @User() user: UserDocument) {
     const flock = await this.flockService.findOneByCode(flockCode);
 
     if (!flock) {
       throw new NotFoundException('Invalid flock code');
     }
 
-    if (flock.users.includes(userDocument._id)) {
+    if (flock.users.includes(user._id)) {
       throw new BadRequestException('User is already in this flock');
     }
 
-    await this.flockService.update(flock._id, { users: [...flock.users, userDocument._id] });
+    await this.flockService.update(flock._id, { users: [...flock.users, user._id] });
     return this.flockService.findOne(flock._id);
   }
 }

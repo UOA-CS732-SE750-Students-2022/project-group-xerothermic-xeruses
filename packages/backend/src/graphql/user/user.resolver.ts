@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -44,8 +44,8 @@ export class UserResolver {
 
   @Auth()
   @Query(() => UserGraphQLModel)
-  async getCurrentUser(@User() user: DecodedIdToken) {
-    return this.userService.findOneByFirebaseId(user.uid);
+  async getCurrentUser(@User() user: UserDocument) {
+    return user;
   }
 
   @Auth()
@@ -57,26 +57,17 @@ export class UserResolver {
   @Auth()
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals(
-    @User() user: DecodedIdToken,
+    @User() user: UserDocument,
     @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
-    const firebaseId = user.uid;
-    const userDocument = await this.userService.findOneByFirebaseId(firebaseId);
-
-    if (!userDocument) {
-      throw new NotFoundException('Invalid user id');
-    }
-
     const calendarUris = (
       await Promise.all(
-        availabilityIds.map((availabilityId) =>
-          this.userService.findUserAvailability(userDocument._id, availabilityId),
-        ),
+        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
       )
     )
-      .flatMap((userDoc) => (userDoc ? userDoc.availability : []))
+      .flatMap((userDocument) => (userDocument ? userDocument.availability : []))
       .flatMap((availability) => {
         if (availability.type === 'ical') {
           return availability.uri;
