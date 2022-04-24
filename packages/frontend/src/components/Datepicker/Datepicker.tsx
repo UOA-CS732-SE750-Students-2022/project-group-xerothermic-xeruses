@@ -21,7 +21,7 @@ const Datepicker = ({ datesPicked }: DatepickerProps) => {
     days && days.length > 0 ? <p>You selected {days.length} day(s).</p> : <p>Please pick one or more days.</p>;
 
   return (
-    <>
+    <div>
       <DayPicker
         classNames={styles}
         modifiersClassNames={{ selected: `${customStyles.selected}` }}
@@ -31,7 +31,7 @@ const Datepicker = ({ datesPicked }: DatepickerProps) => {
         onSelect={handleChange}
         footer={footer}
       />
-    </>
+    </div>
   );
 };
 
