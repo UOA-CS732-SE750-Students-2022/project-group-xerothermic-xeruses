@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 // Do not destructure imports from firebase-admin otherwise it will break
@@ -9,10 +9,15 @@ import { cert, Credential, ServiceAccount } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { ExtractJwt, Strategy } from 'passport-firebase-jwt';
 import { FirebaseConfig } from '~/config/firebaseConfig.schema';
+import { UserDocument } from '~/database/user/user.schema';
+import { UserService } from '~/database/user/user.service';
 
 @Injectable()
 export class FirebaseAuthStrategy extends PassportStrategy(Strategy, 'firebase-auth') {
-  constructor(private readonly configService: ConfigService<FirebaseConfig, true>) {
+  constructor(
+    private readonly configService: ConfigService<FirebaseConfig, true>,
+    private readonly userService: UserService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
@@ -25,7 +30,7 @@ export class FirebaseAuthStrategy extends PassportStrategy(Strategy, 'firebase-a
     return cert(JSON.parse(this.configService.get('FIREBASE_SERVICE_ACCOUNT')) as ServiceAccount);
   }
 
-  async validate(token: string) {
+  async validate(token: string): Promise<UserDocument> {
     const firebaseUser = await getAuth()
       .verifyIdToken(token, true)
       .catch((error: Error) => {
@@ -36,6 +41,11 @@ export class FirebaseAuthStrategy extends PassportStrategy(Strategy, 'firebase-a
       throw new UnauthorizedException();
     }
 
-    return firebaseUser;
+    const user = await this.userService.findOneByFirebaseId(firebaseUser.uid);
+    if (!user) {
+      throw new NotFoundException("User doesn't exist");
+    }
+
+    return user;
   }
 }

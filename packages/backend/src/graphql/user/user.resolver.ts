@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -8,6 +8,7 @@ import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
+import { ValidateUser } from '~/decorators/validate-user-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
 import { AddUserInput } from './inputs/addUser.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
@@ -44,11 +45,11 @@ export class UserResolver {
 
   @Auth()
   @Query(() => UserGraphQLModel)
-  async getCurrentUser(@User() user: DecodedIdToken) {
-    return this.userService.findOneByFirebaseId(user.uid);
+  async getCurrentUser(@User() user: UserDocument) {
+    return user;
   }
 
-  @Auth()
+  @ValidateUser()
   @Mutation(() => UserGraphQLModel)
   async addUser(@User() user: DecodedIdToken, @Args('addUserInput') addUserInput: AddUserInput) {
     return this.userService.create({ ...addUserInput, firebaseId: user.uid });
@@ -57,26 +58,17 @@ export class UserResolver {
   @Auth()
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals(
-    @User() user: DecodedIdToken,
+    @User() user: UserDocument,
     @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
-    const firebaseId = user.uid;
-    const userDocument = await this.userService.findOneByFirebaseId(firebaseId);
-
-    if (!userDocument) {
-      throw new NotFoundException('Invalid user id');
-    }
-
     const calendarUris = (
       await Promise.all(
-        availabilityIds.map((availabilityId) =>
-          this.userService.findUserAvailability(userDocument._id, availabilityId),
-        ),
+        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
       )
     )
-      .flatMap((userDoc) => (userDoc ? userDoc.availability : []))
+      .flatMap((userDocument) => (userDocument ? userDocument.availability : []))
       .flatMap((availability) => {
         if (availability.type === 'ical') {
           return availability.uri;
