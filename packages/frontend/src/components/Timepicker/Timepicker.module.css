@@ -1,0 +1,5 @@
+.select {
+  min-width: 8rem;
+  max-height: min-content;
+  color: var(--flocker-color-primary);
+}
