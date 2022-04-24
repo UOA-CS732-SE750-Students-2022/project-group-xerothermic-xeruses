@@ -26,7 +26,7 @@ class UserSettingsClass implements UserSettings {
 /**
  * UserSettings is an embedded document containing preferences for a single user.
  */
-export type UserSettingsDocument = UserSettings & Omit<Document<Types.ObjectId>, 'id'>;
+export type UserSettingsDocument = UserSettings & Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * UserSettings is an embedded document containing preferences for a single user.

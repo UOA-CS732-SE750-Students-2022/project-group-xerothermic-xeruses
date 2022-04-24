@@ -25,7 +25,8 @@ class UserAvailabilityICalClass implements UserAvailabilityICal {
 /**
  * External .ical datasource for user availability.
  */
-export type UserAvailabilityICalDocument = UserAvailabilityICalClass & Omit<Document<Types.ObjectId>, 'id'>;
+export type UserAvailabilityICalDocument = UserAvailabilityICalClass &
+  Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * External .ical datasource for user availability.

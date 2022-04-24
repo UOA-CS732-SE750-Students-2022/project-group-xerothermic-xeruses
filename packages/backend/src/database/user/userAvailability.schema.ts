@@ -43,7 +43,8 @@ class UserAvailabilityClass /* implements UserAvailability */ {
 /**
  * UserAvailability is a datasource for a user availability schedule.
  */
-export type UserAvailabilityDocument = UserAvailability & Omit<Document<Types.ObjectId>, 'id'>;
+export type UserAvailabilityDocument = UserAvailability &
+  Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * UserAvailability is a datasource for a user availability schedule.

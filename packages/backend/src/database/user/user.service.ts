@@ -35,6 +35,10 @@ export class UserService {
     return this.model.findById({ _id }).exec();
   }
 
+  async findOneByFirebaseId(firebaseId: string): Promise<UserDocument | null> {
+    return this.model.findOne({ firebaseId }).exec();
+  }
+
   async update(_id: Types.ObjectId | string, user: Partial<User>): Promise<UserDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, user).exec();
   }
