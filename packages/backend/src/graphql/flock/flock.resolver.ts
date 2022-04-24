@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Resolver, Args, Query, Parent, ResolveField, Mutation } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -31,6 +32,13 @@ export class FlockResolver {
 
   @Mutation(() => FlockGraphQLModel)
   async addFlock(@Args('addFlockInput') addFlockInput: AddFlockInput) {
+    for (const flockDay of addFlockInput.flockDays) {
+      const { start, end } = flockDay;
+
+      if (start >= end) {
+        return new BadRequestException('Invalid start and end date(s)');
+      }
+    }
     return this.flockService.create(addFlockInput);
   }
 

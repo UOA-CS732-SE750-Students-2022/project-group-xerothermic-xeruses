@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { type Document, Schema as MSchema, type Types } from 'mongoose';
+import { FlockDay } from './flockDay.schema';
 
 export const FLOCK_MODEL_NAME = 'Flock';
 
@@ -8,6 +9,8 @@ export const FLOCK_MODEL_NAME = 'Flock';
  */
 export interface Flock {
   name: string;
+  flockDays: FlockDay[];
+  flockCode: string;
   users: Types.ObjectId[];
 }
 
@@ -15,6 +18,12 @@ export interface Flock {
 class FlockClass implements Flock {
   @Prop({ required: true })
   name!: string;
+
+  @Prop({ required: true })
+  flockDays!: FlockDay[];
+
+  @Prop({ unique: true, required: true })
+  flockCode!: string;
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', required: true })
   users!: Types.ObjectId[];

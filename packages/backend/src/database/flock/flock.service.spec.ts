@@ -4,8 +4,16 @@ import { createMock } from '@golevelup/ts-jest';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { type Model, type Query, Types } from 'mongoose';
+import { FlockUtil } from '~/util/flock.util';
 import { type Flock, type FlockDocument, FLOCK_MODEL_NAME } from './flock.schema';
 import { FlockService } from './flock.service';
+
+const mockFlockDays = [
+  {
+    start: new Date(Date.UTC(2022, 9, 2, 10)),
+    end: new Date(Date.UTC(2022, 9, 2, 16)),
+  },
+];
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
@@ -14,12 +22,16 @@ const id = (id: string) => {
 
 const mockFlock = (mock?: Partial<Flock>): Flock => ({
   name: mock?.name || '<flock name Alpha>',
+  flockDays: mock?.flockDays || mockFlockDays,
+  flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
 });
 
 const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument> => ({
   _id: mock?._id || id('FID_Alpha'),
   name: mock?.name || '<flock name Alpha>',
+  flockDays: mock?.flockDays || mockFlockDays,
+  flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
 });
 
@@ -33,17 +45,20 @@ const FLOCKS = FLOCK_DOCUMENTS.map(mockFlock);
 
 describe(FlockService.name, () => {
   let service: FlockService;
+  let util: FlockUtil;
   let model: Model<FlockDocument>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FlockService,
+        FlockUtil,
         {
           provide: getModelToken(FLOCK_MODEL_NAME),
           useValue: class {
             static create = jest.fn();
             static find = jest.fn();
+            static findOne = jest.fn();
             static findById = jest.fn();
             static findByIdAndRemove = jest.fn();
             static findByIdAndUpdate = jest.fn();
@@ -54,6 +69,7 @@ describe(FlockService.name, () => {
     }).compile();
 
     service = module.get(FlockService);
+    util = module.get(FlockUtil);
     model = module.get(getModelToken(FLOCK_MODEL_NAME));
   });
 
@@ -69,6 +85,8 @@ describe(FlockService.name, () => {
 
   it('should insert a new flock', async () => {
     jest.spyOn(model, 'create').mockReturnValueOnce(FLOCK_DOCUMENTS[0] as any);
+    jest.spyOn(model, 'findOne').mockReturnValueOnce(null as any);
+    jest.spyOn(util, 'generateFlockCode').mockReturnValueOnce('<flock flockCode Alpha>' as any);
     const newFlock = await service.create(FLOCKS[0]);
     expect(newFlock).toEqual(FLOCK_DOCUMENTS[0]);
   });
