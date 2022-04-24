@@ -5,11 +5,11 @@ import { DayPicker } from 'react-day-picker';
 
 /* Empty type needed due to Typescript's checker.ts */
 type DatepickerProps = {
-  datesPicked: (dates: Date[]) => Date[] | undefined;
+  datesPicked: (dates: Date[]) => void;
 };
 
 // eslint-disable-next-line no-empty-pattern
-const Datepicker = ({}: DatepickerProps, datesPicked: (dates: Date[]) => Date[] | undefined) => {
+const Datepicker = ({}: DatepickerProps, datesPicked: (dates: Date[]) => void) => {
   const initialDays: Date[] = [];
   const [days, setDays] = useState<Date[] | undefined>(initialDays);
 
