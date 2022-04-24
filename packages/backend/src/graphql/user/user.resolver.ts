@@ -8,6 +8,7 @@ import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
+import { ValidateAuth } from '~/decorators/validate-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
 import { AddUserInput } from './inputs/addUser.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
@@ -48,7 +49,7 @@ export class UserResolver {
     return user;
   }
 
-  @Auth()
+  @ValidateAuth()
   @Mutation(() => UserGraphQLModel)
   async addUser(@User() user: DecodedIdToken, @Args('addUserInput') addUserInput: AddUserInput) {
     return this.userService.create({ ...addUserInput, firebaseId: user.uid });
