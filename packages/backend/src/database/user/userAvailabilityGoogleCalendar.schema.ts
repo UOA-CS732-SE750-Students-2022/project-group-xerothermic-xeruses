@@ -34,7 +34,7 @@ class UserAvailabilityGoogleCalendarClass implements UserAvailabilityGoogleCalen
  * Google Calendar datasource for user availability.
  */
 export type UserAvailabilityGoogleCalendarDocument = UserAvailabilityGoogleCalendarClass &
-  Omit<Document<Types.ObjectId>, 'id'>;
+  Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * Google Calendar datasource for user availability.

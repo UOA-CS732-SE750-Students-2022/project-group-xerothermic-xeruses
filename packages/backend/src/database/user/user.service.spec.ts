@@ -14,6 +14,7 @@ const id = (id: string) => {
 
 const mockUser = (mock?: Partial<User>): User => ({
   name: mock?.name || '<user name Alpha>',
+  firebaseId: mock?.firebaseId || '<user firebaseId Alpha>',
   flocks: [],
   flockInvites: [],
   availability: [],
@@ -22,6 +23,7 @@ const mockUser = (mock?: Partial<User>): User => ({
 const mockUserDocument = (mock?: Partial<UserDocument>): Partial<UserDocument> => ({
   _id: mock?._id || id('UID_Alpha'),
   name: mock?.name || '<user name Alpha>',
+  firebaseId: mock?.firebaseId || '<user firebaseId Alpha>',
   flocks: mock?.flocks || [],
   flockInvites: mock?.flockInvites || [],
   availability: mock?.availability || [],
@@ -29,8 +31,8 @@ const mockUserDocument = (mock?: Partial<UserDocument>): Partial<UserDocument> =
 
 const USER_DOCUMENTS = [
   mockUserDocument(),
-  mockUserDocument({ _id: id('UID_Bravo'), name: '<user uuid Bravo>' }),
-  mockUserDocument({ _id: id('UID_Charlie'), name: '<user uuid Charlie>' }),
+  mockUserDocument({ _id: id('UID_Bravo'), name: '<user uuid Bravo>', firebaseId: '<user firebaseId Bravo>' }),
+  mockUserDocument({ _id: id('UID_Charlie'), name: '<user uuid Charlie>', firebaseId: '<user firebaseId Charlie>' }),
 ];
 
 const USERS = USER_DOCUMENTS.map(mockUser);
@@ -48,6 +50,7 @@ describe(UserService.name, () => {
           useValue: class {
             static create = jest.fn();
             static find = jest.fn();
+            static findOne = jest.fn();
             static findById = jest.fn();
             static findByIdAndRemove = jest.fn();
             static findByIdAndUpdate = jest.fn();
@@ -68,8 +71,6 @@ describe(UserService.name, () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-
-  //
 
   it('should insert a new user', async () => {
     jest.spyOn(model, 'create').mockReturnValueOnce(USER_DOCUMENTS[0] as any);
@@ -101,6 +102,16 @@ describe(UserService.name, () => {
       }) as any,
     );
     const foundUser = await service.findOne(USER_DOCUMENTS[0]._id!);
+    expect(foundUser).toEqual(USER_DOCUMENTS[0]);
+  });
+
+  it('should find one by firebaseId', async () => {
+    jest.spyOn(model, 'findOne').mockReturnValueOnce(
+      createMock<Query<UserDocument, UserDocument>>({
+        exec: jest.fn().mockResolvedValueOnce(mockUserDocument(USER_DOCUMENTS[0])),
+      }) as any,
+    );
+    const foundUser = await service.findOneByFirebaseId(USER_DOCUMENTS[0].firebaseId!);
     expect(foundUser).toEqual(USER_DOCUMENTS[0]);
   });
 

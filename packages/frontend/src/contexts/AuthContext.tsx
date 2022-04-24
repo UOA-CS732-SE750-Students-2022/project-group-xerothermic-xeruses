@@ -5,11 +5,13 @@ import { User } from 'firebase/auth';
 type AuthContextType = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  signedIn: boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   setUser: () => null,
+  signedIn: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -22,6 +24,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
       value={{
         user,
         setUser,
+        signedIn: !!user,
       }}
     >
       {children}
