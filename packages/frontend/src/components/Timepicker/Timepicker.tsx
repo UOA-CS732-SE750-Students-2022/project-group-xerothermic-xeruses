@@ -7,49 +7,47 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 type TimepickerProps = {
   label: string;
+  timeChanged: (date: Date) => void;
 };
 
 /* Generates all 24 hours in 12 hour format with AM/PM */
 function getHours() {
-  const hours = [];
-  const date = new Date(new Date().setHours(0, 0, 0, 0));
+  const hours = new Map<string, Date>();
 
   for (let i = 0; i < 24; i++) {
-    const ampm = date.getHours() + i >= 12 ? 'pm' : 'am';
-    date.getHours() + i > 12
-      ? (hours[i] = `${date.getHours() + i - 12} ${ampm}`)
-      : (hours[i] = `${date.getHours() + i} ${ampm}`);
+    const ampm = i >= 12 ? 'pm' : 'am';
+    const timeString = i > 12 ? `${i - 12}:00 ${ampm}` : `${i}:00 ${ampm}`;
+    const timeAsDate = new Date();
+    timeAsDate.setHours(i, 0, 0, 0);
+    hours.set(timeString, timeAsDate);
   }
+
   return hours;
 }
 
-const Timepicker = ({ label }: TimepickerProps, timeChanged: (date: Date) => Date) => {
+const Timepicker = ({ label, timeChanged }: TimepickerProps) => {
   const [time, setTime] = useState('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setTime(event.target.value as string);
-    const timeAsDate = new Date(new Date().setHours(parseInt(event.target.value.charAt(0)), 0, 0, 0));
-    timeChanged(timeAsDate);
-  };
-
-  timeChanged = (date: Date): Date => {
-    return new Date(date);
-  };
-
   const hours = getHours();
+
+  const handleChange = (event: SelectChangeEvent) => {
+    const timeString = event.target.value as string;
+    setTime(timeString);
+    timeChanged(hours.get(timeString) as Date);
+  };
 
   return (
     <div>
-      <FormControl variant="standard" className={`${styles.select}`}>
+      <FormControl variant="standard" className={styles.select}>
         <InputLabel id="demo-simple-select-standard-label">{label}</InputLabel>
         <Select
-          role={'menu'}
+          role="menu"
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
           value={time}
           onChange={handleChange}
         >
-          {hours.map((hour) => (
-            <MenuItem role={'menuitem'} value={hour} key={hour}>
+          {Array.from(hours.keys()).map((hour) => (
+            <MenuItem role="menuitem" value={hour} key={hour}>
               {hour}
             </MenuItem>
           ))}
