@@ -8,21 +8,12 @@ import { FlockService } from '~/database/flock/flock.service';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
-import { CalendarUtil } from '~/util/calendar.util';
-import { FlockUtil } from '~/util/flock.util';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockGraphQLModel } from './models/flock.model';
 
-const FLOCK_CODE_LENGTH = 8;
-
 @Resolver(() => FlockGraphQLModel)
 export class FlockResolver {
-  constructor(
-    private flockService: FlockService,
-    private userService: UserService,
-    private flockUtil: FlockUtil,
-    private calendarUtil: CalendarUtil,
-  ) {}
+  constructor(private flockService: FlockService, private userService: UserService) {}
 
   @ResolveField()
   async users(@Parent() flock: FlockDocument) {
@@ -48,9 +39,7 @@ export class FlockResolver {
         return new BadRequestException('Invalid start and end date(s)');
       }
     }
-
-    const flockCode = this.flockUtil.generateFlockCode(FLOCK_CODE_LENGTH);
-    return this.flockService.create({ ...addFlockInput, flockCode });
+    return this.flockService.create(addFlockInput);
   }
 
   @Auth()
