@@ -9,16 +9,18 @@ type DatepickerProps = {
 };
 
 // eslint-disable-next-line no-empty-pattern
-const Datepicker = ({}: DatepickerProps, datesPicked: (dates: Date[]) => void) => {
+const Datepicker = ({ datesPicked }: DatepickerProps) => {
   const initialDays: Date[] = [];
   const [days, setDays] = useState<Date[] | undefined>(initialDays);
 
+  const handleChange = (dates: Date[] | undefined) => {
+    setDays(dates);
+    if (dates) dates.sort((date1, date2) => date1.valueOf() - date2.valueOf());
+    datesPicked(dates as Date[]);
+  };
+
   const footer =
     days && days.length > 0 ? <p>You selected {days.length} day(s).</p> : <p>Please pick one or more days.</p>;
-
-  datesPicked = (dates: Date[]) => {
-    return days;
-  };
 
   return (
     <>
@@ -28,7 +30,7 @@ const Datepicker = ({}: DatepickerProps, datesPicked: (dates: Date[]) => void) =
         mode="multiple"
         min={1}
         selected={days}
-        onSelect={setDays}
+        onSelect={handleChange}
         footer={footer}
       />
     </>
