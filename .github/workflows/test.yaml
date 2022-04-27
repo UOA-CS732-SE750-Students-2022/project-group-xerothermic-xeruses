@@ -43,4 +43,5 @@ jobs:
       - name: ⚡ Test
         env:
           REACT_APP_FIREBASE_CONFIG_JSON: ${{ secrets.FIREBASE_CONFIG_JSON }}
+          REACT_APP_SERVER_URI: ${{ secrets.SERVER_URI }}
         run: npm run test
