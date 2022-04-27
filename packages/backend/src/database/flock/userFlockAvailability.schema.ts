@@ -6,7 +6,7 @@ import { type Document, Schema as MSchema, type Types } from 'mongoose';
  */
 export interface UserFlockAvailability {
   user: Types.ObjectId;
-  userAvailability: Types.ObjectId;
+  userAvailabilityId: Types.ObjectId;
   enabled: boolean;
 }
 
@@ -16,7 +16,7 @@ class UserFlockAvailabilityClass implements UserFlockAvailability {
   user!: Types.ObjectId;
 
   @Prop({ type: MSchema.Types.ObjectId, ref: 'UserAvailability', required: true })
-  userAvailability!: Types.ObjectId;
+  userAvailabilityId!: Types.ObjectId;
 
   @Prop({ required: true })
   enabled!: boolean;

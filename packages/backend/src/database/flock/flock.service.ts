@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
 import { FLOCK_MODEL_NAME, type Flock, type FlockDocument } from './flock.schema';
+import { UserFlockAvailability } from './userFlockAvailability.schema';
 
 const FLOCK_CODE_LENGTH = 8;
 
@@ -53,5 +54,22 @@ export class FlockService {
 
   async update(_id: Types.ObjectId | string, flock: Partial<Flock>): Promise<FlockDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, flock, { new: true }).exec();
+  }
+
+  async addUserFlockAvailability(
+    _id: Types.ObjectId | string,
+    userFlockAvailability: UserFlockAvailability,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $push: {
+            userFlockAvailability: userFlockAvailability,
+          },
+        },
+        { new: true },
+      )
+      .exec();
   }
 }

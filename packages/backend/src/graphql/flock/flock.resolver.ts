@@ -23,19 +23,17 @@ export class FlockResolver {
   @ResolveField()
   async userFlockAvailability(@Parent() flock: FlockDocument) {
     const userFlockAvailabilityIds = flock.userFlockAvailability.map((userFlockAvailability) => {
-      return userFlockAvailability.userAvailability;
+      return userFlockAvailability.userAvailabilityId;
     });
 
     const userAvailability = await this.userService.findManyUserAvailability(userFlockAvailabilityIds);
 
     return Promise.all(
-      userAvailability.map((document, index) => {
-        return {
-          user: this.userService.findOne(document._id),
-          userAvailability: document.availability,
-          enabled: flock.userFlockAvailability[index].enabled,
-        };
-      }),
+      userAvailability.map((document, index) => ({
+        user: this.userService.findOne(document.userId),
+        userAvailability: document.availabilityDocument,
+        enabled: flock.userFlockAvailability[index].enabled,
+      })),
     );
   }
 
@@ -87,43 +85,35 @@ export class FlockResolver {
     const flock = await this.flockService.findOneByCode(flockCode);
 
     if (!flock) {
-      throw new NotFoundException('Invalid flock code');
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
     } else if (!flock.users.includes(user._id)) {
       throw new BadRequestException('User is not in this flock');
     }
 
     const userAvailability = await this.userService.findUserAvailability(
       user._id,
-      userFlockAvailabilityInput.userAvailability,
+      userFlockAvailabilityInput.userAvailabilityId,
     );
 
     if (!userAvailability) {
-      throw new NotFoundException('Invalid user availability id');
+      throw new NotFoundException(`Invalid user availability id: ${userFlockAvailabilityInput.userAvailabilityId}`);
     }
 
     let existingIndex = 0;
-    const existingUserFlockAvailability = flock.userFlockAvailability.find((userFlockAvailability, index) => {
-      existingIndex = index;
-      return userFlockAvailability.userAvailability.toString() === userFlockAvailabilityInput.userAvailability;
-    });
-
-    if (existingUserFlockAvailability) {
-      flock.userFlockAvailability[existingIndex].enabled = userFlockAvailabilityInput.enabled;
-
-      return this.flockService.update(flock._id, {
-        userFlockAvailability: [...flock.userFlockAvailability],
-      });
+    for (const userFlockAvailability of flock.userFlockAvailability) {
+      if (userFlockAvailability.userAvailabilityId.toString() === userFlockAvailabilityInput.userAvailabilityId) {
+        flock.userFlockAvailability[existingIndex].enabled = userFlockAvailabilityInput.enabled;
+        return this.flockService.update(flock._id, {
+          userFlockAvailability: [...flock.userFlockAvailability],
+        });
+      }
+      existingIndex++;
     }
 
-    return this.flockService.update(flock._id, {
-      userFlockAvailability: [
-        ...flock.userFlockAvailability,
-        {
-          user: user._id,
-          userAvailability: userAvailability.availability[0]._id,
-          enabled: userFlockAvailabilityInput.enabled,
-        },
-      ],
+    return this.flockService.addUserFlockAvailability(flock._id, {
+      user: user._id,
+      userAvailabilityId: userAvailability.availability[0]._id,
+      enabled: userFlockAvailabilityInput.enabled,
     });
   }
 }

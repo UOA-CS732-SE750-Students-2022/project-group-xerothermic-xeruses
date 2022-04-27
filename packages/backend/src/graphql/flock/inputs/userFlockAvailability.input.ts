@@ -4,7 +4,7 @@ import { InputType, Field, ID } from '@nestjs/graphql';
 @InputType()
 export class UserFlockAvailabilityInput implements UserFlockAvailabilityInputDTO {
   @Field(() => ID, { nullable: false })
-  userAvailability!: string;
+  userAvailabilityId!: string;
 
   @Field({ nullable: false })
   enabled!: boolean;

@@ -14,6 +14,6 @@ export interface UserFlockAvailabilityDTO {
  * Used to enable/disable a users calendar for a flock.
  */
 export interface UserFlockAvailabilityInputDTO {
-  userAvailability: string;
+  userAvailabilityId: string;
   enabled: boolean;
 }

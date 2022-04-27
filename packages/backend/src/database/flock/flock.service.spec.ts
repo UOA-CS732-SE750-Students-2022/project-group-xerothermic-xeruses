@@ -34,12 +34,24 @@ const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument
   flockDays: mock?.flockDays || mockFlockDays,
   flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
+  userFlockAvailability: mock?.userFlockAvailability || [],
 });
 
 const FLOCK_DOCUMENTS = [
   mockFlockDocument(),
   mockFlockDocument({ _id: id('FID_Bravo'), name: '<flock name Bravo>', users: [] }),
-  mockFlockDocument({ _id: id('FID_Charlie'), name: '<flock name Charlie>', users: [] }),
+  mockFlockDocument({
+    _id: id('FID_Charlie'),
+    name: '<flock name Charlie>',
+    users: [],
+    userFlockAvailability: [
+      {
+        user: id('UID_Charlie'),
+        userAvailabilityId: id('UAID_Charlie'),
+        enabled: false,
+      },
+    ],
+  }),
 ];
 
 const FLOCKS = FLOCK_DOCUMENTS.map(mockFlock);
@@ -127,5 +139,18 @@ describe(FlockService.name, () => {
     );
     const updatedFlock = await service.update(FLOCK_DOCUMENTS[0]._id!, FLOCKS[0]);
     expect(updatedFlock).toEqual(FLOCK_DOCUMENTS[0]);
+  });
+
+  it('should add a UserFlockAvailability successfully', async () => {
+    jest.spyOn(model, 'findByIdAndUpdate').mockReturnValueOnce(
+      createMock<Query<FlockDocument, FlockDocument>>({
+        exec: jest.fn().mockResolvedValueOnce(FLOCK_DOCUMENTS[2]),
+      }) as any,
+    );
+    const updatedFlock = await service.addUserFlockAvailability(
+      FLOCK_DOCUMENTS[2]._id!,
+      FLOCKS[2].userFlockAvailability[0],
+    );
+    expect(updatedFlock).toEqual(FLOCK_DOCUMENTS[2]);
   });
 });
