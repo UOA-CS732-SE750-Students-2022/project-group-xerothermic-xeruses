@@ -49,4 +49,25 @@ export class UserService {
   ): Promise<UserDocument | null> {
     return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
   }
+
+  async findManyUserAvailability(availabilityIds: (Types.ObjectId | string)[]): Promise<UserDocument[]> {
+    return this.model
+      .aggregate([
+        {
+          $unwind: '$availability',
+        },
+        {
+          $match: {
+            'availability._id': { $in: availabilityIds },
+          },
+        },
+        {
+          $project: {
+            _id: '$_id',
+            availability: '$availability',
+          },
+        },
+      ])
+      .exec();
+  }
 }

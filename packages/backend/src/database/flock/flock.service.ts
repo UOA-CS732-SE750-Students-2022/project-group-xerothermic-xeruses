@@ -18,9 +18,9 @@ export class FlockService {
     private flockUtil: FlockUtil,
   ) {}
 
-  async create(flock: Omit<Flock, 'users' | 'flockCode'>): Promise<FlockDocument> {
+  async create(flock: Omit<Flock, 'users' | 'flockCode' | 'userFlockAvailability'>): Promise<FlockDocument> {
     const flockCode = await this.flockUtil.generateFlockCode(FLOCK_CODE_LENGTH);
-    return this.model.create({ ...flock, flockCode, users: [] });
+    return this.model.create({ ...flock, flockCode, users: [], userFlockAvailability: [] });
   }
 
   async delete(_id: Types.ObjectId | string): Promise<FlockDocument | null> {
@@ -52,6 +52,6 @@ export class FlockService {
   }
 
   async update(_id: Types.ObjectId | string, flock: Partial<Flock>): Promise<FlockDocument | null> {
-    return this.model.findByIdAndUpdate({ _id }, flock).exec();
+    return this.model.findByIdAndUpdate({ _id }, flock, { new: true }).exec();
   }
 }

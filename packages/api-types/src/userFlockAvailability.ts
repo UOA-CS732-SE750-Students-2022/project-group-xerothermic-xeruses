@@ -1,10 +1,19 @@
+import { UserDTO } from './user';
 import { UserAvailabilityDTO } from './userAvailability';
 
 /**
- * Used to return the users availability for all dates.
+ * Used to return the representation of a users calendar being disabled/enabled for a flock.
  */
 export interface UserFlockAvailabilityDTO {
-  // We can send back the entire calendar on response, but only want to provide the calendar id on request.
-  flockAvailability: UserAvailabilityDTO | string;
+  user: UserDTO;
+  userAvailability: UserAvailabilityDTO;
+  enabled: boolean;
+}
+
+/**
+ * Used to enable/disable a users calendar for a flock.
+ */
+export interface UserFlockAvailabilityInputDTO {
+  userAvailability: string;
   enabled: boolean;
 }

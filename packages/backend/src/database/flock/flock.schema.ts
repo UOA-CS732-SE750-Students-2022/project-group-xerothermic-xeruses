@@ -13,7 +13,7 @@ export interface Flock {
   flockDays: FlockDay[];
   flockCode: string;
   users: Types.ObjectId[];
-  userFlockCalendars: UserFlockAvailability[];
+  userFlockAvailability: UserFlockAvailability[];
 }
 
 @Schema()
@@ -31,7 +31,7 @@ class FlockClass implements Flock {
   users!: Types.ObjectId[];
 
   @Prop({ type: [UserFlockAvailabilitySchema], required: true })
-  userFlockCalendars!: UserFlockAvailability[];
+  userFlockAvailability!: UserFlockAvailability[];
 }
 
 /**
