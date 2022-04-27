@@ -6,11 +6,14 @@ import { GraphQLString } from 'graphql';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
+import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserAvailabilityUtil } from '~/database/user/util/userAvailability.util';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { ValidateUser } from '~/decorators/validate-user-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
 import { AddUserInput } from './inputs/addUser.input';
+import { UserAvailabilityInput } from './inputs/common/userAvailability.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
 import { UserGraphQLModel } from './models/user.model';
 import { UserAvailabilityIntervalGraphQLModel } from './models/userAvailabilityInterval.model';
@@ -21,6 +24,7 @@ export class UserResolver {
     private flockService: FlockService,
     private userService: UserService,
     private calendarUtil: CalendarUtil,
+    private userAvailabilityValidation: UserAvailabilityUtil,
   ) {}
 
   @ResolveField()
@@ -53,6 +57,33 @@ export class UserResolver {
   @Mutation(() => UserGraphQLModel)
   async addUser(@User() user: DecodedIdToken, @Args('addUserInput') addUserInput: AddUserInput) {
     return this.userService.create({ ...addUserInput, firebaseId: user.uid });
+  }
+
+  @Auth()
+  @Mutation(() => UserGraphQLModel)
+  async addUserAvailabilitySources(
+    @User() user: UserDocument,
+    @Args({ name: 'userAvailabilitySources', type: () => [UserAvailabilityInput] })
+    userAvailabilitySources: UserAvailabilityInput[],
+  ) {
+    // Check that input is valid - special checks because UserAvailability is a union type.
+    const invalidSources = userAvailabilitySources.filter(
+      (s) => !this.userAvailabilityValidation.isUserAvailability(s),
+    );
+    if (invalidSources.length > 0) {
+      throw new BadRequestException({
+        statusCode: 400,
+        message: 'Bad Request',
+        invalidSources,
+      });
+    }
+
+    // Strip any other fields off the userAvailability (e.g. uri should not be on a Google Calendar source).
+    const sources = userAvailabilitySources.map((s) =>
+      this.userAvailabilityValidation.toUserAvailability(s as UserAvailability),
+    );
+
+    return this.userService.addUserAvailability(user._id, sources);
   }
 
   @Auth()
