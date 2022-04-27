@@ -67,18 +67,20 @@ export class UserService {
     // Not very performant, but works for now.
     // Always use toUserAvailability to ensure the keys are in a consistent order.
     const existingSources = new Set(
-      user.availability.map((s) => JSON.stringify(this.userAvailabilityUtil.toUserAvailability(s))),
+      user.availability.map((availabilitySource) =>
+        JSON.stringify(this.userAvailabilityUtil.toUserAvailability(availabilitySource)),
+      ),
     );
 
-    for (const s of availabilitySources) {
-      const json = JSON.stringify(this.userAvailabilityUtil.toUserAvailability(s));
+    for (const availabilitySource of availabilitySources) {
+      const json = JSON.stringify(this.userAvailabilityUtil.toUserAvailability(availabilitySource));
       if (existingSources.has(json)) {
         // Ignore duplicate sources.
         continue;
       }
 
       existingSources.add(json);
-      user.availability.push(s);
+      user.availability.push(availabilitySource);
     }
 
     await user.save();

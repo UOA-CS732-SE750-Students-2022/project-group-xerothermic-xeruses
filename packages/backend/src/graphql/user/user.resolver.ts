@@ -68,7 +68,7 @@ export class UserResolver {
   ) {
     // Check that input is valid - special checks because UserAvailability is a union type.
     const invalidSources = userAvailabilitySources.filter(
-      (s) => !this.userAvailabilityValidation.isUserAvailability(s),
+      (mightBeAvailabilitySource) => !this.userAvailabilityValidation.isUserAvailability(mightBeAvailabilitySource),
     );
     if (invalidSources.length > 0) {
       throw new BadRequestException({
@@ -79,8 +79,8 @@ export class UserResolver {
     }
 
     // Strip any other fields off the userAvailability (e.g. uri should not be on a Google Calendar source).
-    const sources = userAvailabilitySources.map((s) =>
-      this.userAvailabilityValidation.toUserAvailability(s as UserAvailability),
+    const sources = userAvailabilitySources.map((validSource) =>
+      this.userAvailabilityValidation.toUserAvailability(validSource as UserAvailability),
     );
 
     return this.userService.addUserAvailability(user._id, sources);
