@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
+import { UserAvailability } from './userAvailability.schema';
+import { UserAvailabilityUtil } from './util/userAvailability.util';
 
 /**
  * Service for managing Users in the database.
@@ -9,7 +11,10 @@ import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
  */
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(USER_MODEL_NAME) private readonly model: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(USER_MODEL_NAME) private readonly model: Model<UserDocument>,
+    private readonly userAvailabilityUtil: UserAvailabilityUtil,
+  ) {}
 
   async create(user: Omit<User, 'flocks' | 'flockInvites' | 'availability' | 'settings'>): Promise<UserDocument> {
     return this.model.create({ ...user, flocks: [], flockInvites: [], availability: [], settings: {} });
@@ -48,5 +53,35 @@ export class UserService {
     availabilityId: Types.ObjectId | string,
   ): Promise<UserDocument | null> {
     return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
+  }
+
+  async addUserAvailability(
+    userId: Types.ObjectId | string,
+    availabilitySources: UserAvailability[],
+  ): Promise<UserDocument> {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new Error(`Failed finding user ${userId}.`);
+    }
+
+    // Not very performant, but works for now.
+    // Always use toUserAvailability to ensure the keys are in a consistent order.
+    const existingSources = new Set(
+      user.availability.map((s) => JSON.stringify(this.userAvailabilityUtil.toUserAvailability(s))),
+    );
+
+    for (const s of availabilitySources) {
+      const json = JSON.stringify(this.userAvailabilityUtil.toUserAvailability(s));
+      if (existingSources.has(json)) {
+        // Ignore duplicate sources.
+        continue;
+      }
+
+      existingSources.add(json);
+      user.availability.push(s);
+    }
+
+    await user.save();
+    return user;
   }
 }
