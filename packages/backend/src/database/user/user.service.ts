@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
 import { UserAvailabilityProjectionDocument } from './util/projections.types';
+import { UserAvailability } from './userAvailability.schema';
+import { UserAvailabilityUtil } from './util/userAvailability.util';
 
 /**
  * Service for managing Users in the database.
@@ -10,7 +12,10 @@ import { UserAvailabilityProjectionDocument } from './util/projections.types';
  */
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(USER_MODEL_NAME) private readonly model: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(USER_MODEL_NAME) private readonly model: Model<UserDocument>,
+    private readonly userAvailabilityUtil: UserAvailabilityUtil,
+  ) {}
 
   async create(user: Omit<User, 'flocks' | 'flockInvites' | 'availability' | 'settings'>): Promise<UserDocument> {
     return this.model.create({ ...user, flocks: [], flockInvites: [], availability: [], settings: {} });
@@ -80,5 +85,36 @@ export class UserService {
         },
       ])
       .exec();
+
+  async addUserAvailability(
+    userId: Types.ObjectId | string,
+    availabilitySources: UserAvailability[],
+  ): Promise<UserDocument> {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new Error(`Failed finding user ${userId}.`);
+    }
+
+    // Not very performant, but works for now.
+    // Always use toUserAvailability to ensure the keys are in a consistent order.
+    const existingSources = new Set(
+      user.availability.map((availabilitySource) =>
+        JSON.stringify(this.userAvailabilityUtil.toUserAvailability(availabilitySource)),
+      ),
+    );
+
+    for (const availabilitySource of availabilitySources) {
+      const json = JSON.stringify(this.userAvailabilityUtil.toUserAvailability(availabilitySource));
+      if (existingSources.has(json)) {
+        // Ignore duplicate sources.
+        continue;
+      }
+
+      existingSources.add(json);
+      user.availability.push(availabilitySource);
+    }
+
+    await user.save();
+    return user;
   }
 }
