@@ -52,6 +52,6 @@ export class FlockService {
   }
 
   async update(_id: Types.ObjectId | string, flock: Partial<Flock>): Promise<FlockDocument | null> {
-    return this.model.findByIdAndUpdate({ _id }, flock).exec();
+    return this.model.findByIdAndUpdate({ _id }, flock, { new: true }).exec();
   }
 }

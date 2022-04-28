@@ -47,14 +47,14 @@ export class FlockResolver {
     const flock = await this.flockService.findOneByCode(flockCode);
 
     if (!flock) {
-      throw new NotFoundException('Invalid flock code');
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
     }
 
     if (flock.users.includes(user._id)) {
       throw new BadRequestException('User is already in this flock');
     }
 
-    await this.flockService.update(flock._id, { users: [...flock.users, user._id] });
-    return this.flockService.findOne(flock._id);
+    await this.userService.update(user._id, { flocks: [...flock.users, user._id] });
+    return this.flockService.update(flock._id, { users: [...flock.users, user._id] });
   }
 }
