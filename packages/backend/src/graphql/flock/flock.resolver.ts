@@ -51,10 +51,10 @@ export class FlockResolver {
     }
 
     if (flock.users.includes(user._id)) {
-      throw new BadRequestException('User is already in this flock');
+      throw new BadRequestException(`User is already in this flock: ${flockCode}`);
     }
 
-    await this.userService.update(user._id, { flocks: [...flock.users, user._id] });
+    await this.userService.update(user._id, { flocks: [...user.flocks, flock._id] });
     return this.flockService.update(flock._id, { users: [...flock.users, user._id] });
   }
 }
