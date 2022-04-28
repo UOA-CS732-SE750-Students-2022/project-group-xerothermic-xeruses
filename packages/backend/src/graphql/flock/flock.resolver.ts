@@ -99,15 +99,12 @@ export class FlockResolver {
       throw new NotFoundException(`Invalid user availability id: ${userFlockAvailabilityInput.userAvailabilityId}`);
     }
 
-    let existingIndex = 0;
     for (const userFlockAvailability of flock.userFlockAvailability) {
       if (userFlockAvailability.userAvailabilityId.toString() === userFlockAvailabilityInput.userAvailabilityId) {
-        flock.userFlockAvailability[existingIndex].enabled = userFlockAvailabilityInput.enabled;
-        return this.flockService.update(flock._id, {
-          userFlockAvailability: [...flock.userFlockAvailability],
-        });
+        userFlockAvailability.enabled = userFlockAvailabilityInput.enabled;
+        await flock.save();
+        return flock;
       }
-      existingIndex++;
     }
 
     return this.flockService.addUserFlockAvailability(flock._id, {
