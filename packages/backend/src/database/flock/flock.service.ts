@@ -52,20 +52,6 @@ export class FlockService {
       .exec();
   }
 
-  async addUserToFlock(_id: Types.ObjectId | string, userId: Types.ObjectId | string): Promise<FlockDocument | null> {
-    return this.model
-      .findByIdAndUpdate(
-        { _id },
-        {
-          $push: {
-            users: userId,
-          },
-        },
-        { new: true },
-      )
-      .exec();
-  }
-
   async update(_id: Types.ObjectId | string, flock: Partial<Flock>): Promise<FlockDocument | null> {
     return this.model.findByIdAndUpdate({ _id }, flock, { new: true }).exec();
   }
