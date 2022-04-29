@@ -6,6 +6,7 @@ import { Test, type TestingModule } from '@nestjs/testing';
 import { type Model, type Query, Types } from 'mongoose';
 import { type User, type UserDocument, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
+import { UserDatabaseUtilModule } from './util/userDatabaseUtil.module';
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
@@ -27,6 +28,7 @@ const mockUserDocument = (mock?: Partial<UserDocument>): Partial<UserDocument> =
   flocks: mock?.flocks || [],
   flockInvites: mock?.flockInvites || [],
   availability: mock?.availability || [],
+  save: jest.fn(),
 });
 
 const USER_DOCUMENTS = [
@@ -43,6 +45,7 @@ describe(UserService.name, () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [UserDatabaseUtilModule],
       providers: [
         UserService,
         {
@@ -55,6 +58,7 @@ describe(UserService.name, () => {
             static findByIdAndRemove = jest.fn();
             static findByIdAndUpdate = jest.fn();
             static exec = jest.fn();
+            static updateOne = jest.fn();
           },
         },
       ],
@@ -98,7 +102,7 @@ describe(UserService.name, () => {
   it('should find one by id', async () => {
     jest.spyOn(model, 'findById').mockReturnValueOnce(
       createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(mockUserDocument(USER_DOCUMENTS[0])),
+        exec: jest.fn().mockResolvedValueOnce(USER_DOCUMENTS[0]),
       }) as any,
     );
     const foundUser = await service.findOne(USER_DOCUMENTS[0]._id!);
@@ -108,7 +112,7 @@ describe(UserService.name, () => {
   it('should find one by firebaseId', async () => {
     jest.spyOn(model, 'findOne').mockReturnValueOnce(
       createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(mockUserDocument(USER_DOCUMENTS[0])),
+        exec: jest.fn().mockResolvedValueOnce(USER_DOCUMENTS[0]),
       }) as any,
     );
     const foundUser = await service.findOneByFirebaseId(USER_DOCUMENTS[0].firebaseId!);
@@ -123,5 +127,48 @@ describe(UserService.name, () => {
     );
     const updatedUser = await service.update(USER_DOCUMENTS[0]._id!, USERS[0]);
     expect(updatedUser).toEqual(USER_DOCUMENTS[0]);
+  });
+
+  it('should add a new user availability source', async () => {
+    const userDoc = mockUserDocument({ ...USER_DOCUMENTS[0], availability: [{ type: 'ical', uri: 'uri://test' }] });
+
+    jest.spyOn(model, 'findById').mockReturnValueOnce(
+      createMock<Query<UserDocument, UserDocument>>({
+        exec: jest.fn().mockResolvedValueOnce(userDoc),
+      }) as any,
+    );
+
+    await service.addUserAvailability(userDoc._id!, [{ type: 'ical', uri: 'uri://another' }]);
+    expect(userDoc.availability).toEqual([
+      { type: 'ical', uri: 'uri://test' },
+      { type: 'ical', uri: 'uri://another' },
+    ]);
+  });
+
+  it('should not add a duplicate user availability source', async () => {
+    const userDoc = mockUserDocument({ ...USER_DOCUMENTS[0], availability: [{ type: 'ical', uri: 'uri://test' }] });
+
+    jest.spyOn(model, 'findById').mockReturnValueOnce(
+      createMock<Query<UserDocument, UserDocument>>({
+        exec: jest.fn().mockResolvedValueOnce(userDoc),
+      }) as any,
+    );
+
+    await service.addUserAvailability(userDoc._id!, [{ type: 'ical', uri: 'uri://test' }]);
+    expect(userDoc.availability).toEqual([{ type: 'ical', uri: 'uri://test' }]);
+  });
+
+  it('should save a newly added user availability source', async () => {
+    const userDoc = mockUserDocument(USER_DOCUMENTS[0]);
+
+    jest.spyOn(model, 'findById').mockReturnValueOnce(
+      createMock<Query<UserDocument, UserDocument>>({
+        exec: jest.fn().mockResolvedValueOnce(userDoc),
+      }) as any,
+    );
+
+    const spy = jest.spyOn(userDoc, 'save');
+    await service.addUserAvailability(userDoc._id!, [{ type: 'ical', uri: 'uri://test' }]);
+    expect(spy).toBeCalled();
   });
 });
