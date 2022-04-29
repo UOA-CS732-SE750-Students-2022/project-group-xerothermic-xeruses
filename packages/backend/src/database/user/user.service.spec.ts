@@ -6,7 +6,6 @@ import { Test, type TestingModule } from '@nestjs/testing';
 import { type Model, type Query, Types } from 'mongoose';
 import { type User, type UserDocument, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
-import { UserAvailabilityDocument } from './userAvailability.schema';
 import { UserDatabaseUtilModule } from './util/userDatabaseUtil.module';
 
 const id = (id: string) => {
@@ -128,56 +127,5 @@ describe(UserService.name, () => {
     );
     const updatedUser = await service.update(USER_DOCUMENTS[0]._id!, USERS[0]);
     expect(updatedUser).toEqual(USER_DOCUMENTS[0]);
-  });
-
-  it('should add a new user availability source', async () => {
-    const userDoc = mockUserDocument({
-      ...USER_DOCUMENTS[0],
-      availability: [{ _id: id('UID_Alpha'), type: 'ical', uri: 'uri://test' } as UserAvailabilityDocument],
-    });
-
-    jest.spyOn(model, 'findById').mockReturnValueOnce(
-      createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(userDoc),
-      }) as any,
-    );
-
-    await service.addUserAvailability(userDoc._id!, [
-      { type: 'ical', uri: 'uri://another' } as UserAvailabilityDocument,
-    ]);
-    expect(userDoc.availability).toEqual([
-      { type: 'ical', uri: 'uri://test' },
-      { type: 'ical', uri: 'uri://another' },
-    ]);
-  });
-
-  it('should not add a duplicate user availability source', async () => {
-    const userDoc = mockUserDocument({
-      ...USER_DOCUMENTS[0],
-      availability: [{ type: 'ical', uri: 'uri://test' } as UserAvailabilityDocument],
-    });
-
-    jest.spyOn(model, 'findById').mockReturnValueOnce(
-      createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(userDoc),
-      }) as any,
-    );
-
-    await service.addUserAvailability(userDoc._id!, [{ type: 'ical', uri: 'uri://test' } as UserAvailabilityDocument]);
-    expect(userDoc.availability).toEqual([{ type: 'ical', uri: 'uri://test' } as UserAvailabilityDocument]);
-  });
-
-  it('should save a newly added user availability source', async () => {
-    const userDoc = mockUserDocument(USER_DOCUMENTS[0]);
-
-    jest.spyOn(model, 'findById').mockReturnValueOnce(
-      createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(userDoc),
-      }) as any,
-    );
-
-    const spy = jest.spyOn(userDoc, 'save');
-    await service.addUserAvailability(userDoc._id!, [{ type: 'ical', uri: 'uri://test' } as UserAvailabilityDocument]);
-    expect(spy).toBeCalled();
   });
 });
