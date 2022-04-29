@@ -83,7 +83,20 @@ export class UserService {
             availabilityDocument: '$availability',
           },
         },
-      ])
+      ]).exec();
+  }
+  
+  async addFlockToUser(_id: Types.ObjectId | string, flockId: Types.ObjectId | string): Promise<UserDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $push: {
+            flocks: flockId,
+          },
+        },
+        { new: true },
+      )
       .exec();
   }
 
