@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
 import { UserAvailabilityProjectionDocument } from './util/projections.types';
-import { UserAvailability } from './userAvailability.schema';
+import { UserAvailability, UserAvailabilityDocument } from './userAvailability.schema';
 import { UserAvailabilityUtil } from './util/userAvailability.util';
 
 /**
@@ -85,6 +85,7 @@ export class UserService {
         },
       ])
       .exec();
+  }
 
   async addUserAvailability(
     userId: Types.ObjectId | string,
@@ -111,7 +112,7 @@ export class UserService {
       }
 
       existingSources.add(json);
-      user.availability.push(availabilitySource);
+      user.availability.push(availabilitySource as UserAvailabilityDocument);
     }
 
     await user.save();
