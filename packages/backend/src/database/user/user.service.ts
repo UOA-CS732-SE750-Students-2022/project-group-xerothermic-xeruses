@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { USER_MODEL_NAME, type User, type UserDocument } from './user.schema';
-import { UserAvailability } from './userAvailability.schema';
+import { UserAvailability, UserAvailabilityDocument } from './userAvailability.schema';
+import { UserAvailabilityProjectionDocument } from './util/projections.types';
 import { UserAvailabilityUtil } from './util/userAvailability.util';
 
 /**
@@ -55,6 +56,37 @@ export class UserService {
     return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
   }
 
+  /**
+   * This query is used to find all userAvailability with an id in the provided list, and return each of those subdocuments separately with their parent doc id.
+   *
+   * How it works:
+   * $unwind performs the operation on each element of availability.
+   * $match performs a match on the availability._id field for every availability element. It checks its _id is in the passed list availabilityIds.
+   * $project changes the document structure we want to return. Rather than returning the entire user document, we only return the user document id and then the availability subdocument (not as an array, because we are doing this for each element).
+   */
+  async findManyUserAvailability(
+    availabilityIds: (Types.ObjectId | string)[],
+  ): Promise<UserAvailabilityProjectionDocument[]> {
+    return this.model
+      .aggregate([
+        {
+          $unwind: '$availability',
+        },
+        {
+          $match: {
+            'availability._id': { $in: availabilityIds },
+          },
+        },
+        {
+          $project: {
+            userId: '$_id',
+            availabilityDocument: '$availability',
+          },
+        },
+      ])
+      .exec();
+  }
+
   async addFlockToUser(_id: Types.ObjectId | string, flockId: Types.ObjectId | string): Promise<UserDocument | null> {
     return this.model
       .findByIdAndUpdate(
@@ -94,7 +126,7 @@ export class UserService {
       }
 
       existingSources.add(json);
-      user.availability.push(availabilitySource);
+      user.availability.push(availabilitySource as UserAvailabilityDocument);
     }
 
     await user.save();

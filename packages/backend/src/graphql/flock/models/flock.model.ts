@@ -1,7 +1,8 @@
-import type { FlockDayDTO, FlockDTO, UserDTO } from '@flocker/api-types';
+import type { FlockDayDTO, FlockDTO, UserDTO, UserFlockAvailabilityDTO } from '@flocker/api-types';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { UserGraphQLModel } from '../../user/models/user.model';
 import { FlockDayGraphQLModel } from './flockDay.model';
+import { UserFlockAvailabilityGraphQLModel } from './userFlockAvailability.model';
 
 @ObjectType()
 export class FlockGraphQLModel implements FlockDTO {
@@ -19,4 +20,7 @@ export class FlockGraphQLModel implements FlockDTO {
 
   @Field(() => [UserGraphQLModel], { nullable: false })
   users!: UserDTO[];
+
+  @Field(() => [UserFlockAvailabilityGraphQLModel], { nullable: false })
+  userFlockAvailability!: UserFlockAvailabilityDTO[];
 }

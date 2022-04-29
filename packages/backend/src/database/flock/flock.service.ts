@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
 import { FLOCK_MODEL_NAME, type Flock, type FlockDocument } from './flock.schema';
+import { UserFlockAvailability } from './userFlockAvailability.schema';
 
 const FLOCK_CODE_LENGTH = 8;
 
@@ -18,9 +19,9 @@ export class FlockService {
     private flockUtil: FlockUtil,
   ) {}
 
-  async create(flock: Omit<Flock, 'users' | 'flockCode'>): Promise<FlockDocument> {
+  async create(flock: Omit<Flock, 'users' | 'flockCode' | 'userFlockAvailability'>): Promise<FlockDocument> {
     const flockCode = await this.flockUtil.generateFlockCode(FLOCK_CODE_LENGTH);
-    return this.model.create({ ...flock, flockCode, users: [] });
+    return this.model.create({ ...flock, flockCode, users: [], userFlockAvailability: [] });
   }
 
   async delete(_id: Types.ObjectId | string): Promise<FlockDocument | null> {
@@ -51,6 +52,10 @@ export class FlockService {
       .exec();
   }
 
+  async update(_id: Types.ObjectId | string, flock: Partial<Flock>): Promise<FlockDocument | null> {
+    return this.model.findByIdAndUpdate({ _id }, flock, { new: true }).exec();
+  }
+
   async addUserToFlock(_id: Types.ObjectId | string, userId: Types.ObjectId | string): Promise<FlockDocument | null> {
     return this.model
       .findByIdAndUpdate(
@@ -65,7 +70,20 @@ export class FlockService {
       .exec();
   }
 
-  async update(_id: Types.ObjectId | string, flock: Partial<Flock>): Promise<FlockDocument | null> {
-    return this.model.findByIdAndUpdate({ _id }, flock, { new: true }).exec();
+  async addUserFlockAvailability(
+    _id: Types.ObjectId | string,
+    userFlockAvailability: UserFlockAvailability,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $push: {
+            userFlockAvailability: userFlockAvailability,
+          },
+        },
+        { new: true },
+      )
+      .exec();
   }
 }

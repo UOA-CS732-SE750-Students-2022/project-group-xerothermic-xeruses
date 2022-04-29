@@ -25,6 +25,7 @@ const mockFlock = (mock?: Partial<Flock>): Flock => ({
   flockDays: mock?.flockDays || mockFlockDays,
   flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
+  userFlockAvailability: mock?.userFlockAvailability || [],
 });
 
 const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument> => ({
@@ -33,6 +34,7 @@ const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument
   flockDays: mock?.flockDays || mockFlockDays,
   flockCode: mock?.flockCode || '<flock flockCode Alpha>',
   users: mock?.users || [],
+  userFlockAvailability: mock?.userFlockAvailability || [],
 });
 
 const FLOCK_DOCUMENTS = [

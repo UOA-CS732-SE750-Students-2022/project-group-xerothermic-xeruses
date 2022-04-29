@@ -4,6 +4,7 @@ import {
   type UserAvailability,
   UserAvailabilitySchema,
   registerUserAvailabilityDiscriminators,
+  UserAvailabilityDocument,
 } from './userAvailability.schema';
 import { type UserSettings, UserSettingsSchema } from './userSettings.schema';
 
@@ -36,7 +37,7 @@ class UserClass implements User {
   flockInvites!: Types.ObjectId[];
 
   @Prop({ type: [UserAvailabilitySchema], required: true })
-  availability!: UserAvailability[];
+  availability!: UserAvailabilityDocument[];
 
   @Prop({ type: UserSettingsSchema, required: false })
   settings?: UserSettings;
@@ -45,7 +46,7 @@ class UserClass implements User {
 /**
  * A User represents a single unique person with their Flocks, availability & settings.
  */
-export type UserDocument = User & Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
+export type UserDocument = UserClass & Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * A User represents a single unique person with their Flocks, availability & settings.

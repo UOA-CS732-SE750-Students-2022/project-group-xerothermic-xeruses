@@ -1,4 +1,5 @@
 import type { UserDTO } from './user';
+import { UserFlockAvailabilityDTO } from './userFlockAvailability';
 
 /**
  * A Flock represents a multi-user ('flock') availability schedule.
@@ -8,6 +9,7 @@ export interface FlockDTO {
   name: string;
   flockDays: FlockDayDTO[];
   users: UserDTO[];
+  userFlockAvailability: UserFlockAvailabilityDTO[];
 }
 
 export interface FlockDayDTO {

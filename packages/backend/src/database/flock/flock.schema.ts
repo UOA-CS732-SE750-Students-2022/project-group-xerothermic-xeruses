@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { type Document, Schema as MSchema, type Types } from 'mongoose';
 import { FlockDay } from './flockDay.schema';
+import {
+  UserFlockAvailability,
+  UserFlockAvailabilityDocument,
+  UserFlockAvailabilitySchema,
+} from './userFlockAvailability.schema';
 
 export const FLOCK_MODEL_NAME = 'Flock';
 
@@ -12,6 +17,7 @@ export interface Flock {
   flockDays: FlockDay[];
   flockCode: string;
   users: Types.ObjectId[];
+  userFlockAvailability: UserFlockAvailability[];
 }
 
 @Schema()
@@ -27,12 +33,15 @@ class FlockClass implements Flock {
 
   @Prop({ type: [MSchema.Types.ObjectId], ref: 'User', required: true })
   users!: Types.ObjectId[];
+
+  @Prop({ type: [UserFlockAvailabilitySchema], required: true })
+  userFlockAvailability!: UserFlockAvailabilityDocument[];
 }
 
 /**
  * A Flock represents a multi-user ('flock') availability schedule.
  */
-export type FlockDocument = Flock & Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
+export type FlockDocument = FlockClass & Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
  * A Flock represents a multi-user ('flock') availability schedule.
