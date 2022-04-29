@@ -54,7 +54,7 @@ export class FlockResolver {
       throw new BadRequestException(`User is already in this flock: ${flockCode}`);
     }
 
-    await this.userService.update(user._id, { flocks: [...user.flocks, flock._id] });
-    return this.flockService.update(flock._id, { users: [...flock.users, user._id] });
+    await this.userService.addFlockToUser(user._id, flock._id);
+    return this.flockService.addUserToFlock(flock._id, user._id);
   }
 }

@@ -49,4 +49,18 @@ export class UserService {
   ): Promise<UserDocument | null> {
     return this.model.findOne({ _id: userId, 'availability._id': availabilityId }, { 'availability.$': 1 }).exec();
   }
+
+  async addFlockToUser(_id: Types.ObjectId | string, flockId: Types.ObjectId | string): Promise<UserDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $push: {
+            flocks: flockId,
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
 }
