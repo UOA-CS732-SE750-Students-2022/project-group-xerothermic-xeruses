@@ -9,46 +9,101 @@ import Paper from '@mui/material/Paper';
 import styles from './Timematcher.module.css';
 
 type TimematcherProps = {
-  rowHeader: string;
-  dates: [];
-  timeRange: [];
+  rowTitle: string;
+  dates: Date[];
+  timeRange: Date[];
+  busyTimes: Map<Date, boolean>;
+  availableTimes: Map<Date, boolean>;
 };
 
-function createData(name: string, calories: number, fat: number, carbs: number, protein: number) {
-  return { name, calories, fat, carbs, protein };
-}
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+function formatDates(dates: Date[]) {
+  const dateMap = new Map<string, Date>();
+  if (dates) {
+    dates.forEach((date) => {
+      const dateString = `${date.toLocaleString('default', { weekday: 'short' })} ${date
+        .getDate()
+        .toString()} ${date.toLocaleString('default', { month: 'short' })}`;
+      dateMap.set(dateString, date);
+    });
+  }
 
-const Timematcher = ({ rowHeader, dates, timeRange }: TimematcherProps) => {
+  return { dateMap };
+}
+
+function generateTimes(times: Date[]) {
+  const timeMap = new Map<string, Date>();
+  if (times) {
+    const startTime = times[0];
+    timeMap.set(formatTime(startTime), startTime);
+    const endTime = times[1];
+    let time = startTime;
+    while (time < endTime) {
+      let newTime = new Date(time.getTime() + 15 * 60000);
+      console.log(newTime); //15 min intervals converted into milliseconds
+      let newTimeString = formatTime(newTime);
+      console.log(newTimeString);
+      timeMap.set(newTimeString, newTime);
+      time = newTime;
+    }
+  }
+
+  return { timeMap };
+}
+
+function formatTime(time: Date) {
+  const hour = time.getHours();
+  const minutes = time.getMinutes() === 0 ? '00' : time.getMinutes();
+  const ampm = hour >= 12 ? 'pm' : 'am';
+  return hour > 12 ? `${hour - 12}:${minutes} ${ampm}` : `${hour}:${minutes} ${ampm}`;
+}
+
+function isAvailable(availableTimes: Map<Date, Boolean>, cellTime: Date, cellDate: Date): Boolean {
+  const cellDateAndTime = new Date(cellDate).setTime(cellTime.getTime());
+  return availableTimes.get(cellDate) ? true : false;
+}
+
+const Timematcher = ({ rowTitle, dates, timeRange, busyTimes, availableTimes }: TimematcherProps) => {
+  const allDates = formatDates(dates);
+  const times = generateTimes(timeRange);
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Time</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+    <div>
+      <TableContainer component={Paper} className={styles.table}>
+        <Table stickyHeader className={styles.tableContent}>
+          <TableHead>
+            <TableRow>
+              <TableCell>{rowTitle}</TableCell>
+              {Array.from(allDates.dateMap.keys()).map((date) => (
+                <TableCell align="right">{date}</TableCell>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {Array.from(times.timeMap.keys()).map((time) => (
+              <TableRow key={time} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row">
+                  {time}
+                </TableCell>
+                {Array.from(allDates.dateMap.keys()).map(
+                  (
+                    date, //for each date
+                  ) =>
+                    isAvailable(availableTimes, times.timeMap.get(time) as Date, allDates.dateMap.get(date) as Date) ? (
+                      <TableCell className={styles.othersAvailability} align="right">
+                        hi
+                      </TableCell>
+                    ) : (
+                      <TableCell className={styles.othersBusy} align="right">
+                        bye
+                      </TableCell>
+                    ),
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   );
 };
 

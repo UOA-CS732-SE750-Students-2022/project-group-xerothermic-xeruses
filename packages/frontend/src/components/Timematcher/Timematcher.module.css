@@ -1,0 +1,15 @@
+.table {
+  height: 50vh;
+  width: 80rem;
+  max-width: max-content;
+  padding-right: 1rem;
+}
+
+.tableContent {
+  width: max-content;
+  height: max-content;
+}
+
+.othersBusy {
+  background-color: var(--flocker-color-primary);
+}
