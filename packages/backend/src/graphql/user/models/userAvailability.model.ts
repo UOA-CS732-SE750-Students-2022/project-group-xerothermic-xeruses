@@ -5,6 +5,9 @@ import { GraphQLString } from 'graphql';
 @ObjectType()
 export class UserAvailabilityGraphQLModel implements UserAvailabilityPartialDTO {
   @Field({ nullable: false })
+  id!: string;
+
+  @Field({ nullable: false })
   type!: string;
 
   @Field(() => GraphQLString, { nullable: true })
