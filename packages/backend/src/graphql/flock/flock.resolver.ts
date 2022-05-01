@@ -135,22 +135,18 @@ export class FlockResolver {
       throw new NotFoundException(`Invalid flock code: ${flockCode}`);
     }
 
-    const availabilitiesToCheck = flock.userFlockAvailability.filter(
-      (userFlockAvailability) => userFlockAvailability.user.toString() !== currentUser._id.toString(),
-    );
+    const availabilitiesToCheck = flock.userFlockAvailability
+      .filter(
+        (userFlockAvailability) =>
+          userFlockAvailability.user.toString() !== currentUser._id.toString() && userFlockAvailability.enabled,
+      )
+      .map((userFlockAvailability) => userFlockAvailability.userAvailabilityId);
+
+    const userAvailabilities = await this.userService.findManyUserAvailability(availabilitiesToCheck);
 
     const availabilities = [];
-    for (const availability of availabilitiesToCheck) {
-      if (!availability.enabled) {
-        continue;
-      }
-
-      const userAvailability = await this.userService.findManyUserAvailability([availability.userAvailabilityId]);
-      if (userAvailability.length === 0) {
-        continue;
-      }
-
-      const { userId, availabilityDocument } = userAvailability[0];
+    for (const availability of userAvailabilities) {
+      const { userId, availabilityDocument } = availability;
       if (availabilityDocument.type !== 'ical') {
         continue;
       }
