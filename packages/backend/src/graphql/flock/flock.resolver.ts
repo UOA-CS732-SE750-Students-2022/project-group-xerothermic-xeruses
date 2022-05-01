@@ -114,4 +114,21 @@ export class FlockResolver {
       enabled: userFlockAvailabilityInput.enabled,
     });
   }
+
+  // @Auth()
+  // @Query(() => UserAvailabilityIntervalGraphQLModel)
+  // async getUserIntervalsForFlock(
+  //   @User() currentUser: UserDocument,
+  //   @Args('flockId', { type: () => GraphQLString }) flockId: string,
+  // ) {
+  //   const flock = await this.flockService.findOne(flockId);
+
+  //   if (!flock) {
+  //     throw new NotFoundException(`Invalid flock id: ${flockId}`);
+  //   }
+
+  //   const flock.userFlockAvailability.filter((userFlockAvailability) => {
+  //     return userFlockAvailability.user.toString() === currentUser._id.toString();
+  //   });
+  // }
 }
