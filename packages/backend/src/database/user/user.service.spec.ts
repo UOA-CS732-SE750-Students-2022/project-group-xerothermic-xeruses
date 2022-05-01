@@ -1,9 +1,26 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Types } from 'mongoose';
 import { closeMongoDBConnection, rootMongooseTestModule } from '../util/mongo.helper';
-import { UserSchema, USER_MODEL_NAME } from './user.schema';
+import { UserDocument, UserSchema, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
 import { UserDatabaseUtilModule } from './util/userDatabaseUtil.module';
+
+const createUserInput = {
+  name: 'Test User',
+  firebaseId: 'QwerTY12345Qwerty12345qWErTY',
+};
+
+const userDocument: Partial<UserDocument> = {
+  _id: new Types.ObjectId(),
+  name: 'Test User',
+  firebaseId: 'QwerTY12345Qwerty12345qWErTY',
+  flocks: [],
+  flockInvites: [],
+  availability: [],
+};
 
 describe(UserService.name, () => {
   let service: UserService;
@@ -24,6 +41,79 @@ describe(UserService.name, () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should create an user successfully', async () => {
+    const user: UserDocument = await service.create(createUserInput);
+    userDocument._id = user._id;
+    console.log(user._id);
+    expect(user._id).toEqual(userDocument._id);
+    expect(user.name).toEqual(userDocument.name);
+    expect(user.firebaseId).toEqual(userDocument.firebaseId);
+    expect(user.flocks).toEqual(userDocument.flocks);
+    expect(user.flockInvites).toEqual(userDocument.flockInvites);
+    expect(user.availability).toEqual(userDocument.availability);
+  });
+
+  it('should delete a user successfully', async () => {
+    console.log(userDocument._id);
+    const user: UserDocument | null = await service.delete(userDocument._id!);
+
+    console.log(user);
+    expect(user).toBeTruthy();
+    expect(user!._id).toEqual(userDocument._id);
+    expect(user!.name).toEqual(userDocument.name);
+    expect(user!.firebaseId).toEqual(userDocument.firebaseId);
+    expect(user!.flocks).toEqual(userDocument.flocks);
+    expect(user!.flockInvites).toEqual(userDocument.flockInvites);
+    expect(user!.availability).toEqual(userDocument.availability);
+  });
+
+  it('should return all users', async () => {
+    const users: UserDocument[] | null = await service.findAll();
+    // expect(users).toEqual([userDocument]);
+    console.log(users);
+  });
+
+  it('should find one by id', async () => {
+    const user: UserDocument | null = await service.findOne(userDocument._id!);
+
+    expect(user).toBeTruthy();
+    expect(user!._id).toEqual(userDocument._id);
+    expect(user!.name).toEqual(userDocument.name);
+    expect(user!.firebaseId).toEqual(userDocument.firebaseId);
+    expect(user!.flocks).toEqual(userDocument.flocks);
+    expect(user!.flockInvites).toEqual(userDocument.flockInvites);
+    expect(user!.availability).toEqual(userDocument.availability);
+  });
+
+  it('should find one by firebaseId', async () => {
+    const user: UserDocument | null = await service.findOneByFirebaseId(userDocument.firebaseId!);
+
+    expect(user).toBeTruthy();
+    expect(user!._id).toEqual(userDocument._id);
+    expect(user!.name).toEqual(userDocument.name);
+    expect(user!.firebaseId).toEqual(userDocument.firebaseId);
+    expect(user!.flocks).toEqual(userDocument.flocks);
+    expect(user!.flockInvites).toEqual(userDocument.flockInvites);
+    expect(user!.availability).toEqual(userDocument.availability);
+  });
+
+  it('should update a user successfully', async () => {
+    const user: UserDocument | null = await service.update(userDocument._id!, {
+      name: 'New Name',
+    });
+
+    const updatedUser: Partial<UserDocument> = userDocument;
+    updatedUser.name = 'New Name';
+
+    expect(user).toBeTruthy();
+    expect(user!._id).toEqual(updatedUser._id);
+    expect(user!.name).toEqual(updatedUser.name);
+    expect(user!.firebaseId).toEqual(updatedUser.firebaseId);
+    expect(user!.flocks).toEqual(updatedUser.flocks);
+    expect(user!.flockInvites).toEqual(updatedUser.flockInvites);
+    expect(user!.availability).toEqual(updatedUser.availability);
   });
 
   afterAll(async () => {
