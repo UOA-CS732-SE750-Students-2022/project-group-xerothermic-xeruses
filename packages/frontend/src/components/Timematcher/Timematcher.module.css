@@ -10,6 +10,7 @@
   height: max-content;
 }
 
-.othersBusy {
+.othersAvailable {
   background-color: var(--flocker-color-primary);
+  opacity: 0.25;
 }
