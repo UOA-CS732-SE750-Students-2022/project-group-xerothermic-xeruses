@@ -7,13 +7,20 @@ import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
+import { CalendarUtil } from '~/util/calendar.util';
 import { AddFlockInput } from './inputs/addFlock.input';
+import { FlockAvailabilityIntervalInput } from './inputs/flockAvailabilityInterval.input';
 import { UserFlockAvailabilityInput } from './inputs/userFlockAvailability.input';
 import { FlockGraphQLModel } from './models/flock.model';
+import { FlockAvailabilityGraphQLModel } from './models/flockAvailability.model';
 
 @Resolver(() => FlockGraphQLModel)
 export class FlockResolver {
-  constructor(private flockService: FlockService, private userService: UserService) {}
+  constructor(
+    private flockService: FlockService,
+    private userService: UserService,
+    private calendarUtil: CalendarUtil,
+  ) {}
 
   @ResolveField()
   async users(@Parent() flock: FlockDocument) {
@@ -115,20 +122,50 @@ export class FlockResolver {
     });
   }
 
-  // @Auth()
-  // @Query(() => UserAvailabilityIntervalGraphQLModel)
-  // async getUserIntervalsForFlock(
-  //   @User() currentUser: UserDocument,
-  //   @Args('flockId', { type: () => GraphQLString }) flockId: string,
-  // ) {
-  //   const flock = await this.flockService.findOne(flockId);
+  @Auth()
+  @Query(() => FlockAvailabilityGraphQLModel)
+  async getUserIntervalsForFlock(
+    @User() currentUser: UserDocument,
+    @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
+    @Args('flockAvailabilityIntervalInput') flockAvailabilityIntervalInput: FlockAvailabilityIntervalInput,
+  ) {
+    const flock = await this.flockService.findOneByCode(flockCode);
 
-  //   if (!flock) {
-  //     throw new NotFoundException(`Invalid flock id: ${flockId}`);
-  //   }
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    }
 
-  //   const flock.userFlockAvailability.filter((userFlockAvailability) => {
-  //     return userFlockAvailability.user.toString() === currentUser._id.toString();
-  //   });
-  // }
+    const availabilitiesToCheck = flock.userFlockAvailability.filter(
+      (userFlockAvailability) => userFlockAvailability.user.toString() !== currentUser._id.toString(),
+    );
+
+    const availabilities = [];
+    for (const availability of availabilitiesToCheck) {
+      if (!availability.enabled) {
+        continue;
+      }
+
+      const userAvailability = await this.userService.findManyUserAvailability([availability.userAvailabilityId]);
+      if (userAvailability.length === 0) {
+        continue;
+      }
+
+      const { userId, availabilityDocument } = userAvailability[0];
+      if (availabilityDocument.type !== 'ical') {
+        continue;
+      }
+
+      const availabilityIntervals = await this.calendarUtil.convertIcalToIntervalsFromUris(
+        [availabilityDocument.uri],
+        flockAvailabilityIntervalInput.intervals,
+      );
+
+      availabilities.push({
+        userId,
+        intervals: availabilityIntervals,
+      });
+    }
+
+    return { availabilities };
+  }
 }

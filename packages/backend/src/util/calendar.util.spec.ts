@@ -1,6 +1,6 @@
 import { sync as icalParser } from 'node-ical';
 import { CalendarUtil } from './calendar.util';
-import { UserInterval } from './models';
+import { Interval } from './models';
 
 interface FakeEvent {
   id: number;
@@ -59,7 +59,7 @@ function createIntervalsWithAvailability(start: Date, availablility: boolean[], 
 /**
  * Keep only defined fields in intervals.
  */
-function sanitizeIntervals(intervals: UserInterval[]): UserInterval[] {
+function sanitizeIntervals(intervals: Interval[]): Interval[] {
   return intervals.map(({ start, end }) => ({ start, end }));
 }
 

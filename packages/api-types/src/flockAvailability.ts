@@ -1,5 +1,3 @@
-import { UserDTO } from './user';
-
 /**
  * Used to represent an interval we wish to know the availability for.
  */
@@ -19,7 +17,7 @@ export interface FlockAvailabilityIntervalInputDTO {
  * Supply information to obtain a flocks interval availability.
  */
 export interface FlockAvailabilityDTO {
-  availabilities: FlockAvailabilityDTO[];
+  availabilities: FlockAvailabilityIntervalDTO[];
 }
 
 /**
