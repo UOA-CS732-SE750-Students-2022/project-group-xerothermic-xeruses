@@ -10,4 +10,4 @@ export type UserAvailabilityCombinedDTO = { type: string } & NoType<UserAvailabi
   NoType<UserAvailabilityICalDTO>;
 
 // Requires that all attributes from UserAvailabilityCombined are present or explicitly undefined in UserAvailabilityPartial.
-export type UserAvailabilityPartialDTO = { type: string } & MaybeUndefined<UserAvailabilityCombinedDTO>;
+export type UserAvailabilityPartialDTO = { type: string; id: string } & MaybeUndefined<UserAvailabilityCombinedDTO>;
