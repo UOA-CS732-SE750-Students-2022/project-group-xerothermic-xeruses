@@ -121,8 +121,8 @@ const Timematcher = ({ rowTitle, dates, timeRange, availabilityIds }: Timematche
                           availabilityIds: [],
                         },
                       })
-                    ).data ? (
-                      <TableCell>available</TableCell>
+                    ).data.getUserIntervals.available ? (
+                      <TableCell className={styles.selfAvailable}></TableCell>
                     ) : (
                       <TableCell>busy</TableCell>
                     ),

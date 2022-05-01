@@ -14,3 +14,8 @@
   background-color: var(--flocker-color-primary);
   opacity: 0.25;
 }
+
+.selfAvailable {
+  background-color: var(--flocker-color-secondary);
+  opacity: 0.25;
+}
