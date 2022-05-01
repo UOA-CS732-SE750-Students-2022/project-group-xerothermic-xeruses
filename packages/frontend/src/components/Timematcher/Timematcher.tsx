@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,16 +6,17 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import styles from './Timematcher.module.css';
+import { useLazyQuery } from '@apollo/client';
+import { GET_USER_INTERVALS } from '../../apollo/queries';
 
 type TimematcherProps = {
   rowTitle: string;
   dates: Date[];
   timeRange: Date[];
-  busyTimes: Map<Date, boolean>;
-  availableTimes: Map<Date, boolean>;
+  availabilityIds: string[];
 };
 
-function formatDates(dates: Date[]) {
+function generateDates(dates: Date[]) {
   const dateMap = new Map<string, Date>();
   if (dates) {
     dates.forEach((date) => {
@@ -38,10 +38,8 @@ function generateTimes(times: Date[]) {
     const endTime = times[1];
     let time = startTime;
     while (time < endTime) {
-      let newTime = new Date(time.getTime() + 15 * 60000);
-      console.log(newTime); //15 min intervals converted into milliseconds
+      let newTime = new Date(time.getTime() + 15 * 60000); //15 min intervals converted into milliseconds
       let newTimeString = formatTime(newTime);
-      console.log(newTimeString);
       timeMap.set(newTimeString, newTime);
       time = newTime;
     }
@@ -57,14 +55,33 @@ function formatTime(time: Date) {
   return hour > 12 ? `${hour - 12}:${minutes} ${ampm}` : `${hour}:${minutes} ${ampm}`;
 }
 
-function isAvailable(availableTimes: Map<Date, Boolean>, cellTime: Date, cellDate: Date): Boolean {
-  const cellDateAndTime = new Date(cellDate).setTime(cellTime.getTime());
-  return availableTimes.get(cellDate) ? true : false;
+function getCell(time: Date, date: Date) {
+  const cellStartDateTime = new Date(date);
+  cellStartDateTime.setHours(time.getHours(), time.getMinutes(), 0, 0);
+  const cellEndDateTime = new Date(cellStartDateTime.getTime() + 15 * 60000);
+  return { cellStartDateTime, cellEndDateTime };
 }
 
-const Timematcher = ({ rowTitle, dates, timeRange, busyTimes, availableTimes }: TimematcherProps) => {
-  const allDates = formatDates(dates);
+const Timematcher = ({ rowTitle, dates, timeRange, availabilityIds }: TimematcherProps) => {
+  const allDates = generateDates(dates);
   const times = generateTimes(timeRange);
+  const [getAvailability, { error, data }] = useLazyQuery(GET_USER_INTERVALS, {
+    variables: {
+      userIntervalInput: {
+        intervals: [
+          {
+            start: new Date(),
+            end: new Date(),
+          },
+        ],
+      },
+      availabilityIds: [],
+    },
+  });
+
+  if (error) {
+    console.log(error);
+  }
 
   return (
     <div>
@@ -85,17 +102,29 @@ const Timematcher = ({ rowTitle, dates, timeRange, busyTimes, availableTimes }: 
                   {time}
                 </TableCell>
                 {Array.from(allDates.dateMap.keys()).map(
-                  (
-                    date, //for each date
+                  async (
+                    date, //for each date at that time
                   ) =>
-                    isAvailable(availableTimes, times.timeMap.get(time) as Date, allDates.dateMap.get(date) as Date) ? (
-                      <TableCell className={styles.othersAvailability} align="right">
-                        hi
-                      </TableCell>
+                    (
+                      await getAvailability({
+                        variables: {
+                          userIntervalInput: {
+                            intervals: [
+                              {
+                                start: getCell(times.timeMap.get(time) as Date, allDates.dateMap.get(date) as Date)
+                                  .cellStartDateTime,
+                                end: getCell(times.timeMap.get(time) as Date, allDates.dateMap.get(date) as Date)
+                                  .cellEndDateTime,
+                              },
+                            ],
+                          },
+                          availabilityIds: [],
+                        },
+                      })
+                    ).data ? (
+                      <TableCell>available</TableCell>
                     ) : (
-                      <TableCell className={styles.othersBusy} align="right">
-                        bye
-                      </TableCell>
+                      <TableCell>busy</TableCell>
                     ),
                 )}
               </TableRow>
