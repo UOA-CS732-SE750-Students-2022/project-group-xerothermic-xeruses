@@ -8,11 +8,6 @@ import { UserDocument, UserSchema, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
 import { UserDatabaseUtilModule } from './util/userDatabaseUtil.module';
 
-const createUserInput = {
-  name: 'Test User',
-  firebaseId: 'QwerTY12345Qwerty12345qWErTY',
-};
-
 const userDocument: Partial<UserDocument> = {
   _id: new Types.ObjectId(),
   name: 'Test User',
@@ -44,6 +39,11 @@ describe(UserService.name, () => {
   });
 
   it('should create an user successfully', async () => {
+    const createUserInput = {
+      name: 'Test User',
+      firebaseId: 'QwerTY12345Qwerty12345qWErTY',
+    };
+
     const user: UserDocument = await service.create(createUserInput);
     userDocument._id = user._id;
 
