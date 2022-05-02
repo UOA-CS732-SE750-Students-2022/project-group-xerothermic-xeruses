@@ -3,7 +3,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
-import { UserAvailability, UserAvailabilityDocument } from '../user/userAvailability.schema';
 import { closeMongoDBConnection, rootMongooseTestModule } from '../util/mongo.helper';
 import { FlockDocument, FlockSchema, FLOCK_MODEL_NAME } from './flock.schema';
 import { FlockService } from './flock.service';
