@@ -10,7 +10,7 @@ describe(FlockService.name, () => {
   let service: FlockService;
   let module: TestingModule;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [rootMongooseTestModule(), MongooseModule.forFeature([{ name: FLOCK_MODEL_NAME, schema: FlockSchema }])],
       providers: [FlockService, FlockUtil],
