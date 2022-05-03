@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { createContext, useContext, useState } from 'react';
 import { User } from 'firebase/auth';
 import { auth } from '../auth/firebase';
-import apolloClient, { link } from '../apollo';
 
 type AuthContextType = {
   user: User | null;
@@ -30,7 +29,6 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
     const clearListener = auth.onAuthStateChanged((user) => {
       setUser(user);
       setAuthLoaded(true);
-      apolloClient.setLink(link);
     });
 
     return clearListener;
