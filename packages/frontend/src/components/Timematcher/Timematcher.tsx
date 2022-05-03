@@ -8,7 +8,6 @@ import Paper from '@mui/material/Paper';
 import styles from './Timematcher.module.css';
 
 type TimematcherProps = {
-  rowTitle: string;
   dates: Date[];
   timeRange: Date[];
   userAvailability: Availability[];
@@ -102,7 +101,7 @@ const getCell = (time: Date, date: Date) => {
   return { cellStartDateTime, cellEndDateTime };
 };
 
-const Timematcher = ({ rowTitle, dates, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
+const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
   const allDates = generateDates(dates);
   const times = generateTimes(timeRange);
   let column_id = 0;
@@ -115,7 +114,7 @@ const Timematcher = ({ rowTitle, dates, timeRange, userAvailability, othersAvail
           <TableHead>
             <TableRow className={styles.tableColumn} key={column_id}>
               <TableCell className={(styles.dates, styles.time)} key={column_id++}>
-                {rowTitle}
+                Time
               </TableCell>
               {Array.from(allDates.dateMap.keys()).map((date) => (
                 <TableCell align="center" className={styles.dates} key={date}>
