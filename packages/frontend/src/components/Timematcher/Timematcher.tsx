@@ -6,17 +6,22 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import styles from './Timematcher.module.css';
-import { useLazyQuery } from '@apollo/client';
-import { GET_USER_INTERVALS } from '../../apollo/queries';
 
 type TimematcherProps = {
   rowTitle: string;
   dates: Date[];
   timeRange: Date[];
-  availabilityIds: string[];
+  userAvailability: Availability[];
+  othersAvailability: Availability[];
 };
 
-function generateDates(dates: Date[]) {
+type Availability = {
+  start: Date;
+  end: Date;
+  available: boolean;
+};
+
+const generateDates = (dates: Date[]) => {
   const dateMap = new Map<string, Date>();
   if (dates) {
     dates.forEach((date) => {
@@ -28,9 +33,9 @@ function generateDates(dates: Date[]) {
   }
 
   return { dateMap };
-}
+};
 
-function generateTimes(times: Date[]) {
+const generateTimes = (times: Date[]) => {
   const timeMap = new Map<string, Date>();
   if (times) {
     const startTime = times[0];
@@ -46,86 +51,102 @@ function generateTimes(times: Date[]) {
   }
 
   return { timeMap };
-}
+};
 
-function formatTime(time: Date) {
+const formatTime = (time: Date) => {
   const hour = time.getHours();
   const minutes = time.getMinutes() === 0 ? '00' : time.getMinutes();
   const ampm = hour >= 12 ? 'pm' : 'am';
   return hour > 12 ? `${hour - 12}:${minutes} ${ampm}` : `${hour}:${minutes} ${ampm}`;
-}
+};
 
-function getCell(time: Date, date: Date) {
+const isUserAvailable = (time: Date, date: Date, userAvailability: Availability[]): boolean => {
+  let currentCell = getCell(time, date);
+  for (let i = 0; i < userAvailability.length; i++) {
+    if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
+      return userAvailability[i].available;
+    }
+  }
+  return false;
+};
+
+const areOthersAvailable = (time: Date, date: Date, othersAvailability: Availability[]): boolean => {
+  let currentCell = getCell(time, date);
+  for (let i = 0; i < othersAvailability.length; i++) {
+    if (othersAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
+      return othersAvailability[i].available;
+    }
+  }
+  return false;
+};
+
+const bothAvailable = (
+  time: Date,
+  date: Date,
+  userAvailability: Availability[],
+  othersAvailability: Availability[],
+): boolean => {
+  let iAmAvailable = areOthersAvailable(time, date, userAvailability);
+  let othersAreAvailable = areOthersAvailable(time, date, othersAvailability);
+  if (iAmAvailable && othersAreAvailable) {
+    return true;
+  }
+
+  return false;
+};
+
+const getCell = (time: Date, date: Date) => {
   const cellStartDateTime = new Date(date);
   cellStartDateTime.setHours(time.getHours(), time.getMinutes(), 0, 0);
   const cellEndDateTime = new Date(cellStartDateTime.getTime() + 15 * 60000);
   return { cellStartDateTime, cellEndDateTime };
-}
+};
 
-const Timematcher = ({ rowTitle, dates, timeRange, availabilityIds }: TimematcherProps) => {
+const Timematcher = ({ rowTitle, dates, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
   const allDates = generateDates(dates);
   const times = generateTimes(timeRange);
-  const [getAvailability, { error, data }] = useLazyQuery(GET_USER_INTERVALS, {
-    variables: {
-      userIntervalInput: {
-        intervals: [
-          {
-            start: new Date(),
-            end: new Date(),
-          },
-        ],
-      },
-      availabilityIds: [availabilityIds],
-    },
-  });
-
-  if (error) {
-    console.log(error);
-  }
+  let column_id = 0;
+  let row_id = 0;
 
   return (
     <div>
       <TableContainer component={Paper} className={styles.table}>
         <Table stickyHeader className={styles.tableContent}>
           <TableHead>
-            <TableRow>
-              <TableCell>{rowTitle}</TableCell>
+            <TableRow className={styles.tableColumn} key={column_id}>
+              <TableCell className={styles.dates} key={column_id++}>
+                {rowTitle}
+              </TableCell>
               {Array.from(allDates.dateMap.keys()).map((date) => (
-                <TableCell align="right">{date}</TableCell>
+                <TableCell align="center" className={styles.dates} key={date}>
+                  {date}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {Array.from(times.timeMap.keys()).map((time) => (
-              <TableRow key={time} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row">
+              <TableRow key={row_id}>
+                <TableCell component="th" scope="row" key={row_id++}>
                   {time}
                 </TableCell>
-                {Array.from(allDates.dateMap.keys()).map(
-                  async (
-                    date, //for each date at that time
-                  ) =>
-                    (
-                      await getAvailability({
-                        variables: {
-                          userIntervalInput: {
-                            intervals: [
-                              {
-                                start: getCell(times.timeMap.get(time) as Date, allDates.dateMap.get(date) as Date)
-                                  .cellStartDateTime,
-                                end: getCell(times.timeMap.get(time) as Date, allDates.dateMap.get(date) as Date)
-                                  .cellEndDateTime,
-                              },
-                            ],
-                          },
-                          availabilityIds: [],
-                        },
-                      })
-                    ).data.getUserIntervals.available ? (
-                      <TableCell className={styles.selfAvailable}></TableCell>
-                    ) : (
-                      <TableCell>busy</TableCell>
-                    ),
+                {Array.from(allDates.dateMap.keys()).map((date) =>
+                  bothAvailable(
+                    times.timeMap.get(time) as Date,
+                    allDates.dateMap.get(date) as Date,
+                    userAvailability,
+                    othersAvailability,
+                  ) ? (
+                    <TableCell className={styles.bothAvailable} key={time + date}></TableCell>
+                  ) : isUserAvailable(
+                      times.timeMap.get(time) as Date,
+                      allDates.dateMap.get(date) as Date,
+                      userAvailability,
+                    ) ? (
+                    <TableCell className={styles.userAvailable} key={time + date}></TableCell>
+                  ) : (
+                    <TableCell className={styles.othersAvailable} key={time + date}></TableCell>
+                  ),
                 )}
               </TableRow>
             ))}

@@ -1,8 +1,8 @@
 .table {
-  height: 50vh;
-  width: 80rem;
-  max-width: max-content;
-  padding-right: 1rem;
+  display: inline-block;
+  max-width: 30vw;
+  max-height: 50vh;
+  padding: 0.5rem;
 }
 
 .tableContent {
@@ -10,12 +10,25 @@
   height: max-content;
 }
 
+.tableColumn {
+  min-width: max-content;
+}
+
+.dates {
+  font-size: medium;
+}
+
+.userAvailable {
+  background-color: var(--flocker-color-secondary);
+  opacity: 0.4;
+}
+
 .othersAvailable {
   background-color: var(--flocker-color-primary);
   opacity: 0.25;
 }
 
-.selfAvailable {
-  background-color: var(--flocker-color-secondary);
+.bothAvailable {
+  background-color: var(--flocker-color-tertiary);
   opacity: 0.25;
 }
