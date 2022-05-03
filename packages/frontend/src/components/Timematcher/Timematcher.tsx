@@ -75,7 +75,7 @@ const Timematcher = ({ rowTitle, dates, timeRange, availabilityIds }: Timematche
           },
         ],
       },
-      availabilityIds: [],
+      availabilityIds: [availabilityIds],
     },
   });
 
