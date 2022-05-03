@@ -1,7 +1,7 @@
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { User } from 'firebase/auth';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import FlockerApolloProvider from './provider';
 
 const SERVER_URI = process.env.REACT_APP_SERVER_URI;
@@ -39,7 +39,7 @@ const httpLink = new HttpLink({
  * @returns the Apollo client
  */
 export const useApolloClient = (user: User | null) => {
-  const client = new ApolloClient({ cache: new InMemoryCache() });
+  const [client] = useState(new ApolloClient({ cache: new InMemoryCache() }));
 
   // If the user changes, reset the authorization header, and clear the cache
   // so that queries can be rerun on the new user.
