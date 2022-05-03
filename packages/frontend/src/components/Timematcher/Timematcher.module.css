@@ -2,7 +2,14 @@
   display: inline-block;
   max-width: 30vw;
   max-height: 50vh;
-  padding: 0.5rem;
+}
+
+.time {
+  font-size: medium;
+  position: sticky;
+  background-color: white;
+  left: 0;
+  z-index: 2;
 }
 
 .tableContent {
@@ -12,10 +19,21 @@
 
 .tableColumn {
   min-width: max-content;
+  left: 0;
+  position: 'sticky';
+  z-index: 2;
+}
+
+.leftCol {
+  position: sticky;
+  background-color: white;
+  left: 0;
+  z-index: 800;
 }
 
 .dates {
   font-size: medium;
+  z-index: 1;
 }
 
 .userAvailable {

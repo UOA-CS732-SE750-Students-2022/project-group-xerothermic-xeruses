@@ -43,7 +43,7 @@ const generateTimes = (times: Date[]) => {
     const endTime = times[1];
     let time = startTime;
     while (time < endTime) {
-      let newTime = new Date(time.getTime() + 15 * 60000); //15 min intervals converted into milliseconds
+      let newTime = new Date(time.getTime() + 15 * 60000);
       let newTimeString = formatTime(newTime);
       timeMap.set(newTimeString, newTime);
       time = newTime;
@@ -114,7 +114,7 @@ const Timematcher = ({ rowTitle, dates, timeRange, userAvailability, othersAvail
         <Table stickyHeader className={styles.tableContent}>
           <TableHead>
             <TableRow className={styles.tableColumn} key={column_id}>
-              <TableCell className={styles.dates} key={column_id++}>
+              <TableCell className={(styles.dates, styles.time)} key={column_id++}>
                 {rowTitle}
               </TableCell>
               {Array.from(allDates.dateMap.keys()).map((date) => (
@@ -127,7 +127,7 @@ const Timematcher = ({ rowTitle, dates, timeRange, userAvailability, othersAvail
           <TableBody>
             {Array.from(times.timeMap.keys()).map((time) => (
               <TableRow key={row_id}>
-                <TableCell component="th" scope="row" key={row_id++}>
+                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={row_id++}>
                   {time}
                 </TableCell>
                 {Array.from(allDates.dateMap.keys()).map((date) =>
@@ -137,15 +137,33 @@ const Timematcher = ({ rowTitle, dates, timeRange, userAvailability, othersAvail
                     userAvailability,
                     othersAvailability,
                   ) ? (
-                    <TableCell className={styles.bothAvailable} key={time + date}></TableCell>
+                    <TableCell
+                      className={styles.bothAvailable}
+                      key={time + date}
+                      data-testid={'both-available'}
+                    ></TableCell>
                   ) : isUserAvailable(
                       times.timeMap.get(time) as Date,
                       allDates.dateMap.get(date) as Date,
                       userAvailability,
                     ) ? (
-                    <TableCell className={styles.userAvailable} key={time + date}></TableCell>
+                    <TableCell
+                      className={styles.userAvailable}
+                      key={time + date}
+                      data-testid={'user-available'}
+                    ></TableCell>
+                  ) : areOthersAvailable(
+                      times.timeMap.get(time) as Date,
+                      allDates.dateMap.get(date) as Date,
+                      othersAvailability,
+                    ) ? (
+                    <TableCell
+                      className={styles.othersAvailable}
+                      key={time + date}
+                      data-testid={'others-available'}
+                    ></TableCell>
                   ) : (
-                    <TableCell className={styles.othersAvailable} key={time + date}></TableCell>
+                    <TableCell key={time + date} data-testid={'noone-available'}></TableCell>
                   ),
                 )}
               </TableRow>
