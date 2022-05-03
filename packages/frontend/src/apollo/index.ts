@@ -47,7 +47,7 @@ export const useApolloClient = (user: User | null) => {
     const link = getAuthLink(user).concat(httpLink);
     client.setLink(link); // Reset auth header
     client.resetStore(); // Clear cache (and rerun active queries)
-  }, [user]);
+  }, [user, client]);
 
   return client;
 };
