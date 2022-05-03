@@ -10,7 +10,9 @@ type CalendarviewProps = {
 const Calendarview = ({ prop1 }: CalendarviewProps) => {
   const { setUser } = useAuth();
 
-  const [error, data] = useQuery(GET_USER_INTERVALS, {
+  const availabilityIds = [''];
+
+  const { error, data } = useQuery(GET_USER_INTERVALS, {
     variables: {
       userIntervalInput: {
         intervals: [
@@ -24,7 +26,11 @@ const Calendarview = ({ prop1 }: CalendarviewProps) => {
     },
   });
 
-  return <div className={styles.calendarView}></div>;
+  return (
+    <div className={styles.calendarView}>
+      <Timematcher></Timematcher>
+    </div>
+  );
 };
 
 export default Calendarview;
