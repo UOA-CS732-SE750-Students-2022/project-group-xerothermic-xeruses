@@ -27,7 +27,6 @@ it('should render', () => {
 
   const { container } = render(
     <Timematcher
-      rowTitle=""
       dates={[new Date('05/04/2022')]}
       timeRange={[time1, time2]}
       userAvailability={freeTimes}
@@ -65,7 +64,6 @@ it('should render multiple dates', () => {
 
   render(
     <Timematcher
-      rowTitle=""
       dates={[new Date('05/04/2022'), new Date('05/05/2022')]}
       timeRange={[time1, time1]}
       userAvailability={freeTimes}
@@ -102,7 +100,6 @@ it('should render multiple times', () => {
 
   render(
     <Timematcher
-      rowTitle=""
       dates={[new Date('05/04/2022')]}
       timeRange={[time1, time2]}
       userAvailability={freeTimes}
@@ -136,7 +133,6 @@ it('should show both available cell when both user and others are available', ()
 
   render(
     <Timematcher
-      rowTitle=""
       dates={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={freeTimes}
@@ -174,7 +170,6 @@ it('should show user available cell when user is available but others are not', 
 
   render(
     <Timematcher
-      rowTitle=""
       dates={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
@@ -212,7 +207,6 @@ it('should show others available cell when others are available but user is not'
 
   render(
     <Timematcher
-      rowTitle=""
       dates={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
@@ -250,7 +244,6 @@ it('should show no one available cell when neither user or others are available'
 
   render(
     <Timematcher
-      rowTitle=""
       dates={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
