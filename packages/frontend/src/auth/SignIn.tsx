@@ -11,9 +11,20 @@ const SignIn: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const createFlockerUser = async (user: User) => {
+    const name = user.displayName;
+    await createUser({
+      variables: {
+        addUserInput: {
+          name,
+        },
+      },
+    });
+  };
+
   useEffect(() => {
     getCurrentUser(); // This will trigger `loading` to change
-  }, [user]);
+  }, [user, getCurrentUser]);
 
   useEffect(() => {
     if (loading) return;
@@ -31,18 +42,7 @@ const SignIn: React.FC = () => {
         }
       })();
     }
-  }, [loading]);
-
-  const createFlockerUser = async (user: User) => {
-    const name = user.displayName;
-    await createUser({
-      variables: {
-        addUserInput: {
-          name,
-        },
-      },
-    });
-  };
+  }, [createFlockerUser, loading, data, error, navigate, user]);
 
   return <></>;
 };
