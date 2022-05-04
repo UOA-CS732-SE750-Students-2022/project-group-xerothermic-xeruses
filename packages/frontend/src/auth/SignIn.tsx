@@ -11,17 +11,6 @@ const SignIn: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const createFlockerUser = async (user: User) => {
-    const name = user.displayName;
-    await createUser({
-      variables: {
-        addUserInput: {
-          name,
-        },
-      },
-    });
-  };
-
   useEffect(() => {
     getCurrentUser(); // This will trigger `loading` to change
   }, [user, getCurrentUser]);
@@ -29,6 +18,17 @@ const SignIn: React.FC = () => {
   useEffect(() => {
     if (loading) return;
     if (data) navigate('/dashboard', { replace: true }); // User exists, go to dashboard
+
+    const createFlockerUser = async (user: User) => {
+      const name = user.displayName;
+      await createUser({
+        variables: {
+          addUserInput: {
+            name,
+          },
+        },
+      });
+    };
 
     if (error) {
       const errorCode = error.graphQLErrors[0].extensions.code;
@@ -42,7 +42,7 @@ const SignIn: React.FC = () => {
         }
       })();
     }
-  }, [createFlockerUser, loading, data, error, navigate, user]);
+  }, [loading, data, error, navigate, user]);
 
   return <></>;
 };
