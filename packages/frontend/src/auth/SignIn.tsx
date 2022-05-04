@@ -20,7 +20,7 @@ const SignIn: React.FC = () => {
     if (data) navigate('/dashboard', { replace: true }); // User exists, go to dashboard
 
     if (error) {
-      const errorCode = error?.graphQLErrors[0].extensions.code;
+      const errorCode = error.graphQLErrors[0].extensions.code;
       (async () => {
         if (errorCode === '404' && user) {
           // User does not exist
