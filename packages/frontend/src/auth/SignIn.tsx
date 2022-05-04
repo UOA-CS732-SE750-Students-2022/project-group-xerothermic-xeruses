@@ -1,6 +1,6 @@
 import { useMutation, useLazyQuery } from '@apollo/client';
 import { User } from 'firebase/auth';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GET_CURRENT_USER_NAME, CREATE_NEW_USER } from '../apollo/queries';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,15 +11,8 @@ const SignIn: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    getCurrentUser(); // This will trigger `loading` to change
-  }, [user, getCurrentUser]);
-
-  useEffect(() => {
-    if (loading) return;
-    if (data) navigate('/dashboard', { replace: true }); // User exists, go to dashboard
-
-    const createFlockerUser = async (user: User) => {
+  const createFlockerUser = useCallback(
+    async (user: User) => {
       const name = user.displayName;
       await createUser({
         variables: {
@@ -28,7 +21,17 @@ const SignIn: React.FC = () => {
           },
         },
       });
-    };
+    },
+    [createUser],
+  );
+
+  useEffect(() => {
+    getCurrentUser(); // This will trigger `loading` to change
+  }, [user, getCurrentUser]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (data) navigate('/dashboard', { replace: true }); // User exists, go to dashboard
 
     if (error) {
       const errorCode = error.graphQLErrors[0].extensions.code;
@@ -42,7 +45,7 @@ const SignIn: React.FC = () => {
         }
       })();
     }
-  }, [loading, data, error, navigate, user]);
+  }, [createFlockerUser, loading, data, error, navigate, user]);
 
   return <></>;
 };
