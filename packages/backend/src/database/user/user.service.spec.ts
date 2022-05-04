@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { closeMongoDBConnection, rootMongooseTestModule } from '../util/mongo.helper';
+import { UserDatabaseModule } from './user.module';
 import { UserDocument, UserSchema, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
+import { UserAvailabilityICal } from './userAvailabilityICal.schema';
+import { UserAvailabilityUtil } from './util/userAvailability.util';
 import { UserDatabaseUtilModule } from './util/userDatabaseUtil.module';
 
 const userDocument: Partial<UserDocument> = {
@@ -20,17 +23,22 @@ describe(UserService.name, () => {
   let service: UserService;
   let module: TestingModule;
 
+  const userService = new UserService(Model<UserDocument>(), UserAvailabilityUtil());
+
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
+        UserDatabaseModule,
         rootMongooseTestModule(),
         MongooseModule.forFeature([{ name: USER_MODEL_NAME, schema: UserSchema }]),
         UserDatabaseUtilModule,
       ],
-      providers: [UserService],
-    }).compile();
+    })
+      .overrideProvider(UserService)
+      .useValue(userService)
+      .compile();
 
-    service = service = module.get<UserService>(UserService);
+    service = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {
@@ -83,6 +91,25 @@ describe(UserService.name, () => {
 
     expect(user).toBeTruthy();
     checkEquality(user!, updatedUserDocument);
+  });
+
+  it('should find add a flock to a user successfully', async () => {
+    const flockId = new Types.ObjectId();
+    const user: UserDocument | null = await service.addFlockToUser(userDocument._id!, flockId);
+
+    userDocument.flocks!.push(flockId);
+
+    checkEquality(user!, userDocument);
+  });
+
+  it('should add a new user availability source', async () => {
+    const user: UserDocument | null = await service.addUserAvailability(userDocument._id!, [
+      { type: 'ical', uri: 'uri://another' },
+    ]);
+
+    // expect(user).toBeTruthy();
+    // expect(user.availability[0].type).toEqual('ical');
+    // expect((user.availability[0] as UserAvailabilityICal).uri).toEqual('uri://another');
   });
 
   it('should delete a user successfully', async () => {
