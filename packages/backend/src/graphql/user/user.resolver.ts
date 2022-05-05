@@ -1,8 +1,8 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
 import { DecodedIdToken } from 'firebase-admin/auth';
-import { GraphQLString } from 'graphql';
+import { GraphQLBoolean, GraphQLString } from 'graphql';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
@@ -119,5 +119,39 @@ export class UserResolver {
     return {
       availability: this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals),
     };
+  }
+
+  @Auth()
+  @Mutation(() => GraphQLBoolean)
+  async inviteToFlock(
+    @User() user: UserDocument,
+    @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
+    @Args('userToInvite', { type: () => GraphQLString }) userIdToInvite: string,
+  ) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    }
+
+    // TODO: Check that `user` has permission to invite people to the flock.
+
+    const userToInvite = await this.userService.findOne(userIdToInvite);
+    if (!userToInvite) {
+      throw new NotFoundException(`Invalid userToInvite: ${userToInvite}`);
+    }
+
+    if (flock.users.includes(userToInvite._id)) {
+      throw new BadRequestException('User is already in this flock');
+    }
+
+    if (userToInvite.flockInvites.includes(flock._id)) {
+      throw new BadRequestException('User has already been invited to this flock');
+    }
+
+    userToInvite.flockInvites.push(flock._id);
+    await userToInvite.save();
+
+    // Can't return null, might as well give it a happy boolean.
+    return true;
   }
 }

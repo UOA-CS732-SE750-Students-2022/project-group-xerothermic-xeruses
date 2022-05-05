@@ -1,24 +1,23 @@
 import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import apolloClient from './apollo';
 import Routes from './routes/Routes';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { ApolloProvider } from '@apollo/client';
+import { FlockerApolloProvider } from './apollo';
 import { StyledEngineProvider } from '@mui/material/styles';
 
 ReactDOM.render(
   <React.StrictMode>
-    <ApolloProvider client={apolloClient}>
-      <StyledEngineProvider injectFirst>
-        <AuthProvider>
+    <AuthProvider>
+      <FlockerApolloProvider>
+        <StyledEngineProvider injectFirst>
           <BrowserRouter>
             <Routes></Routes>
           </BrowserRouter>
-        </AuthProvider>
-      </StyledEngineProvider>
-    </ApolloProvider>
+        </StyledEngineProvider>
+      </FlockerApolloProvider>
+    </AuthProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );
