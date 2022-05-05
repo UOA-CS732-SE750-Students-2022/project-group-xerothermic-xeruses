@@ -1,0 +1,31 @@
+.container {
+  height: 100vh;
+  width: 250px;
+  background-color: var(--flocker-color-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  padding-top: 36px;
+  color: white;
+}
+
+.content {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: var(--flocker-font-size-subtitle);
+  font-weight: var(--flocker-font-weight-light);
+  margin-bottom: 16px;
+}
+
+.username {
+  font-weight: var(--flocker-font-weight-medium);
+}
