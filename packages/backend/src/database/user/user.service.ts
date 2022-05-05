@@ -46,7 +46,7 @@ export class UserService {
   }
 
   async update(_id: Types.ObjectId | string, user: Partial<User>): Promise<UserDocument | null> {
-    return this.model.findByIdAndUpdate({ _id }, user).exec();
+    return this.model.findByIdAndUpdate({ _id }, user, { new: true }).exec();
   }
 
   async findUserAvailability(
