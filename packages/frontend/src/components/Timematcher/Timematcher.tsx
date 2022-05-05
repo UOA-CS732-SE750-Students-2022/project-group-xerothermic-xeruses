@@ -9,7 +9,7 @@ import styles from './Timematcher.module.css';
 
 type TimematcherProps = {
   dates: Date[];
-  timeRange: Date[];
+  timeRange: [Date, Date];
   userAvailability: Availability[];
   othersAvailability: Availability[];
 };
@@ -20,36 +20,25 @@ type Availability = {
   available: boolean;
 };
 
-const generateDates = (dates: Date[]) => {
-  const dateMap = new Map<string, Date>();
-  if (dates) {
-    dates.forEach((date) => {
-      const dateString = `${date.toLocaleString('default', { weekday: 'short' })} ${date
-        .getDate()
-        .toString()} ${date.toLocaleString('default', { month: 'short' })}`;
-      dateMap.set(dateString, date);
-    });
-  }
-
-  return { dateMap };
-};
+const generateDates = (dates: Date[]) =>
+  new Map(
+    dates.map((d) => [d.toLocaleString(navigator.language, { weekday: 'short', day: 'numeric', month: 'short' }), d]),
+  );
 
 const generateTimes = (times: Date[]) => {
   const timeMap = new Map<string, Date>();
-  if (times) {
-    const startTime = times[0];
-    timeMap.set(formatTime(startTime), startTime);
-    const endTime = times[1];
-    let time = startTime;
-    while (time < endTime) {
-      let newTime = new Date(time.getTime() + 15 * 60000);
-      let newTimeString = formatTime(newTime);
-      timeMap.set(newTimeString, newTime);
-      time = newTime;
-    }
+  const [startTime, endTime] = times;
+  timeMap.set(formatTime(startTime), startTime);
+  let time = startTime;
+  const FIFTEEN_MINUTES = 15 * 60000;
+  while (time < endTime) {
+    let newTime = new Date(time.getTime() + FIFTEEN_MINUTES);
+    let newTimeString = formatTime(newTime);
+    timeMap.set(newTimeString, newTime);
+    time = newTime;
   }
 
-  return { timeMap };
+  return timeMap;
 };
 
 const formatTime = (time: Date) => {
@@ -59,39 +48,28 @@ const formatTime = (time: Date) => {
   return hour > 12 ? `${hour - 12}:${minutes} ${ampm}` : `${hour}:${minutes} ${ampm}`;
 };
 
-const isUserAvailable = (time: Date, date: Date, userAvailability: Availability[]): boolean => {
-  let currentCell = getCell(time, date);
-  for (let i = 0; i < userAvailability.length; i++) {
-    if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
-      return userAvailability[i].available;
-    }
-  }
-  return false;
-};
-
-const areOthersAvailable = (time: Date, date: Date, othersAvailability: Availability[]): boolean => {
-  let currentCell = getCell(time, date);
-  for (let i = 0; i < othersAvailability.length; i++) {
-    if (othersAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
-      return othersAvailability[i].available;
-    }
-  }
-  return false;
-};
-
-const bothAvailable = (
+const isAvailable = (
   time: Date,
   date: Date,
   userAvailability: Availability[],
   othersAvailability: Availability[],
-): boolean => {
-  let iAmAvailable = areOthersAvailable(time, date, userAvailability);
-  let othersAreAvailable = areOthersAvailable(time, date, othersAvailability);
-  if (iAmAvailable && othersAreAvailable) {
-    return true;
+): { userAvailable: boolean; othersAvailable: boolean; bothAvailable: boolean } => {
+  let currentCell = getCell(time, date);
+  let userAvailable = false;
+  let othersAvailable = false;
+  let bothAvailable = false;
+  for (let i = 0; i < userAvailability.length; i++) {
+    if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
+      userAvailable = userAvailability[i].available;
+    }
+    if (othersAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
+      othersAvailable = othersAvailability[i].available;
+    }
   }
 
-  return false;
+  if (userAvailable && othersAvailable) bothAvailable = true;
+
+  return { userAvailable, othersAvailable, bothAvailable };
 };
 
 const getCell = (time: Date, date: Date) => {
@@ -116,7 +94,7 @@ const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }:
               <TableCell className={(styles.dates, styles.time)} key={column_id++}>
                 Time
               </TableCell>
-              {Array.from(allDates.dateMap.keys()).map((date) => (
+              {Array.from(allDates.keys()).map((date) => (
                 <TableCell align="center" className={styles.dates} key={date}>
                   {date}
                 </TableCell>
@@ -124,38 +102,36 @@ const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }:
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.from(times.timeMap.keys()).map((time) => (
+            {Array.from(times.keys()).map((time) => (
               <TableRow key={row_id}>
                 <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={row_id++}>
                   {time}
                 </TableCell>
-                {Array.from(allDates.dateMap.keys()).map((date) =>
-                  bothAvailable(
-                    times.timeMap.get(time) as Date,
-                    allDates.dateMap.get(date) as Date,
-                    userAvailability,
-                    othersAvailability,
-                  ) ? (
+                {Array.from(allDates.keys()).map((date) =>
+                  isAvailable(times.get(time) as Date, allDates.get(date) as Date, userAvailability, othersAvailability)
+                    .bothAvailable ? (
                     <TableCell
                       className={styles.bothAvailable}
                       key={time + date}
                       data-testid={'both-available'}
                     ></TableCell>
-                  ) : isUserAvailable(
-                      times.timeMap.get(time) as Date,
-                      allDates.dateMap.get(date) as Date,
+                  ) : isAvailable(
+                      times.get(time) as Date,
+                      allDates.get(date) as Date,
                       userAvailability,
-                    ) ? (
+                      othersAvailability,
+                    ).userAvailable ? (
                     <TableCell
                       className={styles.userAvailable}
                       key={time + date}
                       data-testid={'user-available'}
                     ></TableCell>
-                  ) : areOthersAvailable(
-                      times.timeMap.get(time) as Date,
-                      allDates.dateMap.get(date) as Date,
+                  ) : isAvailable(
+                      times.get(time) as Date,
+                      allDates.get(date) as Date,
+                      userAvailability,
                       othersAvailability,
-                    ) ? (
+                    ).othersAvailable ? (
                     <TableCell
                       className={styles.othersAvailable}
                       key={time + date}
