@@ -3,7 +3,6 @@ import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Types } from 'mongoose';
 import { closeMongoDBConnection, rootMongooseTestModule } from '../test-util/mongo-memory-db.helper';
-import { UserDatabaseModule } from './user.module';
 import { UserDocument, UserSchema, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
 import { UserAvailabilityDocument } from './userAvailability.schema';
