@@ -2,8 +2,6 @@ import '@testing-library/jest-dom';
 import { screen, render } from '@testing-library/react';
 import Timematcher from './Timematcher';
 
-beforeAll(() => {});
-
 it('should render', () => {
   const time1 = new Date('05/04/2022');
   time1.setHours(9, 0, 0, 0);
