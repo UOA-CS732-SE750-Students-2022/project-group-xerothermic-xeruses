@@ -1,29 +1,32 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { MongooseModule } from '@nestjs/mongoose';
+import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Types } from 'mongoose';
 import { closeMongoDBConnection, rootMongooseTestModule } from '../util/mongo.helper';
 import { UserDatabaseModule } from './user.module';
 import { UserDocument, UserSchema, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
+import { UserAvailabilityDocument } from './userAvailability.schema';
 import { UserAvailabilityICal } from './userAvailabilityICal.schema';
-import { UserAvailabilityUtil } from './util/userAvailability.util';
 import { UserDatabaseUtilModule } from './util/userDatabaseUtil.module';
 
+const id = (id: string) => {
+  if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
+  return new Types.ObjectId(id.padEnd(12, '_'));
+};
+
 const userDocument: Partial<UserDocument> = {
-  _id: new Types.ObjectId(),
+  _id: id('Test User'),
   name: 'Test User',
   firebaseId: 'QwerTY12345Qwerty12345qWErTY',
   flocks: [],
   flockInvites: [],
-  availability: [],
+  availability: [{ _id: id('Availabil_01'), type: 'ical', uri: 'uri://test' }] as UserAvailabilityDocument[],
 };
 
 describe(UserService.name, () => {
   let service: UserService;
   let module: TestingModule;
-
-  const userService = new UserService(Model<UserDocument>(), UserAvailabilityUtil());
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -33,12 +36,16 @@ describe(UserService.name, () => {
         MongooseModule.forFeature([{ name: USER_MODEL_NAME, schema: UserSchema }]),
         UserDatabaseUtilModule,
       ],
-    })
-      .overrideProvider(UserService)
-      .useValue(userService)
-      .compile();
+    }).compile();
 
     service = module.get<UserService>(UserService);
+  });
+
+  beforeEach(async () => {
+    // This is where we setup our fake data.
+    const userModel = module.get<Model<UserDocument>>(getModelToken(USER_MODEL_NAME));
+    await userModel.deleteMany();
+    await userModel.create(userDocument);
   });
 
   it('should be defined', () => {
@@ -52,16 +59,15 @@ describe(UserService.name, () => {
     };
 
     const user: UserDocument = await service.create(createUserInput);
-    userDocument._id = user._id;
-
     expect(user).toBeTruthy();
-    checkEquality(user!, userDocument);
+    expect(user._id).toBeTruthy();
+    expect(user.name).toEqual(createUserInput.name);
+    expect(user.firebaseId).toEqual(createUserInput.firebaseId);
   });
 
   it('should return all users', async () => {
     const users: UserDocument[] | null = await service.findAll();
 
-    expect(users).toBeDefined();
     expect(Array.isArray(users)).toBe(true);
     expect(users.length).toBe(1);
     checkEquality(users[0], userDocument);
@@ -86,6 +92,7 @@ describe(UserService.name, () => {
       name: 'New Name',
     });
 
+    // FYI this doesn't make a copy.
     const updatedUserDocument: Partial<UserDocument> = userDocument;
     updatedUserDocument.name = 'New Name';
 
@@ -107,9 +114,11 @@ describe(UserService.name, () => {
       { type: 'ical', uri: 'uri://another' },
     ]);
 
-    // expect(user).toBeTruthy();
-    // expect(user.availability[0].type).toEqual('ical');
-    // expect((user.availability[0] as UserAvailabilityICal).uri).toEqual('uri://another');
+    expect(user.availability.length).toEqual(userDocument.availability!.length + 1);
+
+    const newAvailability = user.availability.at(-1) as UserAvailabilityICal;
+    expect(newAvailability.type).toEqual('ical');
+    expect(newAvailability.uri).toEqual('uri://another');
   });
 
   it('should delete a user successfully', async () => {
@@ -128,10 +137,7 @@ describe(UserService.name, () => {
 });
 
 const checkEquality = (user: UserDocument, expected: Partial<UserDocument>) => {
-  expect(user._id).toEqual(expected._id);
-  expect(user.name).toEqual(expected.name);
-  expect(user.firebaseId).toEqual(expected.firebaseId);
-  expect(user.flocks).toEqual(expected.flocks);
-  expect(user.flockInvites).toEqual(expected.flockInvites);
-  expect(user.availability).toEqual(expected.availability);
+  const userObj = user.toJSON();
+  delete userObj['__v']; // don't check version
+  expect(userObj).toEqual(expected);
 };
