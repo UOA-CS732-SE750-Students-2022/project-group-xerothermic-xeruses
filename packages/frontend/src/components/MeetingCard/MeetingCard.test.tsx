@@ -7,7 +7,7 @@ test('should render', () => {
   render(<MeetingCard title="Meeting" numParticipants={2} dateRange={dateRange} />);
   const title = screen.queryByText('Meeting');
   const participants = screen.queryByText('2 participants');
-  const datesString = screen.queryByText('22 March 2022 - 27 March 2022');
+  const datesString = screen.queryByText('Mar 22, 2022 - Mar 26, 2022');
 
   expect(title).toBeVisible();
   expect(participants).toBeVisible();
