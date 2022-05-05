@@ -1,8 +1,8 @@
 .container {
   border: 1px solid black;
   margin: 1em;
-  padding: 1.5em;
-  border-radius: 16px;
+  padding: 1.2em;
+  border-radius: 12px;
   min-width: 250px;
   width: fit-content;
   transition: ease-in-out 0.2s;
