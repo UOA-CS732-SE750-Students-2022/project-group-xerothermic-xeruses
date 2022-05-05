@@ -9,9 +9,9 @@ test('should render', () => {
   const participants = screen.queryByText('2 participants');
   const datesString = screen.queryByText('22 March 2022 - 27 March 2022');
 
-  expect(title).toBeVisible;
-  expect(participants).toBeVisible;
-  expect(datesString).toBeVisible;
+  expect(title).toBeVisible();
+  expect(participants).toBeVisible();
+  expect(datesString).toBeVisible();
 });
 
 test('should call onClick prop when clicked', () => {
