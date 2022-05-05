@@ -59,8 +59,7 @@ describe(UserService.name, () => {
     };
 
     const user: UserDocument = await service.create(createUserInput);
-    expect(user).toBeTruthy();
-    expect(user._id).toBeTruthy();
+    expect(user._id).toBeInstanceOf(Types.ObjectId);
     expect(user.name).toEqual(createUserInput.name);
     expect(user.firebaseId).toEqual(createUserInput.firebaseId);
   });
@@ -75,16 +74,12 @@ describe(UserService.name, () => {
 
   it('should find one by id', async () => {
     const user: UserDocument | null = await service.findOne(userDocument._id!);
-
-    expect(user).toBeTruthy();
-    checkEquality(user!, userDocument);
+    checkEquality(user, userDocument);
   });
 
   it('should find one by firebaseId', async () => {
     const user: UserDocument | null = await service.findOneByFirebaseId(userDocument.firebaseId!);
-
-    expect(user).toBeTruthy();
-    checkEquality(user!, userDocument);
+    checkEquality(user, userDocument);
   });
 
   it('should update a user successfully', async () => {
@@ -92,21 +87,16 @@ describe(UserService.name, () => {
       name: 'New Name',
     });
 
-    // FYI this doesn't make a copy.
-    const updatedUserDocument: Partial<UserDocument> = userDocument;
-    updatedUserDocument.name = 'New Name';
-
-    expect(user).toBeTruthy();
-    checkEquality(user!, updatedUserDocument);
+    const updatedUserDocument = { ...userDocument, name: 'New Name' };
+    checkEquality(user, updatedUserDocument);
   });
 
   it('should find add a flock to a user successfully', async () => {
     const flockId = new Types.ObjectId();
     const user: UserDocument | null = await service.addFlockToUser(userDocument._id!, flockId);
 
-    userDocument.flocks!.push(flockId);
-
-    checkEquality(user!, userDocument);
+    const updatedUserDocument = { ...userDocument, flocks: [...(userDocument.flocks ?? []), flockId] };
+    checkEquality(user, updatedUserDocument);
   });
 
   it('should add a new user availability source', async () => {
@@ -123,9 +113,7 @@ describe(UserService.name, () => {
 
   it('should delete a user successfully', async () => {
     const user: UserDocument | null = await service.delete(userDocument._id!);
-
-    expect(user).toBeTruthy();
-    checkEquality(user!, userDocument);
+    checkEquality(user, userDocument);
   });
 
   afterAll(async () => {
@@ -136,7 +124,13 @@ describe(UserService.name, () => {
   });
 });
 
-const checkEquality = (user: UserDocument, expected: Partial<UserDocument>) => {
+const checkEquality = (user: UserDocument | null | undefined, expected: Partial<UserDocument> | null | undefined) => {
+  if (user == null) {
+    // If `user` is nullish then `expected` should match it.
+    expect(user).toEqual(expected);
+    return;
+  }
+
   const userObj = user.toJSON();
   delete userObj['__v']; // don't check version
   expect(userObj).toEqual(expected);
