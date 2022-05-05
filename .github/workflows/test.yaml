@@ -44,5 +44,5 @@ jobs:
         env:
           REACT_APP_FIREBASE_CONFIG_JSON: ${{ secrets.FIREBASE_CONFIG_JSON }}
           REACT_APP_SERVER_URI: ${{ secrets.SERVER_URI }}
-          MONGODB_URI: $${{ secrets.MONGODB_URI }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: npm run test
