@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { MongooseModule } from '@nestjs/mongoose';
+import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
 import { closeMongoDBConnection, rootMongooseTestModule } from '../util/mongo.helper';
 import { FlockDocument, FlockSchema, FLOCK_MODEL_NAME } from './flock.schema';
 import { FlockService } from './flock.service';
 import { UserFlockAvailabilityDocument } from './userFlockAvailability.schema';
 
+const id = (id: string) => {
+  if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
+  return new Types.ObjectId(id.padEnd(12, '_'));
+};
+
 const flockDocument: Partial<FlockDocument> = {
-  _id: new Types.ObjectId(),
+  _id: id('Test Flock'),
   name: 'Test Flock',
   flockCode: 'QWERTY12',
   flockDays: [
@@ -18,8 +23,10 @@ const flockDocument: Partial<FlockDocument> = {
       end: new Date(Date.UTC(2022, 9, 2, 16)),
     },
   ],
-  users: [],
-  userFlockAvailability: [],
+  users: [id('Test User 1'), id('Test User 2')],
+  userFlockAvailability: [
+    { _id: id('Avail 1'), user: id('Test User 1'), userAvailabilityId: id('Availabil_01'), enabled: false },
+  ] as UserFlockAvailabilityDocument[],
 };
 
 describe(FlockService.name, () => {
@@ -33,6 +40,13 @@ describe(FlockService.name, () => {
     }).compile();
 
     service = service = module.get<FlockService>(FlockService);
+  });
+
+  beforeEach(async () => {
+    // This is where we setup our fake data.
+    const flockModel = module.get<Model<FlockDocument>>(getModelToken(FLOCK_MODEL_NAME));
+    await flockModel.deleteMany();
+    await flockModel.create(flockDocument);
   });
 
   it('should be defined', () => {
@@ -51,38 +65,28 @@ describe(FlockService.name, () => {
     };
 
     const flock: FlockDocument = await service.create(createFlockInput);
-    flockDocument._id = flock._id;
-    flockDocument.flockCode = flock.flockCode;
 
-    expect(flock).toBeTruthy();
-    checkEquality(flock!, flockDocument);
-    expect(flock!.userFlockAvailability).toEqual(flockDocument.userFlockAvailability);
+    expect(flock._id).toBeInstanceOf(Types.ObjectId);
+    expect(flock.name).toEqual(createFlockInput.name);
+    expect(flock.flockDays).toEqual(createFlockInput.flockDays);
   });
 
   it('should return all flocks', async () => {
     const flocks: FlockDocument[] | null = await service.findAll();
 
-    expect(flocks).toBeDefined();
     expect(Array.isArray(flocks)).toBe(true);
     expect(flocks.length).toBe(1);
     checkEquality(flocks[0], flockDocument);
-    expect(flocks[0]!.userFlockAvailability).toEqual(flockDocument.userFlockAvailability);
   });
 
   it('should find one by id', async () => {
     const flock: FlockDocument | null = await service.findOne(flockDocument._id!);
-
-    expect(flock).toBeTruthy();
-    checkEquality(flock!, flockDocument);
-    expect(flock!.userFlockAvailability).toEqual(flockDocument.userFlockAvailability);
+    checkEquality(flock, flockDocument);
   });
 
   it('should find one by flockCode', async () => {
     const flock: FlockDocument | null = await service.findOneByCode(flockDocument.flockCode!);
-
-    expect(flock).toBeTruthy();
-    checkEquality(flock!, flockDocument);
-    expect(flock!.userFlockAvailability).toEqual(flockDocument.userFlockAvailability);
+    checkEquality(flock, flockDocument);
   });
 
   it('should update a flock successfully', async () => {
@@ -90,60 +94,42 @@ describe(FlockService.name, () => {
       name: 'New Name',
     });
 
-    const updatedFlockDocument: Partial<FlockDocument> = flockDocument;
-    updatedFlockDocument.name = 'New Name';
-
-    expect(flock).toBeTruthy();
-    checkEquality(flock!, updatedFlockDocument);
-    expect(flock!.userFlockAvailability).toEqual(flockDocument.userFlockAvailability);
+    const updatedFlockDocument = { ...flockDocument, name: 'New Name' };
+    checkEquality(flock, updatedFlockDocument);
   });
 
   it('should add a user to a flock successfully', async () => {
-    const userId = new Types.ObjectId();
-    flockDocument.users!.push(userId);
+    const userId = id('New User');
     const flock: FlockDocument | null = await service.addUserToFlock(flockDocument._id!, userId);
 
-    expect(flock).toBeTruthy();
-    checkEquality(flock!, flockDocument);
-    expect(flock!.userFlockAvailability).toEqual(flockDocument.userFlockAvailability);
+    expect(flock!.users.length).toEqual(flockDocument.users!.length + 1);
+    expect(flock!.users).toContainEqual(userId);
   });
 
   it('should add a user flock availability to a flock successfully', async () => {
     const userFlockAvailability = {
-      user: new Types.ObjectId(),
-      userAvailabilityId: new Types.ObjectId(),
+      user: id('Test User 2'),
+      userAvailabilityId: id('Availabil_02'),
       enabled: true,
     };
-    flockDocument.userFlockAvailability!.push(userFlockAvailability as UserFlockAvailabilityDocument);
+
     const flock: FlockDocument | null = await service.addUserFlockAvailability(
       flockDocument._id!,
       userFlockAvailability as UserFlockAvailabilityDocument,
     );
 
-    checkEquality(flock!, flockDocument);
-    expect(flock!.userFlockAvailability[0].user).toEqual(flockDocument.userFlockAvailability![0].user);
-    expect(flock!.userFlockAvailability[0].userAvailabilityId).toEqual(
-      flockDocument.userFlockAvailability![0].userAvailabilityId,
-    );
-    expect(flock!.userFlockAvailability[0].enabled).toEqual(flockDocument.userFlockAvailability![0].enabled);
+    expect(flock!.userFlockAvailability.length).toEqual(flockDocument.userFlockAvailability!.length + 1);
+
+    const newAvailability = flock!.userFlockAvailability.at(-1);
+    expect(newAvailability!.enabled).toBeTruthy();
+    expect(newAvailability!.user).toEqual(userFlockAvailability.user);
+    expect(newAvailability!.userAvailabilityId).toEqual(userFlockAvailability.userAvailabilityId);
   });
 
   it('should delete a flock successfully', async () => {
     const flock: FlockDocument | null = await service.delete(flockDocument._id!);
 
-    expect(flock).toBeTruthy();
-    checkEquality(flock!, flockDocument);
-    expect(flock!.userFlockAvailability[0].user).toEqual(flockDocument.userFlockAvailability![0].user);
-    expect(flock!.userFlockAvailability[0].userAvailabilityId).toEqual(
-      flockDocument.userFlockAvailability![0].userAvailabilityId,
-    );
-    expect(flock!.userFlockAvailability[0].enabled).toEqual(flockDocument.userFlockAvailability![0].enabled);
-  });
-
-  it('should not find one by id after document is deleted', async () => {
-    const flock: FlockDocument | null = await service.findOne(flockDocument._id!);
-
-    expect(flock).toBeNull();
+    checkEquality(flock, flockDocument);
   });
 
   afterAll(async () => {
@@ -152,11 +138,19 @@ describe(FlockService.name, () => {
       await closeMongoDBConnection();
     }
   });
-});
 
-const checkEquality = (flock: FlockDocument, expected: Partial<FlockDocument>) => {
-  expect(flock._id).toEqual(expected._id);
-  expect(flock.name).toEqual(expected.name);
-  expect(flock.flockDays).toEqual(expected.flockDays);
-  expect(flock.users).toEqual(expected.users);
-};
+  const checkEquality = (
+    flock: FlockDocument | null | undefined,
+    expected: Partial<FlockDocument> | null | undefined,
+  ) => {
+    if (flock == null) {
+      // If `flock` is nullish then `expected` should match it.
+      expect(flock).toEqual(expected);
+      return;
+    }
+
+    const flockObj = flock.toJSON();
+    delete flockObj['__v']; // don't check version
+    expect(flockObj).toEqual(expected);
+  };
+});
