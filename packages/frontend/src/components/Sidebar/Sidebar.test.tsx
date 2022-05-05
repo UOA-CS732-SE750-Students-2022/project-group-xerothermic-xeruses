@@ -9,27 +9,27 @@ it('should render', () => {
 
 it("should render the user's name if it is supplied", () => {
   render(<Sidebar username="Goose" />);
-  const name = screen.getByText('Goose');
+  const name = screen.queryByText('Goose');
   expect(name).toBeVisible();
 });
 
 it('should handle when username is not supplied', () => {
   render(<Sidebar />);
-  const heading = screen.getByText('Hello!');
+  const heading = screen.queryByText('Hello!');
   expect(heading).toBeVisible();
 });
 
 it('should render children', () => {
   render(
     <Sidebar>
-      <div className="children">
+      <div role="children">
         <p>Paragaph</p>
         <p>Another paragraph</p>
       </div>
     </Sidebar>,
   );
 
-  const child = document.querySelector('.content')?.children[1];
+  const child = screen.queryByRole('children');
   expect(child).toBeVisible();
-  expect(child?.className).toEqual('children');
+  expect(child?.textContent).toEqual('ParagaphAnother paragraph');
 });
