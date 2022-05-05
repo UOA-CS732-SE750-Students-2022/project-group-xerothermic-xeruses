@@ -5,7 +5,7 @@ type {{pascalcase name}}Props = {
   prop1: string;
 };
 
-const {{pascalcase name}} = ({ prop1 }: {{pascalcase name}}Props) => (
+const {{pascalcase name}}: React.FC<{{pascalcase name}}Props> = ({ prop1 }) => (
   <div>
     <h1 className={styles.title}>{{pascalcase name}}</h1>
   </div>
