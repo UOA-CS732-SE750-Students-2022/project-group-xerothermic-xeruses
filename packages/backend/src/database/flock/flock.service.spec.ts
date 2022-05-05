@@ -1,132 +1,159 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-import { createMock } from '@golevelup/ts-jest';
-import { getModelToken } from '@nestjs/mongoose';
-import { Test, type TestingModule } from '@nestjs/testing';
-import { type Model, type Query, Types } from 'mongoose';
+import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Model, Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
-import { type Flock, type FlockDocument, FLOCK_MODEL_NAME } from './flock.schema';
+import { closeMongoDBConnection, rootMongooseTestModule } from '../test-util/mongo-memory-db.helper';
+import { FlockDocument, FlockSchema, FLOCK_MODEL_NAME } from './flock.schema';
 import { FlockService } from './flock.service';
-
-const mockFlockDays = [
-  {
-    start: new Date(Date.UTC(2022, 9, 2, 10)),
-    end: new Date(Date.UTC(2022, 9, 2, 16)),
-  },
-];
+import { UserFlockAvailabilityDocument } from './userFlockAvailability.schema';
 
 const id = (id: string) => {
   if (id.length > 12) throw new Error('ObjectID length must not exceed 12 characters.');
   return new Types.ObjectId(id.padEnd(12, '_'));
 };
 
-const mockFlock = (mock?: Partial<Flock>): Flock => ({
-  name: mock?.name || '<flock name Alpha>',
-  flockDays: mock?.flockDays || mockFlockDays,
-  flockCode: mock?.flockCode || '<flock flockCode Alpha>',
-  users: mock?.users || [],
-  userFlockAvailability: mock?.userFlockAvailability || [],
-});
-
-const mockFlockDocument = (mock?: Partial<FlockDocument>): Partial<FlockDocument> => ({
-  _id: mock?._id || id('FID_Alpha'),
-  name: mock?.name || '<flock name Alpha>',
-  flockDays: mock?.flockDays || mockFlockDays,
-  flockCode: mock?.flockCode || '<flock flockCode Alpha>',
-  users: mock?.users || [],
-  userFlockAvailability: mock?.userFlockAvailability || [],
-});
-
-const FLOCK_DOCUMENTS = [
-  mockFlockDocument(),
-  mockFlockDocument({ _id: id('FID_Bravo'), name: '<flock name Bravo>', users: [] }),
-  mockFlockDocument({ _id: id('FID_Charlie'), name: '<flock name Charlie>', users: [] }),
-];
-
-const FLOCKS = FLOCK_DOCUMENTS.map(mockFlock);
+const flockDocument: Partial<FlockDocument> = {
+  _id: id('Test Flock'),
+  name: 'Test Flock',
+  flockCode: 'QWERTY12',
+  flockDays: [
+    {
+      start: new Date(Date.UTC(2022, 9, 2, 10)),
+      end: new Date(Date.UTC(2022, 9, 2, 16)),
+    },
+  ],
+  users: [id('Test User 1'), id('Test User 2')],
+  userFlockAvailability: [
+    { _id: id('Avail 1'), user: id('Test User 1'), userAvailabilityId: id('Availabil_01'), enabled: false },
+  ] as UserFlockAvailabilityDocument[],
+};
 
 describe(FlockService.name, () => {
   let service: FlockService;
-  let util: FlockUtil;
-  let model: Model<FlockDocument>;
+  let module: TestingModule;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        FlockService,
-        FlockUtil,
-        {
-          provide: getModelToken(FLOCK_MODEL_NAME),
-          useValue: class {
-            static create = jest.fn();
-            static find = jest.fn();
-            static findOne = jest.fn();
-            static findById = jest.fn();
-            static findByIdAndRemove = jest.fn();
-            static findByIdAndUpdate = jest.fn();
-            static exec = jest.fn();
-          },
-        },
-      ],
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
+      imports: [rootMongooseTestModule(), MongooseModule.forFeature([{ name: FLOCK_MODEL_NAME, schema: FlockSchema }])],
+      providers: [FlockService, FlockUtil],
     }).compile();
 
-    service = module.get(FlockService);
-    util = module.get(FlockUtil);
-    model = module.get(getModelToken(FLOCK_MODEL_NAME));
+    service = module.get<FlockService>(FlockService);
+  });
+
+  beforeEach(async () => {
+    // This is where we setup our fake data.
+    const flockModel = module.get<Model<FlockDocument>>(getModelToken(FLOCK_MODEL_NAME));
+    await flockModel.deleteMany();
+    await flockModel.create(flockDocument);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  it('should create a flock successfully', async () => {
+    const createFlockInput = {
+      name: 'Test Flock',
+      flockDays: [
+        {
+          start: new Date(Date.UTC(2022, 9, 2, 10)),
+          end: new Date(Date.UTC(2022, 9, 2, 16)),
+        },
+      ],
+    };
 
-  //
+    const flock: FlockDocument = await service.create(createFlockInput);
 
-  it('should insert a new flock', async () => {
-    jest.spyOn(model, 'create').mockReturnValueOnce(FLOCK_DOCUMENTS[0] as any);
-    jest.spyOn(model, 'findOne').mockReturnValueOnce(null as any);
-    jest.spyOn(util, 'generateFlockCode').mockReturnValueOnce('<flock flockCode Alpha>' as any);
-    const newFlock = await service.create(FLOCKS[0]);
-    expect(newFlock).toEqual(FLOCK_DOCUMENTS[0]);
-  });
-
-  it('should delete a flock successfully', async () => {
-    jest.spyOn(model, 'findByIdAndRemove').mockReturnValueOnce(
-      createMock<Query<FlockDocument, FlockDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(FLOCK_DOCUMENTS[0]),
-      }) as any,
-    );
-    expect(await service.delete(FLOCK_DOCUMENTS[0]._id!)).toEqual(FLOCK_DOCUMENTS[0]);
+    expect(flock._id).toBeInstanceOf(Types.ObjectId);
+    expect(flock.name).toEqual(createFlockInput.name);
+    expect(flock.flockDays).toEqual(createFlockInput.flockDays);
   });
 
   it('should return all flocks', async () => {
-    jest.spyOn(model, 'find').mockReturnValueOnce({
-      exec: jest.fn().mockResolvedValueOnce(FLOCK_DOCUMENTS),
-    } as any);
-    const flocks = await service.findAll();
-    expect(flocks).toEqual(FLOCK_DOCUMENTS);
+    const flocks: FlockDocument[] | null = await service.findAll();
+
+    expect(Array.isArray(flocks)).toBe(true);
+    expect(flocks.length).toBe(1);
+    checkEquality(flocks[0], flockDocument);
   });
 
   it('should find one by id', async () => {
-    jest.spyOn(model, 'findById').mockReturnValueOnce(
-      createMock<Query<FlockDocument, FlockDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(mockFlockDocument(FLOCK_DOCUMENTS[0])),
-      }) as any,
-    );
-    const foundFlock = await service.findOne(FLOCK_DOCUMENTS[0]._id!);
-    expect(foundFlock).toEqual(FLOCK_DOCUMENTS[0]);
+    const flock: FlockDocument | null = await service.findOne(flockDocument._id!);
+    checkEquality(flock, flockDocument);
+  });
+
+  it('should find one by flockCode', async () => {
+    const flock: FlockDocument | null = await service.findOneByCode(flockDocument.flockCode!);
+    checkEquality(flock, flockDocument);
   });
 
   it('should update a flock successfully', async () => {
-    jest.spyOn(model, 'findByIdAndUpdate').mockReturnValueOnce(
-      createMock<Query<FlockDocument, FlockDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(FLOCK_DOCUMENTS[0]),
-      }) as any,
-    );
-    const updatedFlock = await service.update(FLOCK_DOCUMENTS[0]._id!, FLOCKS[0]);
-    expect(updatedFlock).toEqual(FLOCK_DOCUMENTS[0]);
+    const flock: FlockDocument | null = await service.update(flockDocument._id!, {
+      name: 'New Name',
+    });
+
+    const updatedFlockDocument = { ...flockDocument, name: 'New Name' };
+    checkEquality(flock, updatedFlockDocument);
   });
+
+  it('should add a user to a flock successfully', async () => {
+    const userId = id('New User');
+    const flock: FlockDocument | null = await service.addUserToFlock(flockDocument._id!, userId);
+
+    expect(flock!.users.length).toEqual(flockDocument.users!.length + 1);
+    expect(flock!.users).toContainEqual(userId);
+  });
+
+  it('should add a user flock availability to a flock successfully', async () => {
+    const userFlockAvailability = {
+      user: id('Test User 2'),
+      userAvailabilityId: id('Availabil_02'),
+      enabled: true,
+    };
+
+    const flock: FlockDocument | null = await service.addUserFlockAvailability(
+      flockDocument._id!,
+      userFlockAvailability as UserFlockAvailabilityDocument,
+    );
+
+    expect(flock!.userFlockAvailability.length).toEqual(flockDocument.userFlockAvailability!.length + 1);
+
+    const newAvailability = flock!.userFlockAvailability.at(-1);
+    expect(newAvailability!.enabled).toBeTruthy();
+    expect(newAvailability!.user).toEqual(userFlockAvailability.user);
+    expect(newAvailability!.userAvailabilityId).toEqual(userFlockAvailability.userAvailabilityId);
+  });
+
+  it('should delete a flock successfully', async () => {
+    const flock: FlockDocument | null = await service.delete(flockDocument._id!);
+    checkEquality(flock, flockDocument);
+
+    // Ensure flock is deleted.
+    const flocks: FlockDocument[] | null = await service.findAll();
+    expect(flocks.length).toBe(0);
+  });
+
+  afterAll(async () => {
+    if (module) {
+      await module.close();
+      await closeMongoDBConnection();
+    }
+  });
+
+  const checkEquality = (
+    flock: FlockDocument | null | undefined,
+    expected: Partial<FlockDocument> | null | undefined,
+  ) => {
+    if (flock == null) {
+      // If `flock` is nullish then `expected` should match it.
+      expect(flock).toEqual(expected);
+      return;
+    }
+
+    const flockObj = flock.toJSON();
+    delete flockObj['__v']; // don't check version
+    expect(flockObj).toEqual(expected);
+  };
 });
