@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-
-import { createMock } from '@golevelup/ts-jest';
-import { getModelToken } from '@nestjs/mongoose';
-import { Test, type TestingModule } from '@nestjs/testing';
-import { type Model, type Query, Types } from 'mongoose';
-import { type User, type UserDocument, USER_MODEL_NAME } from './user.schema';
+import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Model, Types } from 'mongoose';
+import { closeMongoDBConnection, rootMongooseTestModule } from '../test-util/mongo-memory-db.helper';
+import { UserDocument, UserSchema, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
+import { UserAvailabilityDocument } from './userAvailability.schema';
+import { UserAvailabilityICal } from './userAvailabilityICal.schema';
+import { UserAvailabilityProjectionDocument } from './util/projections.types';
 import { UserDatabaseUtilModule } from './util/userDatabaseUtil.module';
 
 const id = (id: string) => {
@@ -13,119 +15,168 @@ const id = (id: string) => {
   return new Types.ObjectId(id.padEnd(12, '_'));
 };
 
-const mockUser = (mock?: Partial<User>): User => ({
-  name: mock?.name || '<user name Alpha>',
-  firebaseId: mock?.firebaseId || '<user firebaseId Alpha>',
+const userDocument: Partial<UserDocument> = {
+  _id: id('Test User'),
+  name: 'Test User',
+  firebaseId: 'QwerTY12345Qwerty12345qWErTY',
   flocks: [],
   flockInvites: [],
-  availability: [],
-});
-
-const mockUserDocument = (mock?: Partial<UserDocument>): Partial<UserDocument> => ({
-  _id: mock?._id || id('UID_Alpha'),
-  name: mock?.name || '<user name Alpha>',
-  firebaseId: mock?.firebaseId || '<user firebaseId Alpha>',
-  flocks: mock?.flocks || [],
-  flockInvites: mock?.flockInvites || [],
-  availability: mock?.availability || [],
-  save: jest.fn(),
-});
-
-const USER_DOCUMENTS = [
-  mockUserDocument(),
-  mockUserDocument({ _id: id('UID_Bravo'), name: '<user uuid Bravo>', firebaseId: '<user firebaseId Bravo>' }),
-  mockUserDocument({ _id: id('UID_Charlie'), name: '<user uuid Charlie>', firebaseId: '<user firebaseId Charlie>' }),
-];
-
-const USERS = USER_DOCUMENTS.map(mockUser);
+  availability: [
+    { _id: id('Availabil_01'), type: 'ical', uri: 'uri://test' },
+    { _id: id('Availabil_02'), type: 'ical', uri: 'uri://test2' },
+  ] as UserAvailabilityDocument[],
+};
 
 describe(UserService.name, () => {
   let service: UserService;
-  let model: Model<UserDocument>;
+  let module: TestingModule;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [UserDatabaseUtilModule],
-      providers: [
-        UserService,
-        {
-          provide: getModelToken(USER_MODEL_NAME),
-          useValue: class {
-            static create = jest.fn();
-            static find = jest.fn();
-            static findOne = jest.fn();
-            static findById = jest.fn();
-            static findByIdAndRemove = jest.fn();
-            static findByIdAndUpdate = jest.fn();
-            static exec = jest.fn();
-            static updateOne = jest.fn();
-          },
-        },
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
+      imports: [
+        rootMongooseTestModule(),
+        MongooseModule.forFeature([{ name: USER_MODEL_NAME, schema: UserSchema }]),
+        UserDatabaseUtilModule,
       ],
+      providers: [UserService],
     }).compile();
 
-    service = module.get(UserService);
-    model = module.get(getModelToken(USER_MODEL_NAME));
+    service = module.get<UserService>(UserService);
+  });
+
+  beforeEach(async () => {
+    // This is where we setup our fake data.
+    const userModel = module.get<Model<UserDocument>>(getModelToken(USER_MODEL_NAME));
+    await userModel.deleteMany();
+    await userModel.create(userDocument);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  it('should create an user successfully', async () => {
+    const createUserInput = {
+      name: 'Test User',
+      firebaseId: 'QwerTY12345Qwerty12345qWErTY',
+    };
 
-  it('should insert a new user', async () => {
-    jest.spyOn(model, 'create').mockReturnValueOnce(USER_DOCUMENTS[0] as any);
-    const newUser = await service.create(USERS[0]);
-    expect(newUser).toEqual(USER_DOCUMENTS[0]);
-  });
-
-  it('should delete a user successfully', async () => {
-    jest.spyOn(model, 'findByIdAndRemove').mockReturnValueOnce(
-      createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(USER_DOCUMENTS[0]),
-      }) as any,
-    );
-    expect(await service.delete(USER_DOCUMENTS[0]._id!)).toEqual(USER_DOCUMENTS[0]);
+    const user: UserDocument = await service.create(createUserInput);
+    expect(user._id).toBeInstanceOf(Types.ObjectId);
+    expect(user.name).toEqual(createUserInput.name);
+    expect(user.firebaseId).toEqual(createUserInput.firebaseId);
   });
 
   it('should return all users', async () => {
-    jest.spyOn(model, 'find').mockReturnValueOnce({
-      exec: jest.fn().mockResolvedValueOnce(USER_DOCUMENTS),
-    } as any);
-    const users = await service.findAll();
-    expect(users).toEqual(USER_DOCUMENTS);
+    const users: UserDocument[] | null = await service.findAll();
+
+    expect(Array.isArray(users)).toBe(true);
+    expect(users.length).toBe(1);
+    checkEquality(users[0], userDocument);
   });
 
   it('should find one by id', async () => {
-    jest.spyOn(model, 'findById').mockReturnValueOnce(
-      createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(USER_DOCUMENTS[0]),
-      }) as any,
-    );
-    const foundUser = await service.findOne(USER_DOCUMENTS[0]._id!);
-    expect(foundUser).toEqual(USER_DOCUMENTS[0]);
+    const user: UserDocument | null = await service.findOne(userDocument._id!);
+    checkEquality(user, userDocument);
   });
 
   it('should find one by firebaseId', async () => {
-    jest.spyOn(model, 'findOne').mockReturnValueOnce(
-      createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(USER_DOCUMENTS[0]),
-      }) as any,
-    );
-    const foundUser = await service.findOneByFirebaseId(USER_DOCUMENTS[0].firebaseId!);
-    expect(foundUser).toEqual(USER_DOCUMENTS[0]);
+    const user: UserDocument | null = await service.findOneByFirebaseId(userDocument.firebaseId!);
+    checkEquality(user, userDocument);
   });
 
   it('should update a user successfully', async () => {
-    jest.spyOn(model, 'findByIdAndUpdate').mockReturnValueOnce(
-      createMock<Query<UserDocument, UserDocument>>({
-        exec: jest.fn().mockResolvedValueOnce(USER_DOCUMENTS[0]),
-      }) as any,
-    );
-    const updatedUser = await service.update(USER_DOCUMENTS[0]._id!, USERS[0]);
-    expect(updatedUser).toEqual(USER_DOCUMENTS[0]);
+    const user: UserDocument | null = await service.update(userDocument._id!, {
+      name: 'New Name',
+    });
+
+    const updatedUserDocument = { ...userDocument, name: 'New Name' };
+    checkEquality(user, updatedUserDocument);
   });
+
+  it('should find add a flock to a user successfully', async () => {
+    const flockId = new Types.ObjectId();
+    const user: UserDocument | null = await service.addFlockToUser(userDocument._id!, flockId);
+
+    const updatedUserDocument = { ...userDocument, flocks: [...(userDocument.flocks ?? []), flockId] };
+    checkEquality(user, updatedUserDocument);
+  });
+
+  it('should find a user availability source', async () => {
+    const user: UserDocument | null = await service.findUserAvailability(
+      userDocument._id!,
+      userDocument.availability![0]._id,
+    );
+
+    checkEquality(user, {
+      _id: userDocument._id,
+      availability: [userDocument.availability![0]],
+    });
+  });
+
+  it('should find all user availability sources', async () => {
+    const availabilityIds = userDocument.availability!.map((availability) => availability._id);
+
+    const userAvailabilities: UserAvailabilityProjectionDocument[] = await service.findManyUserAvailability(
+      availabilityIds,
+    );
+
+    expect(userAvailabilities.length).toBe(userDocument.availability?.length);
+
+    userAvailabilities.forEach((userAvailability, index) => {
+      expect(userAvailability).toEqual({
+        _id: userDocument._id,
+        userId: userDocument._id,
+        availabilityDocument: userDocument.availability![index],
+      });
+    });
+  });
+
+  it('should add a new user availability source', async () => {
+    const user: UserDocument | null = await service.addUserAvailability(userDocument._id!, [
+      { type: 'ical', uri: 'uri://another' },
+    ]);
+
+    expect(user.availability.length).toEqual(userDocument.availability!.length + 1);
+
+    const newAvailability = user.availability.at(-1) as UserAvailabilityICal;
+    expect(newAvailability.type).toEqual('ical');
+    expect(newAvailability.uri).toEqual('uri://another');
+  });
+
+  it('should not add a duplicate user availability source', async () => {
+    const user: UserDocument | null = await service.addUserAvailability(userDocument._id!, [
+      { type: 'ical', uri: 'uri://test' },
+    ]);
+
+    expect(user.availability.length).toEqual(userDocument.availability!.length);
+  });
+
+  it('should delete a user successfully', async () => {
+    const user: UserDocument | null = await service.delete(userDocument._id!);
+    checkEquality(user, userDocument);
+
+    // Ensure user is deleted.
+    const users: UserDocument[] | null = await service.findAll();
+    expect(users.length).toBe(0);
+  });
+
+  afterAll(async () => {
+    if (module) {
+      await module.close();
+      await closeMongoDBConnection();
+    }
+  });
+
+  const checkEquality = (user: UserDocument | null | undefined, expected: Partial<UserDocument> | null | undefined) => {
+    if (user == null) {
+      // If `user` is nullish then `expected` should match it.
+      expect(user).toEqual(expected);
+      return;
+    }
+
+    const userObj = user.toJSON();
+    delete userObj['__v']; // don't check version
+    expect(userObj).toEqual(expected);
+  };
 });
