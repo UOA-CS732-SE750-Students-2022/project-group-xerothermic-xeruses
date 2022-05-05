@@ -20,7 +20,7 @@ it('should handle when username is not supplied', () => {
 });
 
 it('should render children', () => {
-  const { container } = render(
+  render(
     <Sidebar>
       <div className="children">
         <p>Paragaph</p>
@@ -28,7 +28,8 @@ it('should render children', () => {
       </div>
     </Sidebar>,
   );
-  const child = container.querySelector('.content')?.children[1];
+
+  const child = document.querySelector('.content')?.children[1];
   expect(child).toBeVisible();
   expect(child?.className).toEqual('children');
 });
