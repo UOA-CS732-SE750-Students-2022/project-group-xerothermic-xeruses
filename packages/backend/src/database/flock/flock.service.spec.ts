@@ -3,7 +3,7 @@ import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
-import { closeMongoDBConnection, rootMongooseTestModule } from '../util/mongo.helper';
+import { closeMongoDBConnection, rootMongooseTestModule } from '../test-util/mongo-memory-db.helper';
 import { FlockDocument, FlockSchema, FLOCK_MODEL_NAME } from './flock.schema';
 import { FlockService } from './flock.service';
 import { UserFlockAvailabilityDocument } from './userFlockAvailability.schema';
@@ -39,7 +39,7 @@ describe(FlockService.name, () => {
       providers: [FlockService, FlockUtil],
     }).compile();
 
-    service = service = module.get<FlockService>(FlockService);
+    service = module.get<FlockService>(FlockService);
   });
 
   beforeEach(async () => {
@@ -128,8 +128,11 @@ describe(FlockService.name, () => {
 
   it('should delete a flock successfully', async () => {
     const flock: FlockDocument | null = await service.delete(flockDocument._id!);
-
     checkEquality(flock, flockDocument);
+
+    // Ensure flock is deleted.
+    const flocks: FlockDocument[] | null = await service.findAll();
+    expect(flocks.length).toBe(0);
   });
 
   afterAll(async () => {

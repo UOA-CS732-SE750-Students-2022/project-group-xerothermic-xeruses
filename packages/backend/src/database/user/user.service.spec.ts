@@ -2,7 +2,7 @@
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model, Types } from 'mongoose';
-import { closeMongoDBConnection, rootMongooseTestModule } from '../util/mongo.helper';
+import { closeMongoDBConnection, rootMongooseTestModule } from '../test-util/mongo-memory-db.helper';
 import { UserDatabaseModule } from './user.module';
 import { UserDocument, UserSchema, USER_MODEL_NAME } from './user.schema';
 import { UserService } from './user.service';
@@ -156,6 +156,10 @@ describe(UserService.name, () => {
   it('should delete a user successfully', async () => {
     const user: UserDocument | null = await service.delete(userDocument._id!);
     checkEquality(user, userDocument);
+
+    // Ensure user is deleted.
+    const users: UserDocument[] | null = await service.findAll();
+    expect(users.length).toBe(0);
   });
 
   afterAll(async () => {
