@@ -35,11 +35,11 @@ describe(UserService.name, () => {
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
-        UserDatabaseModule,
         rootMongooseTestModule(),
         MongooseModule.forFeature([{ name: USER_MODEL_NAME, schema: UserSchema }]),
         UserDatabaseUtilModule,
       ],
+      providers: [UserService],
     }).compile();
 
     service = module.get<UserService>(UserService);
