@@ -1,5 +1,3 @@
-/* eslint-disable testing-library/no-node-access */
-/* eslint-disable testing-library/no-container */
 import '@testing-library/jest-dom';
 import { screen, render } from '@testing-library/react';
 import Timematcher from './Timematcher';
@@ -131,7 +129,7 @@ it('should show both available cell when both user and others are available', ()
 
   const freeTimes = [freeTime1];
 
-  const { container } = render(
+  render(
     <Timematcher
       datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
@@ -140,7 +138,7 @@ it('should show both available cell when both user and others are available', ()
     />,
   );
 
-  const bothAvailable = container.getElementsByClassName('bothAvailable');
+  const bothAvailable = screen.getAllByRole('bothAvailable');
   expect(bothAvailable).toHaveLength(1);
 });
 
@@ -168,7 +166,7 @@ it('should show user available cell when user is available but others are not', 
   const userAvailabilities = [userFreeTime];
   const othersAvailabilities = [othersNotFreeTIme];
 
-  const { container } = render(
+  render(
     <Timematcher
       datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
@@ -177,7 +175,7 @@ it('should show user available cell when user is available but others are not', 
     />,
   );
 
-  const userAvailable = container.getElementsByClassName('userAvailable');
+  const userAvailable = screen.getAllByRole('userAvailable');
   expect(userAvailable).toHaveLength(1);
 });
 
@@ -205,7 +203,7 @@ it('should show others available cell when others are available but user is not'
   const userAvailabilities = [userNotFreeTime];
   const othersAvailabilities = [othersFreeTIme];
 
-  const { container } = render(
+  render(
     <Timematcher
       datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
@@ -214,7 +212,7 @@ it('should show others available cell when others are available but user is not'
     />,
   );
 
-  const othersAvailable = container.getElementsByClassName('othersAvailable');
+  const othersAvailable = screen.getAllByRole('othersAvailable');
   expect(othersAvailable).toHaveLength(1);
 });
 
@@ -242,7 +240,7 @@ it('should show no one available cell when neither user or others are available'
   const userAvailabilities = [userNotFreeTime];
   const othersAvailabilities = [othersFreeTIme];
 
-  const { container } = render(
+  render(
     <Timematcher
       datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
@@ -251,6 +249,6 @@ it('should show no one available cell when neither user or others are available'
     />,
   );
 
-  const nooneAvailable = container.getElementsByClassName('nooneAvailable');
+  const nooneAvailable = screen.getAllByRole('nooneAvailable');
   expect(nooneAvailable).toHaveLength(1);
 });
