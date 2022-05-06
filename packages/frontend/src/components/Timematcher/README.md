@@ -13,7 +13,7 @@ blank if no one is available.
 
 `timeRange`
 
-- type: `Date[]`
+- type: `[Date, Date]`
 - description: A date array consisting of two objects - start and end date. Only the hours and minutes of the date objects are set.
 
 `userAvailability`
