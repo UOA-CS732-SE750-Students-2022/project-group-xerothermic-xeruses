@@ -2,7 +2,7 @@ import styles from './HomeView.module.css';
 import Logo from '../../components/Logo';
 import Button from '../../components/Button';
 import Line from '../../components/Line';
-import { loginWithGoogle } from '../../auth/firebase';
+import { signInWithGoogle } from '../../auth/firebase';
 
 const HomeView = () => {
   return (
@@ -12,7 +12,7 @@ const HomeView = () => {
         <p className={styles.subtitle}>Find a time for you and your group</p>
       </div>
       <div className={styles.buttons}>
-        <Button onClick={loginWithGoogle} color="white" variant="outlined">
+        <Button onClick={signInWithGoogle} color="white" variant="outlined">
           Sign in with Google
         </Button>
         <div className={styles.divider}>
