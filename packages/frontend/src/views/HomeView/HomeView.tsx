@@ -2,18 +2,9 @@ import styles from './HomeView.module.css';
 import Logo from '../../components/Logo';
 import Button from '../../components/Button';
 import Line from '../../components/Line';
-import { auth } from '../../auth/firebase';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useAuth } from '../../contexts/AuthContext';
+import { loginWithGoogle } from '../../auth/firebase';
 
 const HomeView = () => {
-  const { setUser } = useAuth();
-
-  const googleSignInClicked = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider).then((userCred) => setUser(userCred.user));
-  };
-
   return (
     <div className={styles.homeView}>
       <div className={styles.heading}>
@@ -21,7 +12,7 @@ const HomeView = () => {
         <p className={styles.subtitle}>Find a time for you and your group</p>
       </div>
       <div className={styles.buttons}>
-        <Button onClick={googleSignInClicked} color="white" variant="outlined">
+        <Button onClick={loginWithGoogle} color="white" variant="outlined">
           Sign in with Google
         </Button>
         <div className={styles.divider}>
