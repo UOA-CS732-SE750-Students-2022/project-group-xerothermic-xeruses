@@ -25,7 +25,7 @@ it('should render', () => {
 
   const { container } = render(
     <Timematcher
-      dates={[new Date('05/04/2022')]}
+      datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time2]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
@@ -62,7 +62,7 @@ it('should render multiple dates', () => {
 
   render(
     <Timematcher
-      dates={[new Date('05/04/2022'), new Date('05/05/2022')]}
+      datesPicked={[new Date('05/04/2022'), new Date('05/05/2022')]}
       timeRange={[time1, time1]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
@@ -98,7 +98,7 @@ it('should render multiple times', () => {
 
   render(
     <Timematcher
-      dates={[new Date('05/04/2022')]}
+      datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time2]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
@@ -131,7 +131,7 @@ it('should show both available cell when both user and others are available', ()
 
   render(
     <Timematcher
-      dates={[new Date('05/04/2022')]}
+      datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
@@ -168,7 +168,7 @@ it('should show user available cell when user is available but others are not', 
 
   render(
     <Timematcher
-      dates={[new Date('05/04/2022')]}
+      datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
       othersAvailability={othersAvailabilities}
@@ -205,7 +205,7 @@ it('should show others available cell when others are available but user is not'
 
   render(
     <Timematcher
-      dates={[new Date('05/04/2022')]}
+      datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
       othersAvailability={othersAvailabilities}
@@ -242,7 +242,7 @@ it('should show no one available cell when neither user or others are available'
 
   render(
     <Timematcher
-      dates={[new Date('05/04/2022')]}
+      datesPicked={[new Date('05/04/2022')]}
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
       othersAvailability={othersAvailabilities}

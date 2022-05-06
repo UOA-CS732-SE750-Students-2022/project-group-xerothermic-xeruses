@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper';
 import styles from './Timematcher.module.css';
 
 type TimematcherProps = {
-  dates: Date[];
+  datesPicked: Date[];
   timeRange: [Date, Date];
   userAvailability: Availability[];
   othersAvailability: Availability[];
@@ -80,11 +80,24 @@ const getCell = (time: Date, date: Date) => {
   return { cellStartDateTime, cellEndDateTime };
 };
 
-const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
-  const allDates = generateDates(dates);
+const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
+  const dates = generateDates(datesPicked);
   const times = generateTimes(timeRange);
   let columnKey = 0;
   let rowKey = 0;
+
+  const tableCellColour = (time: Date, date: Date) => {
+    const { bothAvailable, userAvailable, othersAvailable } = isAvailable(
+      time,
+      date,
+      userAvailability,
+      othersAvailability,
+    );
+    if (bothAvailable) return 'both-available';
+    if (userAvailable) return 'user-available';
+    if (othersAvailable) return 'others-available';
+    return 'noone-available';
+  };
 
   return (
     <div>
@@ -95,7 +108,7 @@ const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }:
               <TableCell className={(styles.dates, styles.time)} key={columnKey}>
                 Time
               </TableCell>
-              {Array.from(allDates.keys()).map((date) => (
+              {Array.from(dates.keys()).map((date) => (
                 <TableCell align="center" className={styles.dates} key={date}>
                   {date}
                 </TableCell>
@@ -108,40 +121,13 @@ const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }:
                 <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={rowKey++}>
                   {time}
                 </TableCell>
-                {Array.from(allDates.keys()).map((date) =>
-                  isAvailable(times.get(time) as Date, allDates.get(date) as Date, userAvailability, othersAvailability)
-                    .bothAvailable ? (
-                    <TableCell
-                      className={styles.bothAvailable}
-                      key={time + date}
-                      data-testid={'both-available'}
-                    ></TableCell>
-                  ) : isAvailable(
-                      times.get(time) as Date,
-                      allDates.get(date) as Date,
-                      userAvailability,
-                      othersAvailability,
-                    ).userAvailable ? (
-                    <TableCell
-                      className={styles.userAvailable}
-                      key={time + date}
-                      data-testid={'user-available'}
-                    ></TableCell>
-                  ) : isAvailable(
-                      times.get(time) as Date,
-                      allDates.get(date) as Date,
-                      userAvailability,
-                      othersAvailability,
-                    ).othersAvailable ? (
-                    <TableCell
-                      className={styles.othersAvailable}
-                      key={time + date}
-                      data-testid={'others-available'}
-                    ></TableCell>
-                  ) : (
-                    <TableCell key={time + date} data-testid={'noone-available'}></TableCell>
-                  ),
-                )}
+                {Array.from(dates.keys()).map((date) => (
+                  <TableCell
+                    className={`${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
+                    key={time + date}
+                    data-testid={`${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
+                  ></TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>
