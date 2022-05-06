@@ -124,7 +124,7 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
                 </TableCell>
                 {Array.from(dates.keys()).map((date) => (
                   <TableCell
-                    className={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
+                    className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
                     key={time + date}
                     role={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
                   ></TableCell>

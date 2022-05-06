@@ -36,17 +36,20 @@
   z-index: 1;
 }
 
+.cell {
+  border-left: 1px solid gray;
+  border-right: 1px solid gray;
+  opacity: 0.7;
+}
+
 .userAvailable {
   background-color: var(--flocker-color-secondary);
-  opacity: 0.4;
 }
 
 .othersAvailable {
   background-color: var(--flocker-color-primary);
-  opacity: 0.25;
 }
 
 .bothAvailable {
   background-color: var(--flocker-color-tertiary);
-  opacity: 0.25;
 }
