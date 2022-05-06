@@ -58,6 +58,7 @@ const isAvailable = (
   let userAvailable = false;
   let othersAvailable = false;
   let bothAvailable = false;
+
   for (let i = 0; i < userAvailability.length; i++) {
     if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
       userAvailable = userAvailability[i].available;
@@ -82,16 +83,16 @@ const getCell = (time: Date, date: Date) => {
 const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
   const allDates = generateDates(dates);
   const times = generateTimes(timeRange);
-  let column_id = 0;
-  let row_id = 0;
+  let columnKey = 0;
+  let rowKey = 0;
 
   return (
     <div>
       <TableContainer component={Paper} className={styles.table}>
         <Table stickyHeader className={styles.tableContent}>
           <TableHead>
-            <TableRow className={styles.tableColumn} key={column_id}>
-              <TableCell className={(styles.dates, styles.time)} key={column_id++}>
+            <TableRow className={styles.tableColumn} key={rowKey}>
+              <TableCell className={(styles.dates, styles.time)} key={columnKey}>
                 Time
               </TableCell>
               {Array.from(allDates.keys()).map((date) => (
@@ -103,8 +104,8 @@ const Timematcher = ({ dates, timeRange, userAvailability, othersAvailability }:
           </TableHead>
           <TableBody>
             {Array.from(times.keys()).map((time) => (
-              <TableRow key={row_id}>
-                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={row_id++}>
+              <TableRow key={rowKey++}>
+                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={rowKey++}>
                   {time}
                 </TableCell>
                 {Array.from(allDates.keys()).map((date) =>
