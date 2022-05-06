@@ -25,7 +25,7 @@ const generateDates = (dates: Date[]) =>
     dates.map((d) => [d.toLocaleString(navigator.language, { weekday: 'short', day: 'numeric', month: 'short' }), d]),
   );
 
-const generateTimes = (times: Date[]) => {
+const generateTimes = (times: [Date, Date]) => {
   const timeMap = new Map<string, Date>();
   const [startTime, endTime] = times;
   timeMap.set(formatTime(startTime), startTime);
@@ -53,11 +53,10 @@ const isAvailable = (
   date: Date,
   userAvailability: Availability[],
   othersAvailability: Availability[],
-): { userAvailable: boolean; othersAvailable: boolean; bothAvailable: boolean } => {
+): { userAvailable: boolean; othersAvailable: boolean } => {
   let currentCell = getCell(time, date);
   let userAvailable = false;
   let othersAvailable = false;
-  let bothAvailable = false;
 
   for (let i = 0; i < userAvailability.length; i++) {
     if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
@@ -68,9 +67,7 @@ const isAvailable = (
     }
   }
 
-  if (userAvailable && othersAvailable) bothAvailable = true;
-
-  return { userAvailable, othersAvailable, bothAvailable };
+  return { userAvailable, othersAvailable };
 };
 
 const getCell = (time: Date, date: Date) => {
@@ -87,14 +84,9 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
   let rowKey = 0;
 
   const tableCellColour = (time: Date, date: Date) => {
-    const { bothAvailable, userAvailable, othersAvailable } = isAvailable(
-      time,
-      date,
-      userAvailability,
-      othersAvailability,
-    );
+    const { userAvailable, othersAvailable } = isAvailable(time, date, userAvailability, othersAvailability);
 
-    if (bothAvailable) return styles.bothAvailable;
+    if (userAvailable && othersAvailable) return styles.bothAvailable;
     if (userAvailable) return styles.userAvailable;
     if (othersAvailable) return styles.othersAvailable;
     return styles.nooneAvailable;
@@ -126,8 +118,8 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
                   <TableCell
                     className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
                     key={time + date}
-                    role={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
-                  ></TableCell>
+                    data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
+                  />
                 ))}
               </TableRow>
             ))}

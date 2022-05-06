@@ -138,7 +138,7 @@ it('should show both available cell when both user and others are available', ()
     />,
   );
 
-  const bothAvailable = screen.getAllByRole('bothAvailable');
+  const bothAvailable = screen.getAllByTestId('bothAvailable');
   expect(bothAvailable).toHaveLength(1);
 });
 
@@ -175,7 +175,7 @@ it('should show user available cell when user is available but others are not', 
     />,
   );
 
-  const userAvailable = screen.getAllByRole('userAvailable');
+  const userAvailable = screen.getAllByTestId('userAvailable');
   expect(userAvailable).toHaveLength(1);
 });
 
@@ -212,7 +212,7 @@ it('should show others available cell when others are available but user is not'
     />,
   );
 
-  const othersAvailable = screen.getAllByRole('othersAvailable');
+  const othersAvailable = screen.getAllByTestId('othersAvailable');
   expect(othersAvailable).toHaveLength(1);
 });
 
@@ -249,6 +249,6 @@ it('should show no one available cell when neither user or others are available'
     />,
   );
 
-  const nooneAvailable = screen.getAllByRole('nooneAvailable');
+  const nooneAvailable = screen.getAllByTestId('nooneAvailable');
   expect(nooneAvailable).toHaveLength(1);
 });
