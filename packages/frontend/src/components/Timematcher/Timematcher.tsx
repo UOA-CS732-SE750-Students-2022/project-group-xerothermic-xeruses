@@ -93,10 +93,11 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
       userAvailability,
       othersAvailability,
     );
-    if (bothAvailable) return 'both-available';
-    if (userAvailable) return 'user-available';
-    if (othersAvailable) return 'others-available';
-    return 'noone-available';
+
+    if (bothAvailable) return styles.bothAvailable;
+    if (userAvailable) return styles.userAvailable;
+    if (othersAvailable) return styles.othersAvailable;
+    return styles.nooneAvailable;
   };
 
   return (
@@ -123,9 +124,9 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
                 </TableCell>
                 {Array.from(dates.keys()).map((date) => (
                   <TableCell
-                    className={`${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
+                    className={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
                     key={time + date}
-                    data-testid={`${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
+                    data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
                   ></TableCell>
                 ))}
               </TableRow>
