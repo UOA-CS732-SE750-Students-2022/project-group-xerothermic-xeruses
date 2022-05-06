@@ -126,7 +126,6 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
                   <TableCell
                     className={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
                     key={time + date}
-                    data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
                   ></TableCell>
                 ))}
               </TableRow>
