@@ -1,0 +1,56 @@
+.table {
+  display: inline-block;
+  width: fit-content;
+  max-width: 80vw;
+  max-height: 50vh;
+}
+
+.time {
+  font-size: medium;
+  position: sticky;
+  background-color: white;
+  left: 0;
+  z-index: 2;
+}
+
+.tableContent {
+  width: max-content;
+  height: max-content;
+}
+
+.headerRow {
+  min-width: max-content;
+  left: 0;
+  position: 'sticky';
+  z-index: 2;
+}
+
+.leftCol {
+  position: sticky;
+  background-color: white;
+  left: 0;
+  z-index: 800;
+}
+
+.dates {
+  font-size: medium;
+  z-index: 1;
+}
+
+.cell {
+  border-left: 0.01rem solid white;
+  border-right: 0.01rem solid white;
+  opacity: 0.7;
+}
+
+.userAvailable {
+  background-color: var(--flocker-color-secondary);
+}
+
+.othersAvailable {
+  background-color: var(--flocker-color-primary);
+}
+
+.bothAvailable {
+  background-color: var(--flocker-color-tertiary);
+}
