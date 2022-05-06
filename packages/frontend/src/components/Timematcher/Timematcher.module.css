@@ -18,7 +18,7 @@
   height: max-content;
 }
 
-.tableColumn {
+.headerRow {
   min-width: max-content;
   left: 0;
   position: 'sticky';

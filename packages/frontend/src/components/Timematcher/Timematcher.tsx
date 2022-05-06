@@ -81,6 +81,7 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
   const dates = generateDates(datesPicked);
   const times = generateTimes(timeRange);
   let cellKey = 0;
+  let rowKey = 0;
 
   const tableCellColour = (time: Date, date: Date) => {
     const { userAvailable, othersAvailable } = isAvailable(time, date, userAvailability, othersAvailability);
@@ -96,8 +97,8 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
       <TableContainer component={Paper} className={styles.table}>
         <Table stickyHeader className={styles.tableContent}>
           <TableHead>
-            <TableRow className={styles.tableColumn} key={cellKey}>
-              <TableCell className={(styles.dates, styles.time)} key={cellKey++}>
+            <TableRow className={styles.headerRow} key={rowKey}>
+              <TableCell className={(styles.dates, styles.time)} key={cellKey}>
                 Time
               </TableCell>
               {Array.from(dates.keys()).map((date) => (
@@ -109,7 +110,7 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
           </TableHead>
           <TableBody>
             {Array.from(times.keys()).map((time) => (
-              <TableRow key={cellKey++}>
+              <TableRow key={rowKey++}>
                 <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
                   {time}
                 </TableCell>
