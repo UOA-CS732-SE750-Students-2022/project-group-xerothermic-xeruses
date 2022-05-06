@@ -80,8 +80,7 @@ const getCell = (time: Date, date: Date) => {
 const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
   const dates = generateDates(datesPicked);
   const times = generateTimes(timeRange);
-  let columnKey = 0;
-  let rowKey = 0;
+  let cellKey = 0;
 
   const tableCellColour = (time: Date, date: Date) => {
     const { userAvailable, othersAvailable } = isAvailable(time, date, userAvailability, othersAvailability);
@@ -97,12 +96,12 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
       <TableContainer component={Paper} className={styles.table}>
         <Table stickyHeader className={styles.tableContent}>
           <TableHead>
-            <TableRow className={styles.tableColumn} key={rowKey}>
-              <TableCell className={(styles.dates, styles.time)} key={columnKey}>
+            <TableRow className={styles.tableColumn} key={cellKey}>
+              <TableCell className={(styles.dates, styles.time)} key={cellKey++}>
                 Time
               </TableCell>
               {Array.from(dates.keys()).map((date) => (
-                <TableCell align="center" className={styles.dates} key={date}>
+                <TableCell align="center" className={styles.dates} key={cellKey++}>
                   {date}
                 </TableCell>
               ))}
@@ -110,14 +109,14 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
           </TableHead>
           <TableBody>
             {Array.from(times.keys()).map((time) => (
-              <TableRow key={rowKey++}>
-                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={rowKey++}>
+              <TableRow key={cellKey++}>
+                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
                   {time}
                 </TableCell>
                 {Array.from(dates.keys()).map((date) => (
                   <TableCell
                     className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
-                    key={time + date}
+                    key={cellKey++}
                     data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
                   />
                 ))}

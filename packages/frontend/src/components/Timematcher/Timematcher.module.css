@@ -1,6 +1,7 @@
 .table {
   display: inline-block;
-  max-width: 30vw;
+  width: fit-content;
+  max-width: 80vw;
   max-height: 50vh;
 }
 
@@ -37,8 +38,8 @@
 }
 
 .cell {
-  border-left: 1px solid gray;
-  border-right: 1px solid gray;
+  border-left: 0.01rem solid white;
+  border-right: 0.01rem solid white;
   opacity: 0.7;
 }
 
