@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const firebaseConfigEnv = process.env.REACT_APP_FIREBASE_CONFIG_JSON;
 if (!firebaseConfigEnv) {
@@ -13,3 +13,8 @@ const app = initializeApp(firebaseConfig);
 
 // Use this to utilise Firebase auth
 export const auth = getAuth(app);
+
+export const signInWithGoogle = () => {
+  const provider = new GoogleAuthProvider();
+  signInWithPopup(auth, provider);
+};

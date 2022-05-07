@@ -21,17 +21,15 @@ const SignIn: React.FC = () => {
     });
   };
 
-  const handleError = (err: ApolloError) => {
+  const handleError = async (err: ApolloError) => {
     const errorCode = err.graphQLErrors[0].extensions.code;
-    (async () => {
-      if (errorCode === '404' && user) {
-        // User does not exist
-        await createFlockerUser(user);
-        navigate('/dashboard', { replace: true });
-      } else {
-        navigate('/', { replace: true }); // TODO: redirect to an "account could not be created" page
-      }
-    })();
+    if (errorCode === '404' && user) {
+      // User does not exist
+      await createFlockerUser(user);
+      navigate('/dashboard', { replace: true });
+    } else {
+      navigate('/', { replace: true }); // TODO: redirect to an "account could not be created" page
+    }
   };
 
   const [getCurrentUser] = useLazyQuery(GET_CURRENT_USER_NAME, {

@@ -10,12 +10,7 @@
   top: 0;
 }
 
-.title {
-  font-weight: var(--flocker-font-weight-medium);
-  margin-bottom: 16px;
-}
-
 .content {
-  padding: 32px 48px;
+  height: fit-content;
   flex: 1;
 }
