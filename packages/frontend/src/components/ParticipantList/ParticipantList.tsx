@@ -21,7 +21,6 @@ const getFirstLetter = (participant: string) => {
 
 const ParticipantList: React.FC<ParticipantListProps> = ({ participants }) => (
   <div className={styles.participantList}>
-    <h1 className={styles.heading}>Participants</h1>
     <List className={styles.listContent}>
       {Array.from(participants as Participant[]).map((participant) => (
         <ListItem key={participant.id}>
