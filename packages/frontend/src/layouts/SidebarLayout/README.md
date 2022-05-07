@@ -1,13 +1,8 @@
 # SidebarLayout
 
-For views that have a sidebar on the left, and content on the right with a title.
+For views that have a sidebar on the left and content on the right.
 
 ## Props
-
-`title` - _optional_
-
-- type: `string`
-- description: The title of the content.
 
 `sidebarContent` - _optional_
 
