@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { StringValueNode } from 'graphql';
 import { type Document, type Types } from 'mongoose';
 
 /**
