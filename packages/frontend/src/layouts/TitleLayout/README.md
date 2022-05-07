@@ -9,7 +9,7 @@ For views that have a title with content underneath.
 - type: `string`
 - description: The title of the content.
 
-`content` - _optional_
+`content` - _required_
 
 - type: `React.ReactNode`
 - description: The content to display below the title.
