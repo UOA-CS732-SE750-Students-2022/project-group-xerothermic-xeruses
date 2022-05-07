@@ -1,3 +1,27 @@
-.title {
-  color: red;
+.participantList {
+  overflow: 'hidden';
+  display: inline-block;
+}
+
+.listContent {
+  height: 5rem;
+
+  display: inline-block;
+}
+
+.heading {
+  color: white;
+  font-weight: var(--flocker-font-weight-light);
+  font-size: var(--flocker-font-size-subtitle);
+}
+
+.name {
+  color: white;
+  font-weight: var(--flocker-font-weight-light);
+  font-size: var(--flocker-font-size-small);
+}
+
+.avatar {
+  background-color: white;
+  color: var(--flocker-color-primary);
 }

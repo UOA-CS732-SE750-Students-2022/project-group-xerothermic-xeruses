@@ -7,29 +7,30 @@ import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 
 type ParticipantListProps = {
-  participants: string[];
+  participants: Participant[] | Participant;
 };
 
-const generate = (element: React.ReactElement) => {
-  return [0, 1, 2].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    }),
-  );
+type Participant = {
+  name: string;
+  id: string;
+};
+
+const getFirstLetter = (participant: string) => {
+  return participant.charAt(0).toUpperCase();
 };
 
 const ParticipantList: React.FC<ParticipantListProps> = ({ participants }) => (
-  <div>
-    <h1 className={styles.title}>Participants</h1>
-    <List dense={true}>
-      {generate(
-        <ListItem>
+  <div className={styles.participantList}>
+    <h1 className={styles.heading}>Participants</h1>
+    <List className={styles.listContent} dense={true}>
+      {Array.from(participants as Participant[]).map((participant) => (
+        <ListItem key={participant.id}>
           <ListItemAvatar>
-            <Avatar></Avatar>
+            <Avatar className={`${styles.avatar}`}>{getFirstLetter(participant.name)}</Avatar>
           </ListItemAvatar>
-          <ListItemText primary="participant-name" />
-        </ListItem>,
-      )}
+          <ListItemText className={styles.name} primary={`${participant.name}`} />
+        </ListItem>
+      ))}
     </List>
   </div>
 );
