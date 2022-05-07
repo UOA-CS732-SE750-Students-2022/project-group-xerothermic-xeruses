@@ -36,6 +36,7 @@ export class UserAvailabilityUtil {
     return (
       typeof x === 'object' &&
       x.type === USER_AVAILABILITY_GOOGLE_CALENDAR &&
+      typeof x.name === 'string' &&
       typeof x.refreshToken === 'string' &&
       typeof x.accessToken === 'string' &&
       x.accessTokenExpiration instanceof Date
@@ -53,7 +54,12 @@ export class UserAvailabilityUtil {
   }
 
   isUserAvailabilityICal(x: any): x is UserAvailabilityICal {
-    return typeof x === 'object' && x.type === USER_AVAILABILITY_ICAL && typeof x.uri === 'string';
+    return (
+      typeof x === 'object' &&
+      x.type === USER_AVAILABILITY_ICAL &&
+      typeof x.name === 'string' &&
+      typeof x.uri === 'string'
+    );
   }
 
   /**
