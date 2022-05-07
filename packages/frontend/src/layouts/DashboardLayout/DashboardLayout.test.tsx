@@ -4,5 +4,5 @@ import DashboardLayout from './DashboardLayout';
 
 test('should render', () => {
   const { container } = render(<DashboardLayout />);
-  expect(container.firstChild).toBeVisible();
+  expect(container).toBeVisible();
 });
