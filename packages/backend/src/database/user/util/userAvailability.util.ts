@@ -48,8 +48,8 @@ export class UserAvailabilityUtil {
    * Also used to set the order of keys in the object, e.g. for `JSON.stringify()` comparisons.
    */
   toUserAvailabilityGoogleCalendar(x: UserAvailabilityGoogleCalendar): UserAvailabilityGoogleCalendar {
-    const { type, refreshToken, accessToken, accessTokenExpiration } = x;
-    return { type, refreshToken, accessToken, accessTokenExpiration };
+    const { type, name, refreshToken, accessToken, accessTokenExpiration } = x;
+    return { type, name, refreshToken, accessToken, accessTokenExpiration };
   }
 
   isUserAvailabilityICal(x: any): x is UserAvailabilityICal {
@@ -62,7 +62,7 @@ export class UserAvailabilityUtil {
    * Also used to set the order of keys in the object, e.g. for `JSON.stringify()` comparisons.
    */
   toUserAvailabilityICal(x: UserAvailabilityICal): UserAvailabilityICal {
-    const { type, uri } = x;
-    return { type, uri };
+    const { type, name, uri } = x;
+    return { type, name, uri };
   }
 }

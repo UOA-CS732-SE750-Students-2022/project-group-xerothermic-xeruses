@@ -10,6 +10,9 @@ export class UserAvailabilityGraphQLModel implements UserAvailabilityPartialDTO 
   @Field({ nullable: false })
   type!: string;
 
+  @Field({ nullable: false })
+  name!: string;
+
   @Field(() => GraphQLString, { nullable: true })
   uri: string | undefined;
 
