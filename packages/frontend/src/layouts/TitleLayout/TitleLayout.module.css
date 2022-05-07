@@ -1,0 +1,8 @@
+.container {
+  padding: 32px 48px;
+}
+
+.title {
+  font-weight: var(--flocker-font-weight-medium);
+  margin-bottom: 16px;
+}
