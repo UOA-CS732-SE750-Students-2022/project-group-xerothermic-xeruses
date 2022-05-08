@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './CheckboxList.module.css';
+import styles from './CalendarList.module.css';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -7,7 +7,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 
-type CheckboxListProps = {
+type CalendarListProps = {
   calendars: Calendar[];
   intialSelectedCalendars: Calendar[];
   getSelectedCalendars: (calendars: Calendar[]) => void;
@@ -18,7 +18,7 @@ type Calendar = {
   id: string;
 };
 
-const CheckboxList: React.FC<CheckboxListProps> = ({ calendars, intialSelectedCalendars, getSelectedCalendars }) => {
+const CalendarList: React.FC<CalendarListProps> = ({ calendars, intialSelectedCalendars, getSelectedCalendars }) => {
   const [checked, setChecked] = React.useState<Calendar[]>(intialSelectedCalendars);
 
   const selectedCalendars = [...checked];
@@ -55,4 +55,4 @@ const CheckboxList: React.FC<CheckboxListProps> = ({ calendars, intialSelectedCa
   );
 };
 
-export default CheckboxList;
+export default CalendarList;
