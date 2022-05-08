@@ -6,18 +6,21 @@ type Calendar = {
   name: string;
   id: string;
   enabled: boolean;
+  onChange: (enabled: boolean) => void;
 };
 
 const calendar1: Calendar = {
   name: 'cal1',
   id: '1',
   enabled: false,
+  onChange: () => {},
 };
 
 const calendar2: Calendar = {
   name: 'cal2',
   id: '2',
   enabled: false,
+  onChange: () => {},
 };
 
 it('should render', () => {

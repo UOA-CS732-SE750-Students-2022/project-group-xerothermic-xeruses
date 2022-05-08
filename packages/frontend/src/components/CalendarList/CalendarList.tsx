@@ -17,6 +17,7 @@ type Calendar = {
   name: string;
   id: string;
   enabled: boolean;
+  onChange: (enabled: boolean) => void;
 };
 
 const CalendarList: React.FC<CalendarListProps> = ({ calendars, onUpdate }) => {
