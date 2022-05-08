@@ -1,6 +1,5 @@
 .container {
   display: flex;
-  background: var(--flocker-color-background);
 }
 
 .sidebar {
