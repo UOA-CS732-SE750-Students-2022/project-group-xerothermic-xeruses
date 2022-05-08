@@ -18,8 +18,8 @@ const StyledNavLink: React.FC<StyledNavLinkProps> = ({ to, children }) => (
 const Navigation = () => (
   <nav className={styles.nav}>
     {/* TODO: Uncomment these as the views become available */}
-    {/* <StyledNavLink to="meetings">My Meetings</StyledNavLink>
-    <StyledNavLink to="create">Create New Meeting</StyledNavLink> */}
+    <StyledNavLink to="meetings">My Meetings</StyledNavLink>
+    {/* <StyledNavLink to="create">Create New Meeting</StyledNavLink> */}
   </nav>
 );
 
