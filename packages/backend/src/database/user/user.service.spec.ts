@@ -22,8 +22,8 @@ const userDocument: Partial<UserDocument> = {
   flocks: [],
   flockInvites: [],
   availability: [
-    { _id: id('Availabil_01'), type: 'ical', uri: 'uri://test' },
-    { _id: id('Availabil_02'), type: 'ical', uri: 'uri://test2' },
+    { _id: id('Availabil_01'), type: 'ical', name: 'test', uri: 'uri://test' },
+    { _id: id('Availabil_02'), type: 'ical', name: 'test 2', uri: 'uri://test2' },
   ] as UserAvailabilityDocument[],
 };
 
@@ -134,7 +134,7 @@ describe(UserService.name, () => {
 
   it('should add a new user availability source', async () => {
     const user: UserDocument | null = await service.addUserAvailability(userDocument._id!, [
-      { type: 'ical', uri: 'uri://another' },
+      { type: 'ical', name: 'my calendar', uri: 'uri://another' },
     ]);
 
     expect(user.availability.length).toEqual(userDocument.availability!.length + 1);
@@ -146,7 +146,7 @@ describe(UserService.name, () => {
 
   it('should not add a duplicate user availability source', async () => {
     const user: UserDocument | null = await service.addUserAvailability(userDocument._id!, [
-      { type: 'ical', uri: 'uri://test' },
+      { type: 'ical', name: 'test', uri: 'uri://test' },
     ]);
 
     expect(user.availability.length).toEqual(userDocument.availability!.length);

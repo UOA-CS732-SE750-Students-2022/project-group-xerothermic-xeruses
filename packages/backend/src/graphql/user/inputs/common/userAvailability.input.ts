@@ -7,6 +7,9 @@ export class UserAvailabilityInput implements Partial<UserAvailabilityCombinedDT
   @Field({ nullable: false })
   type!: string;
 
+  @Field({ nullable: false })
+  name!: string;
+
   @Field(() => GraphQLString, { nullable: true })
   uri?: string;
 
