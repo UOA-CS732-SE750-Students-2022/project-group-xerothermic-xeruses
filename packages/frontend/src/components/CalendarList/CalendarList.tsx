@@ -16,6 +16,7 @@ type CalendarListProps = {
 type Calendar = {
   name: string;
   id: string;
+  enabled: boolean;
 };
 
 const CalendarList: React.FC<CalendarListProps> = ({ calendars, initialSelectedCalendars, onUpdate }) => {
@@ -27,13 +28,15 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, initialSelectedC
     const currentIndex = checked.indexOf(calendar);
 
     if (currentIndex === -1) {
+      calendar.enabled = true;
       selectedCalendars.push(calendar);
     } else {
+      calendar.enabled = false;
       selectedCalendars.splice(currentIndex, 1);
     }
 
     setChecked(selectedCalendars);
-    onUpdate(selectedCalendars);
+    onUpdate(calendars);
   };
 
   return (
