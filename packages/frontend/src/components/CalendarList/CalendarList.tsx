@@ -34,7 +34,6 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, intialSelectedCa
 
     setChecked(selectedCalendars);
     getSelectedCalendars(selectedCalendars);
-    console.log(selectedCalendars);
   };
 
   return (
