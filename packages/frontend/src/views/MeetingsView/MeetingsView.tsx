@@ -8,7 +8,7 @@ import { GET_USER_FLOCKS, GetCurrentUserResult } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 
 const MeetingsList: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // TODO: Uncomment this when the "create new meeting" view becomes available
   const { loading, error, data } = useQuery<GetCurrentUserResult>(GET_USER_FLOCKS);
   const errorMessage = <>Sorry, we couldn't get your meetings :(</>;
 
