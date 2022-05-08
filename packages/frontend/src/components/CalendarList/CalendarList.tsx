@@ -19,20 +19,22 @@ type Calendar = {
   enabled: boolean;
 };
 
-const CalendarList: React.FC<CalendarListProps> = ({ calendars, initialSelectedCalendars, onUpdate }) => {
-  const [checked, setChecked] = React.useState<Calendar[]>(initialSelectedCalendars);
-  let selectedCalendars = initialSelectedCalendars;
+const CalendarList: React.FC<CalendarListProps> = ({ calendars, onUpdate }) => {
+  let selectedCalendars = calendars.filter((calendar) => {
+    return calendar.enabled === true;
+  });
+  const [checked, setChecked] = React.useState<Calendar[]>();
 
   const handleToggle = (calendar: Calendar) => () => {
-    selectedCalendars = [...checked];
-    const currentIndex = checked.indexOf(calendar);
+    selectedCalendars = [...(checked as Calendar[])];
+    const currentIndex = checked?.indexOf(calendar);
 
     if (currentIndex === -1) {
       calendar.enabled = true;
       selectedCalendars.push(calendar);
     } else {
       calendar.enabled = false;
-      selectedCalendars.splice(currentIndex, 1);
+      selectedCalendars.splice(currentIndex as number, 1);
     }
 
     setChecked(selectedCalendars);
@@ -49,7 +51,7 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, initialSelectedC
                 <Checkbox
                   className={styles.checkbox}
                   edge="start"
-                  checked={checked.indexOf(calendar) !== -1}
+                  checked={checked?.indexOf(calendar) !== -1}
                   tabIndex={-1}
                   disableRipple={true}
                   sx={{
