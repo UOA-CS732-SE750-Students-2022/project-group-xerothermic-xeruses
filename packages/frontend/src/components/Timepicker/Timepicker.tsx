@@ -7,6 +7,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 type TimepickerProps = {
   label: string;
+  defaultValue?: string;
   timeChanged: (date: Date) => void;
 };
 
@@ -25,8 +26,8 @@ function getHours() {
   return hours;
 }
 
-const Timepicker = ({ label, timeChanged }: TimepickerProps) => {
-  const [time, setTime] = useState('');
+const Timepicker = ({ label, timeChanged, defaultValue }: TimepickerProps) => {
+  const [time, setTime] = useState(defaultValue ?? '');
   const hours = getHours();
 
   const handleChange = (event: SelectChangeEvent) => {
