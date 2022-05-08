@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './MeetingsView.module.css';
 import MeetingCard from '../../components/MeetingCard';
 import TitleLayout from '../../layouts/TitleLayout';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom'; TODO: Uncomment this when the "create new meeting" view becomes available
 import { useQuery } from '@apollo/client';
 import { GET_USER_FLOCKS, GetCurrentUserResult } from '../../apollo';
 import { CircularProgress } from '@mui/material';
