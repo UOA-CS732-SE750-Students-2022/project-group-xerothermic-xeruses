@@ -30,6 +30,11 @@ jobs:
           REACT_APP_SERVER_URI: ${{ secrets.SERVER_URI }}
         run: npm run build
 
+      - name: Copy frontend index.html to 404.html
+        run: |
+          cd ./packages/frontend/build
+          [ -f ./404.html ] || cp ./index.html ./404.html
+
       - name: ⚡ Test
         env:
           REACT_APP_FIREBASE_CONFIG_JSON: ${{ secrets.FIREBASE_CONFIG_JSON }}
