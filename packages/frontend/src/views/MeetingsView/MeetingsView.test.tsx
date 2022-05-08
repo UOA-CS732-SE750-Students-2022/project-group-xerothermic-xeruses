@@ -57,19 +57,19 @@ const getComponent = () => (
   </BrowserRouter>
 );
 
-test('should render', async () => {
+it('should render', async () => {
   const { container } = render(<MockedProvider>{getComponent()}</MockedProvider>);
   expect(container).toBeVisible();
 });
 
-test('should show error message when no data is returned', async () => {
+it('should show error message when no data is returned', async () => {
   render(<MockedProvider>{getComponent()}</MockedProvider>);
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
   const text = screen.queryByText("Sorry, we couldn't get your meetings :(");
   expect(text).toBeVisible();
 });
 
-test('should show meeting cards', async () => {
+it('should show meeting cards', async () => {
   render(<MockedProvider mocks={[flockResultMock]}>{getComponent()}</MockedProvider>);
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
 
@@ -88,14 +88,14 @@ test('should show meeting cards', async () => {
   expect(dates2).toBeVisible();
 });
 
-test('should show message when user had no flocks', async () => {
+it('should show message when user had no flocks', async () => {
   render(<MockedProvider mocks={[emptyFlockResultMock]}>{getComponent()}</MockedProvider>);
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
   const text = screen.queryByText('You are not part of any meetings');
   expect(text).toBeVisible();
 });
 
-test('should show error message when error occurs', async () => {
+it('should show error message when error occurs', async () => {
   render(<MockedProvider mocks={[errorMock]}>{getComponent()}</MockedProvider>);
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
   const text = screen.queryByText("Sorry, we couldn't get your meetings :(");
