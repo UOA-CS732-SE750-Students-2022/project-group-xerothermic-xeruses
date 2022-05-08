@@ -1,12 +1,11 @@
 .container {
   display: flex;
   height: 100vh;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .sidebar {
   position: sticky;
-  height: 100vh;
   top: 0;
 }
 
