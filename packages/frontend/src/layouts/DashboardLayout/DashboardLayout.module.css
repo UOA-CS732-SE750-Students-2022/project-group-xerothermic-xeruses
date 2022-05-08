@@ -1,0 +1,32 @@
+.nav {
+  margin-top: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.link {
+  color: white;
+  text-decoration: none;
+  font-weight: var(--flocker-font-weight-light);
+  font-size: var(--flocker-font-size-small);
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+}
+
+.link::after {
+  content: '';
+  height: 1px;
+  background-color: white;
+  width: 0;
+  transition: ease-in-out 0.1s;
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+.activeLink {
+  font-weight: var(--flocker-font-weight-medium);
+}

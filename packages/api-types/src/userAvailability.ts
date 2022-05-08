@@ -6,8 +6,12 @@ export type UserAvailabilityDTO = UserAvailabilityGoogleCalendarDTO | UserAvaila
 
 // Requires that all attributes from UserAvailability* are present in UserAvailabilityCombined.
 type NoType<T> = Omit<T, 'type'>;
-export type UserAvailabilityCombinedDTO = { type: string } & NoType<UserAvailabilityGoogleCalendarDTO> &
+export type UserAvailabilityCombinedDTO = { type: string; name: string } & NoType<UserAvailabilityGoogleCalendarDTO> &
   NoType<UserAvailabilityICalDTO>;
 
 // Requires that all attributes from UserAvailabilityCombined are present or explicitly undefined in UserAvailabilityPartial.
-export type UserAvailabilityPartialDTO = { type: string; id: string } & MaybeUndefined<UserAvailabilityCombinedDTO>;
+export type UserAvailabilityPartialDTO = {
+  type: string;
+  id: string;
+  name: string;
+} & MaybeUndefined<UserAvailabilityCombinedDTO>;
