@@ -38,15 +38,21 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, intialSelectedCa
 
   console.log(selectedCalendars);
   return (
-    <List sx={{ width: '100%', maxWidth: 360 }}>
+    <List>
       {calendars.map((calendar) => {
         return (
           <ListItem key={calendar.id} disablePadding>
-            <ListItemButton role={undefined} onClick={handleToggle(calendar)} dense>
+            <ListItemButton className={styles.button} onClick={handleToggle(calendar)} dense>
               <ListItemIcon>
-                <Checkbox edge="start" checked={checked.indexOf(calendar) !== -1} tabIndex={-1} disableRipple />
+                <Checkbox
+                  className={styles.checkbox}
+                  edge="start"
+                  checked={checked.indexOf(calendar) !== -1}
+                  tabIndex={-1}
+                  disableRipple
+                />
               </ListItemIcon>
-              <ListItemText id={calendar.id + calendar.name} primary={'hi'} />
+              <ListItemText className={styles.calendarName} id={calendar.id + calendar.name} primary={'hi'} />
             </ListItemButton>
           </ListItem>
         );
