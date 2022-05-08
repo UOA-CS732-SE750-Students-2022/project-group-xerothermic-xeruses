@@ -1,9 +1,14 @@
 .participantList {
   display: inline-block;
+  margin-left: 0;
 }
 
 .listContent {
   display: inline-block;
+}
+
+.listItem {
+  padding-left: 0;
 }
 
 .name {
