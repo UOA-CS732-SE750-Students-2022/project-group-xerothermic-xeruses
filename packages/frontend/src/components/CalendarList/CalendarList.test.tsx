@@ -19,14 +19,14 @@ const calendar2: Calendar = {
 
 it('should render', () => {
   const { container } = render(
-    <CalendarList calendars={[]} intialSelectedCalendars={[]} getSelectedCalendars={() => {}} />,
+    <CalendarList calendars={[]} initialSelectedCalendars={[]} getSelectedCalendars={() => {}} />,
   );
   expect(container).toBeVisible();
 });
 
 it('should be able show list of calendars names and checkboxes', () => {
   render(
-    <CalendarList calendars={[calendar1, calendar2]} intialSelectedCalendars={[]} getSelectedCalendars={() => {}} />,
+    <CalendarList calendars={[calendar1, calendar2]} initialSelectedCalendars={[]} getSelectedCalendars={() => {}} />,
   );
   const calendar1Name = screen.getByText(/cal1/i);
   const calendar2Name = screen.getByText(/cal2/i);
@@ -39,7 +39,7 @@ it('should be able show list of calendars names and checkboxes', () => {
 it('should be able to select calendars', () => {
   const getSelectedCalendars = jest.fn();
   render(
-    <CalendarList calendars={[calendar1]} intialSelectedCalendars={[]} getSelectedCalendars={getSelectedCalendars} />,
+    <CalendarList calendars={[calendar1]} initialSelectedCalendars={[]} getSelectedCalendars={getSelectedCalendars} />,
   );
   const checkbox = screen.getByRole('checkbox');
   fireEvent.click(checkbox);
@@ -52,7 +52,7 @@ it('should be able to unselect calendars', () => {
   render(
     <CalendarList
       calendars={[calendar1]}
-      intialSelectedCalendars={[calendar1]}
+      initialSelectedCalendars={[calendar1]}
       getSelectedCalendars={getSelectedCalendars}
     />,
   );

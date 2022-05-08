@@ -1,3 +1,7 @@
+.calendarList {
+  display: inline-block;
+}
+
 .checkbox {
   color: white;
   background-color: transparent;

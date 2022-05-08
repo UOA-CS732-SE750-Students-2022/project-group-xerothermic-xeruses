@@ -37,7 +37,7 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, initialSelectedC
   };
 
   return (
-    <List>
+    <List className={styles.calendarList}>
       {calendars.map((calendar) => {
         return (
           <ListItem key={calendar.id} disablePadding>
