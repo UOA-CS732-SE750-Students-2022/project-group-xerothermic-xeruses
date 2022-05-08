@@ -38,6 +38,9 @@ export type UserAvailabilityPartial = { type: string } & NoType<UserAvailability
 class UserAvailabilityClass /* implements UserAvailability */ {
   @Prop({ type: String, required: true, enum: Object.keys(userAvailabilityDiscriminators) })
   type!: string;
+
+  @Prop({ type: String, required: true })
+  name!: string;
 }
 
 /**

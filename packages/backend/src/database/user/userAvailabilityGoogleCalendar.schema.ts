@@ -11,6 +11,7 @@ export const USER_AVAILABILITY_GOOGLE_CALENDAR = 'googlecalendar';
  */
 export interface UserAvailabilityGoogleCalendar {
   type: typeof USER_AVAILABILITY_GOOGLE_CALENDAR;
+  name: string;
   refreshToken: string;
   accessToken: string;
   accessTokenExpiration: Date;
@@ -19,6 +20,9 @@ export interface UserAvailabilityGoogleCalendar {
 @Schema()
 class UserAvailabilityGoogleCalendarClass implements UserAvailabilityGoogleCalendar {
   type: typeof USER_AVAILABILITY_GOOGLE_CALENDAR = USER_AVAILABILITY_GOOGLE_CALENDAR;
+
+  @Prop({ required: true })
+  name!: string;
 
   @Prop({ required: true })
   refreshToken!: string;
