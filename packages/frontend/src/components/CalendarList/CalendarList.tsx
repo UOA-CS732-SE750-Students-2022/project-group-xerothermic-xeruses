@@ -9,7 +9,7 @@ import Checkbox from '@mui/material/Checkbox';
 
 type CalendarListProps = {
   calendars: Calendar[];
-  intialSelectedCalendars: Calendar[];
+  initialSelectedCalendars: Calendar[];
   getSelectedCalendars: (calendars: Calendar[]) => void;
 };
 
@@ -18,9 +18,9 @@ type Calendar = {
   id: string;
 };
 
-const CalendarList: React.FC<CalendarListProps> = ({ calendars, intialSelectedCalendars, getSelectedCalendars }) => {
-  const [checked, setChecked] = React.useState<Calendar[]>(intialSelectedCalendars);
-  let selectedCalendars = intialSelectedCalendars;
+const CalendarList: React.FC<CalendarListProps> = ({ calendars, initialSelectedCalendars, getSelectedCalendars }) => {
+  const [checked, setChecked] = React.useState<Calendar[]>(initialSelectedCalendars);
+  let selectedCalendars = initialSelectedCalendars;
 
   const handleToggle = (calendar: Calendar) => () => {
     selectedCalendars = [...checked];
