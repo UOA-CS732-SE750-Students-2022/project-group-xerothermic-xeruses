@@ -7,6 +7,7 @@ import { UserFlockAvailabilityDTO } from './userFlockAvailability';
 export interface FlockDTO {
   id: string;
   name: string;
+  flockCode: string;
   flockDays: FlockDayDTO[];
   users: UserDTO[];
   userFlockAvailability: UserFlockAvailabilityDTO[];
