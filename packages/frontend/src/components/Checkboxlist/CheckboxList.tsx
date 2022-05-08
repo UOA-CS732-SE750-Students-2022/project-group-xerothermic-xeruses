@@ -6,56 +6,52 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
 
 type CheckboxListProps = {
   calendars: Calendar[];
+  intialSelectedCalendars: Calendar[];
+  getSelectedCalendars: (calendars: Calendar[]) => void;
 };
 
 type Calendar = {
-  uri: string;
+  name: string;
+  id: string;
 };
 
-const CheckboxList: React.FC<CheckboxListProps> = ({ calendars }) => {
-  const [checked, setChecked] = React.useState([0]);
+const CheckboxList: React.FC<CheckboxListProps> = ({ calendars, intialSelectedCalendars, getSelectedCalendars }) => {
+  const [checked, setChecked] = React.useState<Calendar[]>(intialSelectedCalendars);
 
-  const handleToggle = (value: number) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
+  const selectedCalendars = [...checked];
+
+  const handleToggle = (calendar: Calendar) => () => {
+    const currentIndex = checked.indexOf(calendar);
 
     if (currentIndex === -1) {
-      newChecked.push(value);
+      selectedCalendars.push(calendar);
     } else {
-      newChecked.splice(currentIndex, 1);
+      selectedCalendars.splice(currentIndex, 1);
     }
 
-    setChecked(newChecked);
+    setChecked(selectedCalendars);
+    getSelectedCalendars(selectedCalendars);
   };
 
+  console.log(selectedCalendars);
   return (
-    <div>
-      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-        {[0, 1, 2, 3].map((value) => {
-          const labelId = `checkbox-list-label-${value}`;
-          return (
-            <ListItem key={value} disablePadding>
-              <ListItemButton role={undefined} onClick={handleToggle(value)} dense>
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checked.indexOf(value) !== -1}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ 'aria-labelledby': labelId }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={labelId} primary={`Line item ${value + 1}`} />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-    </div>
+    <List sx={{ width: '100%', maxWidth: 360 }}>
+      {calendars.map((calendar) => {
+        return (
+          <ListItem key={calendar.id} disablePadding>
+            <ListItemButton role={undefined} onClick={handleToggle(calendar)} dense>
+              <ListItemIcon>
+                <Checkbox edge="start" checked={checked.indexOf(calendar) !== -1} tabIndex={-1} disableRipple />
+              </ListItemIcon>
+              <ListItemText id={calendar.id + calendar.name} primary={'hi'} />
+            </ListItemButton>
+          </ListItem>
+        );
+      })}
+    </List>
   );
 };
 
