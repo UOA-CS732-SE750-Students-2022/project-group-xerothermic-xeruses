@@ -4,14 +4,19 @@ import Button from '../../components/Button';
 import Line from '../../components/Line';
 import { signInWithGoogle } from '../../auth/firebase';
 
-const HomeView = () => {
+type HomeViewProps = {
+  showButtons?: boolean;
+};
+
+const HomeView = ({ showButtons = true }: HomeViewProps) => {
+  const buttonVisibility = showButtons ? undefined : 'hidden';
   return (
     <div className={styles.homeView}>
       <div className={styles.heading}>
         <Logo size="display" />
         <p className={styles.subtitle}>Find a time for you and your group</p>
       </div>
-      <div className={styles.buttons}>
+      <div className={styles.buttons} style={{ visibility: buttonVisibility }}>
         <Button onClick={signInWithGoogle} color="white" variant="outlined">
           Sign in with Google
         </Button>
