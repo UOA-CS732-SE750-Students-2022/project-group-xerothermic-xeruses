@@ -57,7 +57,7 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, intialSelectedCa
                   }}
                 />
               </ListItemIcon>
-              <ListItemText className={styles.calendarName} id={calendar.id + calendar.name} primary={'hi'} />
+              <ListItemText className={styles.calendarName} id={calendar.id + calendar.name} primary={calendar.name} />
             </ListItemButton>
           </ListItem>
         );
