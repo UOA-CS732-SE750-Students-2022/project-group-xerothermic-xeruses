@@ -3,10 +3,6 @@
   background-color: transparent;
 }
 
-.button:checked {
-  background-color: white;
-}
-
 .calendarName {
   color: white;
   font-size: var(--flocker-font-size-small);
