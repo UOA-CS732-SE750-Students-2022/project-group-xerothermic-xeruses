@@ -93,7 +93,7 @@ export const CreateMeeting: React.FC = () => {
         </div>
       </div>
       <div className={styles.bottom}>
-        {errorText && <em className={styles.errorText}>{errorText}</em>}
+        <em className={styles.errorText}>{errorText}</em>
         <Button variant="filled" color="primary" onClick={handleCreateClicked}>
           Create
         </Button>
