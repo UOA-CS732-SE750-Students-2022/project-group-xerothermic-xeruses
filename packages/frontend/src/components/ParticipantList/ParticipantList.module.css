@@ -1,0 +1,22 @@
+.participantList {
+  display: inline-block;
+}
+
+.listContent {
+  display: inline-block;
+}
+
+.listItem {
+  padding-left: 0;
+}
+
+.name {
+  color: white;
+  font-weight: var(--flocker-font-weight-light);
+  font-size: var(--flocker-font-size-small);
+}
+
+.avatar {
+  background-color: white;
+  color: var(--flocker-color-primary);
+}

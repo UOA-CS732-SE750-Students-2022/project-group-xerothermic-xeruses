@@ -53,3 +53,5 @@ export const useApolloClient = (user: User | null) => {
 };
 
 export { FlockerApolloProvider };
+export * from './types';
+export * from './queries';
