@@ -5,7 +5,7 @@ import { google } from 'googleapis';
 import { OAuth2Client } from 'googleapis-common';
 import { GoogleConfig } from '~/config/googleConfig.schema';
 import { UserService } from '~/database/user/user.service';
-import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserAvailabilityGoogleCalendar } from '~/database/user/userAvailabilityGoogleCalendar.schema';
 import { FirebaseService } from '~/firebase/firebase.service';
 
 @Injectable()
@@ -75,12 +75,12 @@ export class GoogleCalendarService {
       this.listCalendars(oAuth2Client),
     ]);
 
-    const userAvailabilities: UserAvailability[] = calendars.map((calendar) => ({
+    const userAvailabilities: UserAvailabilityGoogleCalendar[] = calendars.map((calendar) => ({
       type: 'googlecalendar',
       name: calendar.summaryOverride || calendar.summary || 'Google Calendar',
       refreshToken: refreshToken,
-      accessToken: token,
-      accessTokenExpiration: new Date(expiryDate),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      calendarId: calendar.id!,
     }));
 
     await this.userService.addUserAvailability(user._id, userAvailabilities);

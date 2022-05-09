@@ -20,8 +20,5 @@ export class UserAvailabilityGraphQLModel implements UserAvailabilityPartialDTO 
   refreshToken: string | undefined;
 
   @Field(() => GraphQLString, { nullable: true })
-  accessToken: string | undefined;
-
-  @Field(() => Date, { nullable: true })
-  accessTokenExpiration: Date | undefined;
+  calendarId: string | undefined;
 }

@@ -9,6 +9,5 @@ export const USER_AVAILABILITY_GOOGLE_CALENDAR = 'googlecalendar';
 export interface UserAvailabilityGoogleCalendarDTO {
   type: typeof USER_AVAILABILITY_GOOGLE_CALENDAR;
   refreshToken: string;
-  accessToken: string;
-  accessTokenExpiration: Date;
+  calendarId: string;
 }
