@@ -58,12 +58,10 @@ export class CalendarUtil {
       });
     }
 
-    return intervals.map((interval, index) => {
-      return {
-        ...interval,
-        available: availabilityIntervals[index],
-      };
-    });
+    return intervals.map((interval, index) => ({
+      ...interval,
+      available: availabilityIntervals[index],
+    }));
   }
 
   private startsBeforeOrAtInterval(event: Date, intervalStart: Date, eventDuration: number): boolean {
@@ -72,5 +70,26 @@ export class CalendarUtil {
 
   private isDuringInterval(event: Date, intervalStart: Date, intervalEnd: Date, eventDuration: number): boolean {
     return event.getTime() < intervalEnd.getTime() && event.getTime() + eventDuration > intervalStart.getTime();
+  }
+
+  calculateManualAvailability(
+    manualAvailability: Interval[],
+    availabilityIntervals: AvailabilityInterval[],
+  ): AvailabilityInterval[] {
+    for (const availability of manualAvailability) {
+      const { start: availabilityStart, end: availabilityEnd } = availability;
+      availabilityIntervals.forEach((interval, index) => {
+        const { start, end } = interval;
+
+        const eventDuration = availabilityStart.getTime() - availabilityEnd.getTime();
+
+        // Check if the event occurs during the interval
+        if (this.isDuringInterval(availabilityStart, start, end, eventDuration)) {
+          availabilityIntervals[index].available = false;
+        }
+      });
+    }
+
+    return availabilityIntervals;
   }
 }
