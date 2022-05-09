@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GET_CURRENT_USER_NAME, CREATE_NEW_USER } from '../apollo/queries';
 import { useAuth } from '../contexts/AuthContext';
+import BeforeFirstLoadView from '../views/BeforeFirstLoadView';
 
 const SignIn: React.FC = () => {
   const [createUser] = useMutation(CREATE_NEW_USER);
@@ -41,7 +42,7 @@ const SignIn: React.FC = () => {
     getCurrentUser();
   }, [user, getCurrentUser]);
 
-  return <></>;
+  return <BeforeFirstLoadView />;
 };
 
 export default SignIn;
