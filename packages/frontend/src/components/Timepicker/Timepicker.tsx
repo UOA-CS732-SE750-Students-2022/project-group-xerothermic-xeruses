@@ -18,7 +18,7 @@ function getHours() {
   for (let i = 0; i < 24; i++) {
     const ampm = i >= 12 ? 'pm' : 'am';
     const timeString = i > 12 ? `${i - 12}:00 ${ampm}` : `${i}:00 ${ampm}`;
-    const timeAsDate = new Date();
+    const timeAsDate = new Date(0, 0, 0);
     timeAsDate.setHours(i, 0, 0, 0);
     hours.set(timeString, timeAsDate);
   }
