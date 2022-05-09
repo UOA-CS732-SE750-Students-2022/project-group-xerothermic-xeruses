@@ -73,7 +73,7 @@ const Content: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.meetingName}>
         <label htmlFor="meeting-name">Name your meeting</label>
-        <input type="text" name="meeting-name" value={meetingName} onChange={meetingNameChanged} required />
+        <input type="text" id="meeting-name" value={meetingName} onChange={meetingNameChanged} required />
       </div>
 
       <div className={styles.pickers}>
