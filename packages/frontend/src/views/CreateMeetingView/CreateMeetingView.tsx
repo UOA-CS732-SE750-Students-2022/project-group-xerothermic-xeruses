@@ -24,7 +24,7 @@ const NINE_AM = 9;
 const FIVE_PM = 17;
 
 const Content: React.FC = () => {
-  const [meetingName, setMeetingName] = useState('Meeting');
+  const [meetingName, setMeetingName] = useState('New Meeting');
   const [errorText, setErrorText] = useState('');
   const [datesPicked, setDatesPicked] = useState<Date[]>([]);
   const [startTime, setStartTime] = useState<Date>(new Date(0, 0, 0, NINE_AM));
@@ -38,7 +38,7 @@ const Content: React.FC = () => {
   });
   const [joinFlock, { loading: joinFlockLoading }] = useMutation<JoinFlockResult, JoinFlockInput>(JOIN_FLOCK, {
     // onCompleted: (data) => navigate(`/meeting/${data.joinFlock.flockCode}`), // TODO: Uncomment this when the meeting view becomes available
-    onCompleted: () => alert('Successfully created. Meeting view coming soon'), // TODO: Delate this when meeting view becomes available
+    onCompleted: () => alert('Successfully created. Meeting view coming soon'), // TODO: Delete this when meeting view becomes available
     onError: () => setErrorText("Sorry, we couldn't create your meeting"),
   });
 
@@ -46,7 +46,7 @@ const Content: React.FC = () => {
     // Error handling
     if (!meetingName.trim()) return setErrorText('Please enter a meeting name');
     if (!datesPicked.length) return setErrorText('Please select at least one date');
-    if (startTime >= endTime) return setErrorText('Please select a valid date range');
+    if (startTime >= endTime) return setErrorText('Please select a valid time range');
     setErrorText('');
     createMeeting();
   };
