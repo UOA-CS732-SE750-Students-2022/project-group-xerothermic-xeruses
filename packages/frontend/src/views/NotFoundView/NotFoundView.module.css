@@ -5,7 +5,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4em;
+  gap: 2em;
 }
 
 .container {
@@ -16,8 +16,13 @@
 }
 
 .heading {
-  font-size: 10rem;
-  font-weight: bold;
+  color: var(--flocker-color-secondary);
+  font-size: 10em;
+}
+
+.goose {
+  width: 40vmax;
+  max-width: 500px;
 }
 
 .subtitle {

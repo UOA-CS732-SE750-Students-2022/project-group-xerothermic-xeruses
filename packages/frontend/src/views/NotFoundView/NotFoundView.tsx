@@ -18,11 +18,7 @@ const NotFoundView: React.FC<NotFoundViewProps> = ({ goBackLink }) => (
         </Button>
       </Link>
     </div>
-    <img
-      className={`${styles.goose} ${styles.goose}`}
-      src={`${process.env.PUBLIC_URL}/assets/images/flocker-goose.png`}
-      alt="logo"
-    />
+    <img className={styles.goose} src={`${process.env.PUBLIC_URL}/assets/images/flocker-goose.png`} alt="logo" />
   </div>
 );
 
