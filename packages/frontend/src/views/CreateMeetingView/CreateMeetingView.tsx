@@ -23,7 +23,7 @@ import {
 const NINE_AM = 9;
 const FIVE_PM = 17;
 
-const Content: React.FC = () => {
+export const CreateMeeting: React.FC = () => {
   const [meetingName, setMeetingName] = useState('New Meeting');
   const [errorText, setErrorText] = useState('');
   const [datesPicked, setDatesPicked] = useState<Date[]>([]);
@@ -102,6 +102,6 @@ const Content: React.FC = () => {
   );
 };
 
-const CreateMeetingView: React.FC = () => <TitleLayout title="Create New Meeting" content={<Content />} />;
+const CreateMeetingView: React.FC = () => <TitleLayout title="Create New Meeting" content={<CreateMeeting />} />;
 
 export default CreateMeetingView;
