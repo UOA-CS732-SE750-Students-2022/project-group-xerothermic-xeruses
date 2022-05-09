@@ -92,10 +92,12 @@ const Content: React.FC = () => {
           />
         </div>
       </div>
-      <Button variant="filled" color="primary" onClick={handleCreateClicked}>
-        Create
-      </Button>
-      {errorText && <em className={styles.errorText}>{errorText}</em>}
+      <div className={styles.bottom}>
+        {errorText && <em className={styles.errorText}>{errorText}</em>}
+        <Button variant="filled" color="primary" onClick={handleCreateClicked}>
+          Create
+        </Button>
+      </div>
     </div>
   );
 };

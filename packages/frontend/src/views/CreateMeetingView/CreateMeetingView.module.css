@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   width: fit-content;
-  align-items: flex-end;
   gap: 1.5em;
 }
 
@@ -20,6 +19,12 @@
 .errorText {
   font-size: var(--flocker-font-size-small);
   color: red;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .meetingName {
