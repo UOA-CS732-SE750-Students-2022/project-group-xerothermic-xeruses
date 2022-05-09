@@ -1,13 +1,4 @@
 .calendarList {
-  display: inline-block;
-}
-
-.checkbox {
-  color: white;
-  background-color: transparent;
-}
-
-.calendarName {
   color: white;
   font-size: var(--flocker-font-size-small);
 }

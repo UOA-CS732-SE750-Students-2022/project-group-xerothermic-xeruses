@@ -1,15 +1,10 @@
 import React from 'react';
 import styles from './CalendarList.module.css';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
+import { FormControlLabel, FormGroup } from '@mui/material';
 
 type CalendarListProps = {
   calendars: Calendar[];
-  initialSelectedCalendars: Calendar[];
   onUpdate: (calendars: Calendar[]) => void;
 };
 
@@ -17,57 +12,41 @@ type Calendar = {
   name: string;
   id: string;
   enabled: boolean;
-  onChange: (enabled: boolean) => void;
+  onEnabledChanged: (enabled: boolean) => void;
 };
 
 const CalendarList: React.FC<CalendarListProps> = ({ calendars, onUpdate }) => {
-  let selectedCalendars = calendars.filter((calendar) => {
-    return calendar.enabled === true;
-  });
-  const [checked, setChecked] = React.useState<Calendar[]>();
-
-  const handleToggle = (calendar: Calendar) => () => {
-    selectedCalendars = [...(checked as Calendar[])];
-    const currentIndex = checked?.indexOf(calendar);
-
-    if (currentIndex === -1) {
-      calendar.enabled = true;
-      selectedCalendars.push(calendar);
-    } else {
-      calendar.enabled = false;
-      selectedCalendars.splice(currentIndex as number, 1);
-    }
-
-    setChecked(selectedCalendars);
+  const handleChange = (checked: boolean, calendar: Calendar) => {
+    calendar.enabled = checked;
+    calendar.onEnabledChanged(checked);
     onUpdate(calendars);
   };
 
   return (
-    <List className={styles.calendarList}>
+    <FormGroup>
       {calendars.map((calendar) => {
         return (
-          <ListItem key={calendar.id} disablePadding>
-            <ListItemButton onClick={handleToggle(calendar)} dense>
-              <ListItemIcon>
-                <Checkbox
-                  className={styles.checkbox}
-                  edge="start"
-                  checked={checked?.indexOf(calendar) !== -1}
-                  tabIndex={-1}
-                  disableRipple={true}
-                  sx={{
-                    '&.Mui-checked': {
-                      color: 'white',
-                    },
-                  }}
-                />
-              </ListItemIcon>
-              <ListItemText className={styles.calendarName} id={calendar.id + calendar.name} primary={calendar.name} />
-            </ListItemButton>
-          </ListItem>
+          <FormControlLabel
+            key={calendar.id}
+            className={styles.calendarList}
+            control={
+              <Checkbox
+                sx={{
+                  color: 'white',
+                  '&.Mui-checked': {
+                    color: 'white',
+                  },
+                }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange(e.target.checked, calendar);
+                }}
+              />
+            }
+            label={calendar.name}
+          />
         );
       })}
-    </List>
+    </FormGroup>
   );
 };
 
