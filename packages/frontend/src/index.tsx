@@ -7,7 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { FlockerApolloProvider } from './apollo';
 import { StyledEngineProvider } from '@mui/material/styles';
 
-const App = ReactDOM.render(
+ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
       <FlockerApolloProvider>
@@ -21,5 +21,3 @@ const App = ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root'),
 );
-
-export default App;
