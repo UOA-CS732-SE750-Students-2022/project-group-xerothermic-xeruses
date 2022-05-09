@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, getByText, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import HomeView from '../HomeView';
@@ -21,6 +21,7 @@ it('should render', () => {
       <NotFoundView goBackLink="/" />
     </BrowserRouter>,
   );
+
   expect(container).toBeVisible();
   expect(screen.getByText('404')).toBeVisible();
   expect(screen.getByText('Go Back')).toBeVisible();
