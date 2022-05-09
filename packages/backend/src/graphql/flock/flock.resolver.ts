@@ -79,6 +79,13 @@ export class FlockResolver {
       throw new BadRequestException(`User is already in this flock: ${flockCode}`);
     }
 
+    const userFlockAvailabilities = user.availability.map((availability) => ({
+      user: user._id,
+      userAvailabilityId: availability._id,
+      enabled: true,
+    }));
+
+    await this.flockService.addManyUserFlockAvailability(flock._id, userFlockAvailabilities);
     await this.userService.addFlockToUser(user._id, flock._id);
     return this.flockService.addUserToFlock(flock._id, user._id);
   }
