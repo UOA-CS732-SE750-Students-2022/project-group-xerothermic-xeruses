@@ -7,8 +7,8 @@ import { FirebaseConfigModule } from '~/config/firebaseConfig.module';
 import { FlockGraphQLModule } from '~/graphql/flock/flock.module';
 import { UserGraphQLModule } from '~/graphql/user/user.module';
 import { LoggerModule } from '~/logger/module';
+import { GoogleCalendarModule } from '~/rest/googleCalendar/googleCalendar.module';
 import { FirebaseModule } from './firebase/firebase.module';
-import { GoogleCalendarModule } from './googlecalendar/googlecalendar.module';
 
 @Module({
   imports: [

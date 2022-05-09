@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { GoogleConfigModule } from '~/config/googleConfig.module';
 import { UserDatabaseModule } from '~/database/user/user.module';
 import { FirebaseModule } from '~/firebase/firebase.module';
-import { GoogleCalendarController } from './googlecalendar.controller';
-import { GoogleCalendarService } from './googlecalendar.service';
+import { GoogleCalendarController } from './googleCalendar.controller';
+import { GoogleCalendarService } from './googleCalendar.service';
 
 @Module({
   imports: [FirebaseModule, GoogleConfigModule, UserDatabaseModule],
