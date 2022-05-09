@@ -8,6 +8,7 @@ import { FlockGraphQLModule } from '~/graphql/flock/flock.module';
 import { UserGraphQLModule } from '~/graphql/user/user.module';
 import { LoggerModule } from '~/logger/module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { GoogleCalendarModule } from './googlecalendar/googlecalendar.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FirebaseModule } from './firebase/firebase.module';
     FlockGraphQLModule,
     UserGraphQLModule,
     FirebaseModule,
+    GoogleCalendarModule,
   ],
 })
 export class AppModule {}
