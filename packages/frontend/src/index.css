@@ -29,3 +29,7 @@
   box-sizing: border-box;
   font-family: var(--flocker-font-family-text);
 }
+
+#root {
+  background: #ffffff;
+}
