@@ -5,11 +5,14 @@ import { google } from 'googleapis';
 import { OAuth2Client } from 'googleapis-common';
 import { GoogleConfig } from '~/config/googleConfig.schema';
 import { UserService } from '~/database/user/user.service';
+import { UserAvailability } from '~/database/user/userAvailability.schema';
 import { FirebaseService } from '~/firebase/firebase.service';
 
 @Injectable()
 export class GoogleCalendarService {
-  private oAuth2Client: OAuth2Client;
+  private readonly clientId: string;
+  private readonly clientSecret: string;
+  private readonly redirectUris: string[];
 
   public constructor(
     private readonly configService: ConfigService<GoogleConfig, true>,
@@ -22,15 +25,17 @@ export class GoogleCalendarService {
       throw new Error('Missing fields in GOOGLE_OAUTH2 credentials');
     }
 
-    this.oAuth2Client = new google.auth.OAuth2(
-      creds.web.client_id,
-      creds.web.client_secret,
-      creds.web.redirect_uris[0],
-    );
+    this.clientId = creds.web.client_id;
+    this.clientSecret = creds.web.client_secret;
+    this.redirectUris = creds.web.redirect_uris;
+  }
+
+  private createOAuth2Client() {
+    return new google.auth.OAuth2(this.clientId, this.clientSecret, this.redirectUris[0]);
   }
 
   public async generateAuthUrl() {
-    return this.oAuth2Client.generateAuthUrl({
+    return this.createOAuth2Client().generateAuthUrl({
       access_type: 'offline',
       scope: [
         'https://www.googleapis.com/auth/userinfo.profile',
@@ -41,36 +46,50 @@ export class GoogleCalendarService {
   }
 
   public async processCodeCallback(code: string) {
-    const { tokens } = await this.oAuth2Client.getToken(code);
+    const { tokens } = await this.createOAuth2Client().getToken(code);
     await this.saveCredentialsToDatabase(tokens);
   }
 
   private async saveCredentialsToDatabase(creds: Credentials) {
-    this.oAuth2Client.setCredentials(creds);
-    const { token } = await this.oAuth2Client.getAccessToken();
+    const oAuth2Client = this.createOAuth2Client();
+    oAuth2Client.setCredentials(creds);
+    const { token } = await oAuth2Client.getAccessToken();
     if (!token) {
       throw new Error(`Failed fetching access token with credentials: ${JSON.stringify(creds)}`);
     }
 
-    if (!creds.refresh_token) {
+    const { refresh_token: refreshToken, id_token: idToken, expiry_date: expiryDate } = creds;
+
+    if (!refreshToken) {
       throw new Error(`Missing refresh token in credentials: ${JSON.stringify(creds)}`);
     }
-    if (!creds.id_token) {
+    if (!idToken) {
       throw new Error(`Missing id token in credentials: ${JSON.stringify(creds)}`);
     }
-    if (!creds.expiry_date) {
+    if (!expiryDate) {
       throw new Error(`Missing expiry date in credentials: ${JSON.stringify(creds)}`);
     }
 
-    const user = await this.firebaseService.getUserFromGoogleIdToken(creds.id_token);
-    await this.userService.addUserAvailability(user._id, [
-      {
-        type: 'googlecalendar',
-        name: 'Google Calendar', // user will update this name later
-        refreshToken: creds.refresh_token,
-        accessToken: token,
-        accessTokenExpiration: new Date(creds.expiry_date),
-      },
+    const [user, calendars] = await Promise.all([
+      this.firebaseService.getUserFromGoogleIdToken(idToken),
+      this.listCalendars(oAuth2Client),
     ]);
+
+    const userAvailabilities: UserAvailability[] = calendars.map((calendar) => ({
+      type: 'googlecalendar',
+      name: calendar.summaryOverride || calendar.summary || 'Google Calendar',
+      refreshToken: refreshToken,
+      accessToken: token,
+      accessTokenExpiration: new Date(expiryDate),
+    }));
+
+    await this.userService.addUserAvailability(user._id, userAvailabilities);
+  }
+
+  public async listCalendars(oAuth2Client: OAuth2Client, filterSelected = true) {
+    const gcalendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+    const result = await gcalendar.calendarList.list();
+    const calendars = result.data.items ?? [];
+    return calendars.filter((calendar) => !filterSelected || calendar.selected);
   }
 }
