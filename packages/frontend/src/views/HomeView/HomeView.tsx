@@ -8,7 +8,7 @@ type HomeViewProps = {
   showButtons?: boolean;
 };
 
-const HomeView = ({ showButtons = true }: HomeViewProps) => {
+const HomeView: React.FC<HomeViewProps> = ({ showButtons = true }) => {
   const buttonVisibility = showButtons ? undefined : 'hidden';
   return (
     <div className={styles.homeView}>
