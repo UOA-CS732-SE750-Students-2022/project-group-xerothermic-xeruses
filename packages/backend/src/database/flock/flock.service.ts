@@ -86,4 +86,21 @@ export class FlockService {
       )
       .exec();
   }
+
+  async addManyUserFlockAvailability(
+    _id: Types.ObjectId | string,
+    userFlockAvailability: UserFlockAvailability[],
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $push: {
+            userFlockAvailability: { $each: userFlockAvailability },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
 }
