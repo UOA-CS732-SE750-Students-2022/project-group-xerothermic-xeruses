@@ -67,7 +67,7 @@ export class UserService {
   async findManyUserAvailability(
     availabilityIds: (Types.ObjectId | string)[],
   ): Promise<UserAvailabilityProjectionDocument[]> {
-    return this.model
+    const userAvailabilities = await this.model
       .aggregate([
         {
           $unwind: '$availability',
@@ -85,6 +85,12 @@ export class UserService {
         },
       ])
       .exec();
+
+    userAvailabilities.forEach((userAvailability) => {
+      userAvailability.availabilityDocument.id = userAvailability.availabilityDocument._id.toString();
+    });
+
+    return userAvailabilities;
   }
 
   async addFlockToUser(_id: Types.ObjectId | string, flockId: Types.ObjectId | string): Promise<UserDocument | null> {

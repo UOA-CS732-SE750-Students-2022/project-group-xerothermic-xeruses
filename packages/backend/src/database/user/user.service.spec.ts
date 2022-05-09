@@ -127,7 +127,10 @@ describe(UserService.name, () => {
       expect(userAvailability).toEqual({
         _id: userDocument._id,
         userId: userDocument._id,
-        availabilityDocument: userDocument.availability![index],
+        availabilityDocument: {
+          ...userDocument.availability![index],
+          id: userDocument.availability![index]._id.toString(),
+        },
       });
     });
   });
