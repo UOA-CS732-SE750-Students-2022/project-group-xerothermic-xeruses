@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import SignIn from '../../auth/SignIn';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import MeetingsView from '../../views/MeetingsView';
+import NotFoundView from '../../views/NotFoundView';
 
 const AuthenticatedRoutes = () => (
   <Routes>
@@ -11,6 +12,7 @@ const AuthenticatedRoutes = () => (
       <Route index element={<Navigate to="meetings" />} />
       <Route path="meetings" element={<MeetingsView />} />
     </Route>
+    <Route path="*" element={<NotFoundView goBackLink="/dashboard" />} />
   </Routes>
 );
 

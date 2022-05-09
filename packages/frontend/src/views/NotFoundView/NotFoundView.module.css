@@ -1,0 +1,28 @@
+.notFoundView {
+  background: var(--flocker-color-primary);
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4em;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2em;
+}
+
+.heading {
+  font-size: 10rem;
+  font-weight: bold;
+}
+
+.subtitle {
+  color: white;
+  font-size: var(--flocker-font-size-subtitle);
+  font-weight: normal;
+  text-align: center;
+}
