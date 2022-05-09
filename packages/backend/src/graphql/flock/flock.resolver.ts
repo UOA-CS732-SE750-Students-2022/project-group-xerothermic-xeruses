@@ -49,6 +49,17 @@ export class FlockResolver {
     return this.flockService.findOne(id);
   }
 
+  @Query(() => FlockGraphQLModel)
+  async getFlockByCode(@Args('flockCode', { type: () => GraphQLString }) flockCode: string) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    }
+
+    return flock;
+  }
+
   @Query(() => [FlockGraphQLModel])
   async getFlocks() {
     return this.flockService.findAll();
