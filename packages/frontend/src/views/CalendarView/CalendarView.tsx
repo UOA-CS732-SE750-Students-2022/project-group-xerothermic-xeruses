@@ -12,7 +12,7 @@ type CalendarsProps = {
   flockId: string;
 };
 
-const Calendars: React.FC<CalendarsProps> = ({ flockId: string }) => {
+const Calendars: React.FC<CalendarsProps> = () => {
   const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
     variables: { getFlockId: flockId },
   });
