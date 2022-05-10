@@ -1,8 +1,6 @@
 import styles from './HomeView.module.css';
 import Logo from '../../components/Logo';
-import Button from '../../components/Button';
-import Line from '../../components/Line';
-import { signInWithGoogle } from '../../auth/firebase';
+import SignInButtons from '../../components/SignInButtons';
 
 type HomeViewProps = {
   showButtons?: boolean;
@@ -17,16 +15,7 @@ const HomeView: React.FC<HomeViewProps> = ({ showButtons = true }) => {
         <p className={styles.subtitle}>Find a time for you and your group</p>
       </div>
       <div className={styles.buttons} style={{ visibility: buttonVisibility }}>
-        <Button onClick={signInWithGoogle} color="white" variant="outlined">
-          Sign in with Google
-        </Button>
-        <div className={styles.divider}>
-          <Line text="or" />
-        </div>
-        {/* TODO: Add guest users */}
-        <Button onClick={() => alert('Coming soon')} color="white">
-          Continue as Guest
-        </Button>
+        <SignInButtons />
       </div>
       <img
         className={`${styles.goose} ${styles.goose1}`}
