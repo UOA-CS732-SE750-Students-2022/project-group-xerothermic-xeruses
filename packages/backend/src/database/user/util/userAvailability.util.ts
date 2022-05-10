@@ -38,8 +38,7 @@ export class UserAvailabilityUtil {
       x.type === USER_AVAILABILITY_GOOGLE_CALENDAR &&
       typeof x.name === 'string' &&
       typeof x.refreshToken === 'string' &&
-      typeof x.accessToken === 'string' &&
-      x.accessTokenExpiration instanceof Date
+      typeof x.calendarId === 'string'
     );
   }
 
@@ -49,8 +48,8 @@ export class UserAvailabilityUtil {
    * Also used to set the order of keys in the object, e.g. for `JSON.stringify()` comparisons.
    */
   toUserAvailabilityGoogleCalendar(x: UserAvailabilityGoogleCalendar): UserAvailabilityGoogleCalendar {
-    const { type, name, refreshToken, accessToken, accessTokenExpiration } = x;
-    return { type, name, refreshToken, accessToken, accessTokenExpiration };
+    const { type, name, refreshToken, calendarId } = x;
+    return { type, name, refreshToken, calendarId };
   }
 
   isUserAvailabilityICal(x: any): x is UserAvailabilityICal {
