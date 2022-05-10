@@ -3,8 +3,6 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import SignInButtons from './SignInButtons';
 import * as firebase from '../../auth/firebase';
 
-beforeAll(() => {});
-
 it('should render', () => {
   render(<SignInButtons />);
   expect(screen.getByText('Sign in with Google')).toBeVisible();
