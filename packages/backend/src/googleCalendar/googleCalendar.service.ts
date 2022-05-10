@@ -58,16 +58,13 @@ export class GoogleCalendarService {
       throw new Error(`Failed fetching access token with credentials: ${JSON.stringify(creds)}`);
     }
 
-    const { refresh_token: refreshToken, id_token: idToken, expiry_date: expiryDate } = creds;
+    const { refresh_token: refreshToken, id_token: idToken } = creds;
 
     if (!refreshToken) {
       throw new Error(`Missing refresh token in credentials: ${JSON.stringify(creds)}`);
     }
     if (!idToken) {
       throw new Error(`Missing id token in credentials: ${JSON.stringify(creds)}`);
-    }
-    if (!expiryDate) {
-      throw new Error(`Missing expiry date in credentials: ${JSON.stringify(creds)}`);
     }
 
     const [user, calendars] = await Promise.all([
@@ -78,7 +75,7 @@ export class GoogleCalendarService {
     const userAvailabilities: UserAvailabilityGoogleCalendar[] = calendars.map((calendar) => ({
       type: 'googlecalendar',
       name: calendar.summaryOverride || calendar.summary || 'Google Calendar',
-      refreshToken: refreshToken,
+      refreshToken,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       calendarId: calendar.id!,
     }));
