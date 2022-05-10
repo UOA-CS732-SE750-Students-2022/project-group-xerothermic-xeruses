@@ -142,6 +142,28 @@ export class FlockResolver {
 
   @Auth()
   @Query(() => FlockAvailabilityGraphQLModel)
+  async addManualAvailabilityForFlock(
+    @User() user: UserDocument,
+    @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
+    @Args('flockAvailabilityIntervalInput') flockAvailabilityIntervalInput: FlockAvailabilityIntervalInput,
+  ) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    }
+
+    const { intervals } = flockAvailabilityIntervalInput;
+    intervals.forEach((interval) => {
+      const { start, end } = interval;
+      if (start >= end) {
+        throw new BadRequestException('Invalid interval(s)');
+      }
+    });
+  }
+
+  @Auth()
+  @Query(() => FlockAvailabilityGraphQLModel)
   async getUserIntervalsForFlock(
     @User() currentUser: UserDocument,
     @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
