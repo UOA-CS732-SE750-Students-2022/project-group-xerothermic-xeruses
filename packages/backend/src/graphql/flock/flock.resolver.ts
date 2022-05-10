@@ -210,10 +210,19 @@ export class FlockResolver {
         continue;
       }
 
-      const availabilityIntervals = await this.calendarUtil.convertIcalToIntervalsFromUris(
+      let availabilityIntervals = await this.calendarUtil.convertIcalToIntervalsFromUris(
         [availabilityDocument.uri],
         flockAvailabilityIntervalInput.intervals,
       );
+
+      for (const manualAvailability of flock.userManualAvailability) {
+        if (manualAvailability.user.toString() === userId.toString()) {
+          availabilityIntervals = this.calendarUtil.calculateManualAvailability(
+            manualAvailability.intervals,
+            availabilityIntervals,
+          );
+        }
+      }
 
       availabilities.push({
         userId,

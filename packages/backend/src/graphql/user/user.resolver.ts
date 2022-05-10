@@ -91,9 +91,18 @@ export class UserResolver {
   async getUserIntervals(
     @User() user: UserDocument,
     @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
+    @Args('flockCode', { type: () => [GraphQLString] }) flockCode: string,
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    } else if (!flock.users.includes(user._id)) {
+      throw new BadRequestException('User is not in this flock');
+    }
+
     const calendarUris = (
       await Promise.all(
         availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
@@ -116,9 +125,14 @@ export class UserResolver {
       }
     });
 
-    return {
-      availability: this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals),
-    };
+    let availability = await this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals);
+    for (const manualAvailability of flock.userManualAvailability) {
+      if (manualAvailability.user.toString() === user._id.toString()) {
+        availability = this.calendarUtil.calculateManualAvailability(manualAvailability.intervals, availability);
+      }
+    }
+
+    return { availability };
   }
 
   @Auth()

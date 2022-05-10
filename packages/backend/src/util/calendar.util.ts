@@ -81,7 +81,7 @@ export class CalendarUtil {
       availabilityIntervals.forEach((interval, index) => {
         const { start, end } = interval;
 
-        const eventDuration = availabilityStart.getTime() - availabilityEnd.getTime();
+        const eventDuration = availabilityEnd.getTime() - availabilityStart.getTime();
 
         // Check if the event occurs during the interval
         if (this.isDuringInterval(availabilityStart, start, end, eventDuration)) {
