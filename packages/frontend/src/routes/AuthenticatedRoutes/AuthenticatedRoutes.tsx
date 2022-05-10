@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import SignIn from '../../auth/SignIn';
+import SignOut from '../../auth/SignOut';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import CreateMeetingView from '../../views/CreateMeetingView';
 import MeetingsView from '../../views/MeetingsView';
@@ -14,6 +15,7 @@ const AuthenticatedRoutes = () => (
       <Route path="meetings" element={<MeetingsView />} />
       <Route path="create-meeting" element={<CreateMeetingView />} />
     </Route>
+    <Route path="/signout" element={<SignOut />} />
     <Route path="*" element={<NotFoundView goBackLink="/dashboard" />} />
   </Routes>
 );
