@@ -14,10 +14,12 @@ import {
   GET_USER_CALENDARS,
   GetCurrentUserCalendarsResult,
 } from '../../apollo';
+import { UserAvailabilityPartialDTO } from '../../../../api-types';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import ParticipantList from '../../components/ParticipantList';
 import Line from '../../components/Line';
+import CalendarList from '../../components/CalendarList';
 
 type CalendarsProps = {
   flockId: string;
@@ -78,6 +80,33 @@ const FlockParticipantList: React.FC = () => {
   return <ParticipantList participants={participants} />;
 };
 
+const FlockCalendarList: React.FC = () => {
+  const { loading, error, data } = useQuery<GetCurrentUserCalendarsResult>(GET_USER_CALENDARS);
+  const errorMessage = <>Sorry, we couldn't get your calendars :(</>;
+  if (loading) return <CircularProgress />;
+  if (error) return errorMessage;
+
+  type Calendar = {
+    id: string;
+    name: string;
+    enabled: boolean;
+    onEnabledChanged: (enabled: boolean) => void;
+  };
+
+  let calendars: Calendar[] = [];
+
+  if (data) {
+    const { userFlockAvailability } = data.getUserFlockAvailability;
+    userFlockAvailability.forEach(function (calendar) {
+      const { enabled } = calendar;
+      const { id, name } = calendar.userAvailability as UserAvailabilityPartialDTO;
+      calendars.push({ id, name, enabled, onEnabledChanged: () => {} });
+    });
+  }
+
+  return <CalendarList calendars={calendars} onUpdate={() => {}} />;
+};
+
 const CalendarViewSidebar: React.FC = () => {
   //Participants list
 
@@ -89,6 +118,7 @@ const CalendarViewSidebar: React.FC = () => {
     <Sidebar>
       <FlockParticipantList />
       <Line />
+      <FlockCalendarList />
     </Sidebar>
   );
 };
