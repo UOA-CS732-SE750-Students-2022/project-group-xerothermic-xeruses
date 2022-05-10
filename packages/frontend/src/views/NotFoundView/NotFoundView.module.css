@@ -1,0 +1,40 @@
+.notFoundView {
+  background: var(--flocker-color-primary);
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.heading {
+  color: white;
+  font-size: 10em;
+}
+
+.goose {
+  position: fixed;
+  width: 40vmax;
+  max-width: 500px;
+}
+
+.goose1 {
+  transform: rotate(200deg);
+  left: clamp(-100px, -15vw, 0px);
+  top: -10vh;
+}
+
+.goose2 {
+  transform: rotate(30deg);
+  right: clamp(-100px, -15vw, 0px);
+  bottom: -5vh;
+}
+
+.subtitle {
+  color: white;
+  font-size: var(--flocker-font-size-subtitle);
+  font-weight: var(--flocker-font-weight-regular);
+  text-align: center;
+  margin-bottom: 1em;
+}
