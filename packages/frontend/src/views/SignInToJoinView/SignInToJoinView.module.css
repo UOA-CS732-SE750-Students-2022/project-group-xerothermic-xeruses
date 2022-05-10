@@ -8,6 +8,11 @@
   background-color: var(--flocker-color-primary);
 }
 
+.logo {
+  position: fixed;
+  bottom: 1.5em;
+}
+
 .title {
   color: white;
   text-align: center;
