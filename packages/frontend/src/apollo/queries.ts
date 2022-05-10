@@ -52,9 +52,24 @@ export const JOIN_FLOCK = gql`
   }
 `;
 
-export const GET_USER_FLOCK = gql``;
-
-export const GET_USER_FLOCK_NAME = gql``;
+export const GET_USER_FLOCK = gql`
+  query GetFlock($flockCode: String!) {
+    getFlockByCode(flockCode: $flockCode) {
+      name
+      flockDays {
+        start
+        end
+      }
+      userFlockAvailability {
+        userAvailability {
+          id
+          name
+          calendarId
+        }
+      }
+    }
+  }
+`;
 
 export const GET_FLOCK_PARTICIPANTS = gql`
   query GetFlock($getFlockId: String!) {

@@ -8,7 +8,6 @@ import styles from './CalendarView.module.css';
 import {
   GET_USER_FLOCK,
   GetCurrentFlockResult,
-  GET_USER_FLOCK_NAME,
   GET_FLOCK_PARTICIPANTS,
   GetFlockParticipantResult,
   GET_USER_CALENDARS,
@@ -25,35 +24,25 @@ type CalendarsProps = {
   flockId: string;
 };
 
-const Calendars: React.FC<CalendarsProps> = () => {
-  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {});
-  const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
-  if (loading) return <CircularProgress />;
-  if (error) return errorMessage;
-  if (data) {
-    const { flockDays, users, userFlockAvailability } = data.getFlock;
-  }
-  return (
-    <Timematcher datesPicked={[]} timeRange={[new Date(), new Date()]} userAvailability={[]} othersAvailability={[]} />
-  );
-};
-
 const Flock: React.FC = () => {
   type FlockParams = {
-    flockId: string;
+    flockCode: string;
   };
-  const { flockId } = useParams<FlockParams>();
+  const { flockCode } = useParams<FlockParams>();
 
-  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK_NAME);
+  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
+    variables: { flockCode: { flockCode } },
+  });
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
   if (loading) return <CircularProgress />;
   if (error) return errorMessage;
+
   let flockName = '';
   if (data) {
     const { name } = data.getFlock;
     flockName = name;
   }
-  return <TitleLayout title={flockName} content={<Calendars flockId="" />} />;
+  return <TitleLayout title={flockName} content={<p>content</p>} />;
 };
 
 const FlockParticipantList: React.FC = () => {
