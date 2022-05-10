@@ -32,7 +32,7 @@ it('should take the user back to the home page when they are unauthenticated', (
   renderViewsWithMemory('/');
 
   expect(screen.getByText('404')).toBeVisible();
-  fireEvent(screen.getByText('Go Back'), new MouseEvent('click'));
+  fireEvent.click(screen.getByText('Go Back'));
 
   // Ensure we go back to the home page
   expect(screen.getByText('Sign in with Google')).toBeInTheDocument();
@@ -43,7 +43,7 @@ it('should take the user back to the dashboard when they are authenticated', () 
   renderViewsWithMemory('/dashboard');
 
   expect(screen.getByText('404')).toBeVisible();
-  fireEvent(screen.getByText('Go Back'), new MouseEvent('click'));
+  fireEvent.click(screen.getByText('Go Back'));
 
   // Ensure we go back to the dashboard
   expect(screen.getByText('My Meetings')).toBeInTheDocument();
