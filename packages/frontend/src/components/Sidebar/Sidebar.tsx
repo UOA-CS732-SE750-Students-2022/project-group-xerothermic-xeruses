@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Sidebar.module.css';
 import Logo from '../Logo';
 import Line from '../Line';
+import StyledNavLink from '../StyledNavLink';
 
 type SidebarProps = {
   username?: string | null | undefined;
@@ -22,11 +23,18 @@ const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.header}>
-          {getTitle()} <Line />
+          {getTitle()}
+          <div className={styles.divider}>
+            <Line />
+          </div>
         </div>
         {children}
+        <div className={styles.divider}>
+          <Line />
+        </div>
+        <StyledNavLink to="/signout">Sign out</StyledNavLink>
       </div>
-      <Logo size="footer"></Logo>
+      <Logo size="footer" />
     </div>
   );
 };
