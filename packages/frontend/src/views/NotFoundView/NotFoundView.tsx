@@ -12,7 +12,7 @@ const NotFoundView: React.FC<NotFoundViewProps> = ({ goBackLink }) => (
     <h1 className={styles.heading}>404</h1>
     <h2 className={styles.subtitle}>The goose stole the page you were looking for!</h2>
     <Link to={goBackLink}>
-      <Button color="white" variant="outlined">
+      <Button color="white" variant="filled">
         Go Back
       </Button>
     </Link>
