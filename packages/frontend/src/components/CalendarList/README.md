@@ -16,7 +16,7 @@ A stylised calendar list from MUI's checkbox list.
 
 # Calendar type
 
-The  `Calendar` type has the following props: 
+The `Calendar` type has the following props: 
 
 `name` 
 
