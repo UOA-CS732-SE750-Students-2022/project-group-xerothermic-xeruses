@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  gap: 1.5em;
+}
+
+.pickers {
+  display: flex;
+  gap: 4em;
+}
+
+.times {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.errorText {
+  font-size: var(--flocker-font-size-small);
+  color: red;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meetingName {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.meetingName input {
+  border: 1px solid black;
+  border-radius: 0.8em;
+  padding: 0.5em;
+}
+
+.meetingName input:invalid {
+  border: 1px solid red;
+  box-shadow: 0 0 2px red;
+}
+
+.meetingName input:focus {
+  outline: none;
+  border: 1px solid var(--flocker-color-primary);
+  box-shadow: 0 0 2px var(--flocker-color-primary);
+}
