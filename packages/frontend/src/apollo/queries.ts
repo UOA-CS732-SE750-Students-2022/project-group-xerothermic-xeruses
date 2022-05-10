@@ -66,3 +66,20 @@ export const GET_FLOCK_PARTICIPANTS = gql`
     }
   }
 `;
+
+export const GET_USER_CALENDARS = gql`
+  query getFlock($getFlockId: String!) {
+    getFlock(id: $getFlockId) {
+      userFlockAvailability {
+        userAvailability {
+          id
+          type
+          name
+          uri
+          refreshToken
+          calendarId
+        }
+      }
+    }
+  }
+`;

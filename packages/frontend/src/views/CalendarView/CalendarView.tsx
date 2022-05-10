@@ -11,6 +11,8 @@ import {
   GET_USER_FLOCK_NAME,
   GET_FLOCK_PARTICIPANTS,
   GetFlockParticipantResult,
+  GET_USER_CALENDARS,
+  GetCurrentUserCalendarsResult,
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -52,8 +54,7 @@ const Flock: React.FC = () => {
   return <TitleLayout title={flockName} content={<Calendars flockId="" />} />;
 };
 
-const CalendarViewSidebar: React.FC = () => {
-  //Participants list
+const FlockParticipantList: React.FC = () => {
   const { loading, error, data } = useQuery<GetFlockParticipantResult>(GET_FLOCK_PARTICIPANTS);
   const errorMessage = <>Sorry, we couldn't get the participants of the meeting :(</>;
   if (loading) return <CircularProgress />;
@@ -74,12 +75,19 @@ const CalendarViewSidebar: React.FC = () => {
     });
   }
 
+  return <ParticipantList participants={participants} />;
+};
+
+const CalendarViewSidebar: React.FC = () => {
+  //Participants list
+
   //Calendars list
+
   //Import calendar
 
   return (
     <Sidebar>
-      <ParticipantList participants={participants} />
+      <FlockParticipantList />
       <Line />
     </Sidebar>
   );
