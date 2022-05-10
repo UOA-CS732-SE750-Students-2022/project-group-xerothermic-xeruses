@@ -153,7 +153,7 @@ export class FlockResolver {
 
   @Auth()
   @Mutation(() => FlockGraphQLModel)
-  async addManualAvailabilityForFlock(
+  async setManualAvailabilityForFlock(
     @User() user: UserDocument,
     @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
     @Args('flockAvailabilityIntervalInput') flockAvailabilityIntervalInput: FlockAvailabilityIntervalInput,
