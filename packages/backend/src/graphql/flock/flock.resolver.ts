@@ -3,6 +3,7 @@ import { Resolver, Args, Query, Parent, ResolveField, Mutation } from '@nestjs/g
 import { GraphQLString } from 'graphql';
 import { FlockDocument } from '~/database/flock/flock.schema';
 import { FlockService } from '~/database/flock/flock.service';
+import { UserManualAvailability, UserManualAvailabilityDocument } from '~/database/flock/userManualAvailability.schema';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
@@ -173,12 +174,16 @@ export class FlockResolver {
       }
     });
 
-    const manualAvailability = {
+    for (const userManualAvailability of flock.userManualAvailability) {
+      if (userManualAvailability.user.toString() === user._id.toString()) {
+        return this.flockService.updateManualAvailability(flock._id, user._id, intervals);
+      }
+    }
+
+    return this.flockService.addManualAvailability(flock._id, {
       user: user._id,
       intervals,
-    };
-
-    return this.flockService.addManualAvailability(flock._id, manualAvailability);
+    });
   }
 
   @Auth()

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { type Model, type Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
 import { FLOCK_MODEL_NAME, type Flock, type FlockDocument } from './flock.schema';
+import { ManualAvailability } from './manualAvailability.schema';
 import { UserFlockAvailability } from './userFlockAvailability.schema';
 import { UserManualAvailability } from './userManualAvailability.schema';
 
@@ -120,6 +121,19 @@ export class FlockService {
           },
         },
         { new: true },
+      )
+      .exec();
+  }
+
+  updateManualAvailability(
+    _id: Types.ObjectId,
+    userId: Types.ObjectId,
+    intervals: ManualAvailability[],
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findOneAndUpdate(
+        { _id, 'userManualAvailability.user': userId },
+        { 'userManualAvailability.$.intervals': intervals },
       )
       .exec();
   }
