@@ -51,3 +51,7 @@ export const JOIN_FLOCK = gql`
     }
   }
 `;
+
+export const GET_USER_FLOCK = gql``;
+
+export const GET_USER_FLOCK_NAME = gql``;

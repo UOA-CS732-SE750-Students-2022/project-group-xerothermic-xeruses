@@ -7,15 +7,14 @@ import TitleLayout from '../../layouts/TitleLayout';
 import styles from './CalendarView.module.css';
 import { GET_USER_FLOCK, GetCurrentFlockResult, GET_USER_FLOCK_NAME } from '../../apollo';
 import { CircularProgress } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
 type CalendarsProps = {
   flockId: string;
 };
 
 const Calendars: React.FC<CalendarsProps> = () => {
-  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
-    variables: { getFlockId: flockId },
-  });
+  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {});
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
   if (loading) return <CircularProgress />;
   if (error) return errorMessage;
@@ -28,6 +27,11 @@ const Calendars: React.FC<CalendarsProps> = () => {
 };
 
 const Flock: React.FC = () => {
+  type FlockParams = {
+    flockId: string;
+  };
+  const { flockId } = useParams<FlockParams>();
+
   const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK_NAME);
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
   if (loading) return <CircularProgress />;
