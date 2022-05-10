@@ -141,7 +141,7 @@ export class FlockResolver {
   }
 
   @Auth()
-  @Query(() => FlockAvailabilityGraphQLModel)
+  @Mutation(() => FlockGraphQLModel)
   async addManualAvailabilityForFlock(
     @User() user: UserDocument,
     @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
@@ -160,6 +160,13 @@ export class FlockResolver {
         throw new BadRequestException('Invalid interval(s)');
       }
     });
+
+    const manualAvailability = {
+      user: user._id,
+      intervals,
+    };
+
+    return this.flockService.addManualAvailability(flock._id, manualAvailability);
   }
 
   @Auth()

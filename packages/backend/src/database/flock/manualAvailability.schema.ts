@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { type Document, Schema as MSchema, type Types } from 'mongoose';
+import { type Document, type Types } from 'mongoose';
 
 /**
  * ManualAvailability is used to indicate a particular interval when a user is not available for a flock.
