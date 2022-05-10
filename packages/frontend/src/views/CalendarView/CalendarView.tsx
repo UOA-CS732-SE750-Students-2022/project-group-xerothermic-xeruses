@@ -5,9 +5,17 @@ import Timematcher from '../../components/Timematcher';
 import SidebarLayout from '../../layouts/SidebarLayout';
 import TitleLayout from '../../layouts/TitleLayout';
 import styles from './CalendarView.module.css';
-import { GET_USER_FLOCK, GetCurrentFlockResult, GET_USER_FLOCK_NAME } from '../../apollo';
+import {
+  GET_USER_FLOCK,
+  GetCurrentFlockResult,
+  GET_USER_FLOCK_NAME,
+  GET_FLOCK_PARTICIPANTS,
+  GetFlockParticipantResult,
+} from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import ParticipantList from '../../components/ParticipantList';
+import Line from '../../components/Line';
 
 type CalendarsProps = {
   flockId: string;
@@ -44,6 +52,39 @@ const Flock: React.FC = () => {
   return <TitleLayout title={flockName} content={<Calendars flockId="" />} />;
 };
 
-const CalendarView: React.FC = () => <SidebarLayout sidebarContent={<Sidebar />} bodyContent={<Flock />} />;
+const CalendarViewSidebar: React.FC = () => {
+  //Participants list
+  const { loading, error, data } = useQuery<GetFlockParticipantResult>(GET_FLOCK_PARTICIPANTS);
+  const errorMessage = <>Sorry, we couldn't get the participants of the meeting :(</>;
+  if (loading) return <CircularProgress />;
+  if (error) return errorMessage;
+
+  type Participant = {
+    id: string;
+    name: string;
+  };
+
+  let participants: Participant[] = [];
+
+  if (data) {
+    const { users } = data.getParticipants;
+    users.forEach(function (user) {
+      const { id, name } = user;
+      participants.push({ id, name });
+    });
+  }
+
+  //Calendars list
+  //Import calendar
+
+  return (
+    <Sidebar>
+      <ParticipantList participants={participants} />
+      <Line />
+    </Sidebar>
+  );
+};
+
+const CalendarView: React.FC = () => <SidebarLayout sidebarContent={<CalendarViewSidebar />} bodyContent={<Flock />} />;
 
 export default CalendarView;
