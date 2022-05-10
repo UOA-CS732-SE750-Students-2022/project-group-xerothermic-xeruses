@@ -49,6 +49,17 @@ export class FlockResolver {
     return this.flockService.findOne(id);
   }
 
+  @Query(() => FlockGraphQLModel)
+  async getFlockByCode(@Args('flockCode', { type: () => GraphQLString }) flockCode: string) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    }
+
+    return flock;
+  }
+
   @Query(() => [FlockGraphQLModel])
   async getFlocks() {
     return this.flockService.findAll();
@@ -79,6 +90,13 @@ export class FlockResolver {
       throw new BadRequestException(`User is already in this flock: ${flockCode}`);
     }
 
+    const userFlockAvailabilities = user.availability.map((availability) => ({
+      user: user._id,
+      userAvailabilityId: availability._id,
+      enabled: true,
+    }));
+
+    await this.flockService.addManyUserFlockAvailability(flock._id, userFlockAvailabilities);
     await this.userService.addFlockToUser(user._id, flock._id);
     return this.flockService.addUserToFlock(flock._id, user._id);
   }
