@@ -1,19 +1,8 @@
 import React from 'react';
 import SidebarLayout from '../SidebarLayout';
+import StyledNavLink from '../../components/StyledNavLink';
 import styles from './DashboardLayout.module.css';
-import { Outlet, NavLink } from 'react-router-dom';
-
-const computeActiveClassName = (isActive: boolean) => (isActive ? styles.activeLink : '');
-
-type StyledNavLinkProps = {
-  to: string;
-};
-
-const StyledNavLink: React.FC<StyledNavLinkProps> = ({ to, children }) => (
-  <NavLink to={to} className={({ isActive }) => `${styles.link} ${computeActiveClassName(isActive)}`}>
-    {children}
-  </NavLink>
-);
+import { Outlet } from 'react-router-dom';
 
 const Navigation = () => (
   <nav className={styles.nav}>
