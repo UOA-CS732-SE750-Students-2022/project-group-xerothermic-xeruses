@@ -13,8 +13,7 @@ export interface UserAvailabilityGoogleCalendar {
   type: typeof USER_AVAILABILITY_GOOGLE_CALENDAR;
   name: string;
   refreshToken: string;
-  accessToken: string;
-  accessTokenExpiration: Date;
+  calendarId: string;
 }
 
 @Schema()
@@ -28,10 +27,7 @@ class UserAvailabilityGoogleCalendarClass implements UserAvailabilityGoogleCalen
   refreshToken!: string;
 
   @Prop({ required: true })
-  accessToken!: string;
-
-  @Prop({ required: true })
-  accessTokenExpiration!: Date;
+  calendarId!: string;
 }
 
 /**
