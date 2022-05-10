@@ -44,6 +44,16 @@ export class FlockResolver {
     );
   }
 
+  @ResolveField()
+  async userManualAvailability(@Parent() flock: FlockDocument) {
+    return Promise.all(
+      flock.userManualAvailability.map((document) => ({
+        ...document,
+        user: this.userService.findOne(document.user),
+      })),
+    );
+  }
+
   @Query(() => FlockGraphQLModel)
   async getFlock(@Args('id', { type: () => GraphQLString }) id: string) {
     return this.flockService.findOne(id);
@@ -151,6 +161,8 @@ export class FlockResolver {
 
     if (!flock) {
       throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    } else if (!flock.users.includes(user._id)) {
+      throw new BadRequestException('User is not in this flock');
     }
 
     const { intervals } = flockAvailabilityIntervalInput;
