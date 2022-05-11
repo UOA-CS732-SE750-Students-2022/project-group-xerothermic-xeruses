@@ -178,6 +178,7 @@ describe(FlockService.name, () => {
     expect(flock!.userManualAvailability.length).toEqual(flockDocument.userManualAvailability!.length);
 
     const updatedAvailability = flock!.userManualAvailability.at(-1);
+    expect(updatedAvailability!.user).toEqual(flockDocument.users![0]);
     expect(updatedAvailability!.intervals[0].start).toEqual(intervals[0].start);
     expect(updatedAvailability!.intervals[0].end).toEqual(intervals[0].end);
   });
