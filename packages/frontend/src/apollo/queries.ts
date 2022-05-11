@@ -72,8 +72,8 @@ export const GET_USER_FLOCK = gql`
 `;
 
 export const GET_FLOCK_PARTICIPANTS = gql`
-  query GetFlock($getFlockId: String!) {
-    getFlock(id: $getFlockId) {
+  query GetFlockByCode($flockCode: String!) {
+    getFlockByCode(flockCode: $flockCode) {
       users {
         id
         name
