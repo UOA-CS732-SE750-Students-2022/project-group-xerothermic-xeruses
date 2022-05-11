@@ -53,7 +53,7 @@ export const JOIN_FLOCK = gql`
 `;
 
 export const GET_USER_FLOCK = gql`
-  query GetFlock($flockCode: String!) {
+  query GetFlockByCode($flockCode: String!) {
     getFlockByCode(flockCode: $flockCode) {
       name
       flockDays {
