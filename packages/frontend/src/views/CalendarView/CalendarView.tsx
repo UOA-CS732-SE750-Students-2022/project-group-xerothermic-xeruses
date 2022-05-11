@@ -37,11 +37,31 @@ const Flock: React.FC = () => {
   if (error) return errorMessage;
 
   let flockName = '';
+  let datesPicked: Date[] = [];
+  let timeRange: [Date, Date] = [new Date(), new Date()];
   if (data) {
-    const { name } = data.getFlockByCode;
+    //dates
+    const { name, flockDays } = data.getFlockByCode;
     flockName = name;
+    flockDays.forEach(function (day) {
+      const date = new Date(day.start);
+      datesPicked.push(date);
+    });
+    //timerange
+    const startTime = new Date(flockDays[0].start);
+    const endTime = new Date(flockDays[0].end);
+    timeRange = [startTime, endTime];
+    //useravailability
   }
-  return <TitleLayout title={flockName} content={<p>content</p>} />;
+
+  return (
+    <TitleLayout
+      title={flockName}
+      content={
+        <Timematcher datesPicked={datesPicked} timeRange={timeRange} userAvailability={[]} othersAvailability={[]} />
+      }
+    />
+  );
 };
 
 const FlockParticipantList: React.FC = () => {
