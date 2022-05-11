@@ -174,7 +174,7 @@ export class FlockResolver {
     });
 
     for (const userManualAvailability of flock.userManualAvailability) {
-      if (userManualAvailability.user.toString() === user._id.toString()) {
+      if (userManualAvailability.user.equals(user._id)) {
         return this.flockService.updateManualAvailability(flock._id, user._id, intervals);
       }
     }

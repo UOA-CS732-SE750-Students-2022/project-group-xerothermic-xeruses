@@ -129,7 +129,7 @@ export class UserResolver {
 
     let manualAvailability = intervals.map((interval) => ({ ...interval, available: true }));
     for (const mAvailability of flock.userManualAvailability) {
-      if (mAvailability.user.equals(user._id.toString())) {
+      if (mAvailability.user.equals(user._id)) {
         manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
       }
     }
