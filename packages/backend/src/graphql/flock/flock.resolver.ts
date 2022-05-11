@@ -10,6 +10,7 @@ import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockAvailabilityIntervalInput } from './inputs/flockAvailabilityInterval.input';
+import { ManualAvailabilityIntervalInput } from './inputs/manualAvailabilityInterval.input';
 import { UserFlockAvailabilityInput } from './inputs/userFlockAvailability.input';
 import { FlockGraphQLModel } from './models/flock.model';
 import { FlockAvailabilityGraphQLModel } from './models/flockAvailability.model';
@@ -155,7 +156,7 @@ export class FlockResolver {
   async setManualAvailabilityForFlock(
     @User() user: UserDocument,
     @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
-    @Args('flockAvailabilityIntervalInput') flockAvailabilityIntervalInput: FlockAvailabilityIntervalInput,
+    @Args('manualAvailabilityIntervalInput') manualAvailabilityIntervalInput: ManualAvailabilityIntervalInput,
   ) {
     const flock = await this.flockService.findOneByCode(flockCode);
 
@@ -165,7 +166,7 @@ export class FlockResolver {
       throw new BadRequestException('User is not in this flock');
     }
 
-    const { intervals } = flockAvailabilityIntervalInput;
+    const { intervals } = manualAvailabilityIntervalInput;
     intervals.forEach((interval) => {
       const { start, end } = interval;
       if (start >= end) {

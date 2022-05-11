@@ -1,8 +1,8 @@
 import { ManualAvailabilityDTO } from '@flocker/api-types';
-import { Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
+import { InputType, Field, GraphQLISODateTime } from '@nestjs/graphql';
 
-@ObjectType()
-export class ManualAvailabilityGraphQLModel implements ManualAvailabilityDTO {
+@InputType()
+export class ManualIntervalInput implements ManualAvailabilityDTO {
   @Field(() => GraphQLISODateTime, { nullable: false })
   start!: Date;
 

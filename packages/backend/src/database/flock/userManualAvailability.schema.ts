@@ -3,7 +3,7 @@ import { type Document, Schema as MSchema, type Types } from 'mongoose';
 import { ManualAvailability, ManualAvailabilityDocument, ManualAvailabilitySchema } from './manualAvailability.schema';
 
 /**
- * UserManualAvailability is used to indicate extra times when a user is not available for a flock.
+ * UserManualAvailability is used to indicate extra times when a user is available or not for a flock.
  */
 export interface UserManualAvailability {
   user: Types.ObjectId;
@@ -20,12 +20,12 @@ class UserManualAvailabilityClass implements UserManualAvailability {
 }
 
 /**
- * UserManualAvailability is used to indicate extra times when a user is not available for a flock.
+ * UserManualAvailability is used to indicate extra times when a user is available or not for a flock.
  */
 export type UserManualAvailabilityDocument = UserManualAvailabilityClass &
   Omit<Document<Types.ObjectId>, 'id'> & { _id: Types.ObjectId };
 
 /**
- * UserManualAvailability is used to indicate extra times when a user is not available for a flock.
+ * UserManualAvailability is used to indicate extra times when a user available or not for a flock.
  */
 export const UserManualAvailabilitySchema = SchemaFactory.createForClass(UserManualAvailabilityClass);

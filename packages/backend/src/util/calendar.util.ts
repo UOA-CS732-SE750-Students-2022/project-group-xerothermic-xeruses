@@ -72,18 +72,21 @@ export class CalendarUtil {
     return event.getTime() < intervalEnd.getTime() && event.getTime() + eventDuration > intervalStart.getTime();
   }
 
-  calculateManualAvailability(manualAvailability: Interval[], intervals: Interval[]): AvailabilityInterval[] {
+  calculateManualAvailability(
+    manualAvailability: AvailabilityInterval[],
+    intervals: Interval[],
+  ): AvailabilityInterval[] {
     const availabilities = intervals.map((interval) => ({ ...interval, available: true }));
 
     for (const mAvailability of manualAvailability) {
-      const { start, end } = mAvailability;
+      const { start, end, available } = mAvailability;
 
       for (const availability of availabilities) {
         const eventDuration = end.getTime() - start.getTime();
 
         // Check if the event occurs during the interval
         if (this.isDuringInterval(start, availability.start, availability.end, eventDuration)) {
-          availability.available = false;
+          availability.available = available;
         }
       }
     }

@@ -37,6 +37,7 @@ const flockDocument: Partial<FlockDocument> = {
           _id: id('Intervals 1'),
           start: new Date(Date.UTC(2022, 9, 2, 10)),
           end: new Date(Date.UTC(2022, 9, 2, 16)),
+          available: false,
         },
       ],
     },
@@ -147,6 +148,7 @@ describe(FlockService.name, () => {
         {
           start: new Date(Date.UTC(2022, 9, 3)),
           end: new Date(Date.UTC(2022, 9, 4)),
+          available: false,
         },
       ],
     };
@@ -159,6 +161,7 @@ describe(FlockService.name, () => {
     expect(newManualAvailability!.user).toEqual(userManualAvailability.user);
     expect(newManualAvailability!.intervals[0].start).toEqual(userManualAvailability.intervals[0].start);
     expect(newManualAvailability!.intervals[0].end).toEqual(userManualAvailability.intervals[0].end);
+    expect(newManualAvailability!.intervals[0].available).toEqual(userManualAvailability.intervals[0].available);
   });
 
   it('should update a user manual availability successfully', async () => {
@@ -166,6 +169,7 @@ describe(FlockService.name, () => {
       {
         start: new Date(Date.UTC(2022, 9, 3)),
         end: new Date(Date.UTC(2022, 9, 4)),
+        available: true,
       },
     ];
 
@@ -181,6 +185,7 @@ describe(FlockService.name, () => {
     expect(updatedAvailability!.user).toEqual(flockDocument.users![0]);
     expect(updatedAvailability!.intervals[0].start).toEqual(intervals[0].start);
     expect(updatedAvailability!.intervals[0].end).toEqual(intervals[0].end);
+    expect(updatedAvailability!.intervals[0].available).toEqual(intervals[0].available);
   });
 
   it('should delete a flock successfully', async () => {
