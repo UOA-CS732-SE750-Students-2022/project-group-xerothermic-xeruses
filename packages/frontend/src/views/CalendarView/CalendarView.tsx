@@ -46,7 +46,7 @@ const Flock: React.FC = () => {
 
 const FlockParticipantList: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
-  const { loading, error, data } = useQuery<GetFlockParticipantResult>(GET_FLOCK_PARTICIPANTS, {
+  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_FLOCK_PARTICIPANTS, {
     variables: { flockCode: flockCode },
   });
   const errorMessage = <>Sorry, we couldn't get the participants of the meeting :(</>;
@@ -61,19 +61,21 @@ const FlockParticipantList: React.FC = () => {
   let participants: Participant[] = [];
 
   if (data) {
-    const { users } = data.getParticipants;
+    const { users } = data.getFlockByCode;
     users.forEach(function (user) {
       const { id, name } = user;
       participants.push({ id, name });
     });
   }
 
+  console.log(participants);
+
   return <ParticipantList participants={participants} />;
 };
 
 const FlockCalendarList: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
-  const { loading, error, data } = useQuery<GetCurrentUserCalendarsResult>(GET_USER_CALENDARS, {
+  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_CALENDARS, {
     variables: { flockCode: flockCode },
   });
   const errorMessage = <>Sorry, we couldn't get your calendars :(</>;
@@ -90,7 +92,7 @@ const FlockCalendarList: React.FC = () => {
   let calendars: Calendar[] = [];
 
   if (data) {
-    const { userFlockAvailability } = data.getUserFlockAvailability;
+    const { userFlockAvailability } = data.getFlockByCode;
     userFlockAvailability.forEach(function (calendar) {
       const { enabled } = calendar;
       const { id, name } = calendar.userAvailability as UserAvailabilityPartialDTO;
@@ -105,8 +107,9 @@ const CalendarViewSidebar: React.FC = () => {
   return (
     <div>
       <h1 className={styles.sidebarHeadings}>Participants</h1>
-
+      <FlockParticipantList />
       <Line />
+      <FlockCalendarList />
       <h1 className={styles.sidebarHeadings}>Calendars</h1>
     </div>
   );
