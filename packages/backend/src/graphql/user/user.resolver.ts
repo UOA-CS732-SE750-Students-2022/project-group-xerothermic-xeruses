@@ -12,6 +12,7 @@ import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { ValidateUser } from '~/decorators/validate-user-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
+import { AvailabilityInterval } from '~/util/models';
 import { AddUserInput } from './inputs/addUser.input';
 import { UserAvailabilityInput } from './inputs/common/userAvailability.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
@@ -125,14 +126,30 @@ export class UserResolver {
       }
     });
 
-    let availability = await this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals);
-    for (const manualAvailability of flock.userManualAvailability) {
-      if (manualAvailability.user.toString() === user._id.toString()) {
-        availability = this.calendarUtil.calculateManualAvailability(manualAvailability.intervals, availability);
+    const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals);
+
+    let manualAvailability: AvailabilityInterval[] = [];
+    for (const mAvailability of flock.userManualAvailability) {
+      if (mAvailability.user.toString() === user._id.toString()) {
+        manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
       }
     }
 
-    return { availability };
+    if (manualAvailability.length > 0) {
+      return {
+        availability: intervals.map((interval, i) => ({
+          ...interval,
+          available: icalAvailability[i].available && manualAvailability[i].available,
+        })),
+      };
+    }
+
+    return {
+      availability: intervals.map((interval, i) => ({
+        ...interval,
+        available: icalAvailability[i].available, // google goes here
+      })),
+    };
   }
 
   @Auth()
