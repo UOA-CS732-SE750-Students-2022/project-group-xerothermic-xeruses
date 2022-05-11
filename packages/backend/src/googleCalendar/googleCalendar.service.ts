@@ -30,7 +30,7 @@ export class GoogleCalendarService {
     this.redirectUris = creds.web.redirect_uris;
   }
 
-  private createOAuth2Client() {
+  public createOAuth2Client() {
     return new google.auth.OAuth2(this.clientId, this.clientSecret, this.redirectUris[0]);
   }
 
@@ -88,5 +88,37 @@ export class GoogleCalendarService {
     const result = await gcalendar.calendarList.list();
     const calendars = result.data.items ?? [];
     return calendars.filter((calendar) => !filterSelected || calendar.selected);
+  }
+
+  public async getCalendarEvents(oAuth2Client: OAuth2Client, calendarId: string, timeMin: Date, timeMax: Date) {
+    const gcalendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+    const [calendar, events] = await Promise.all([
+      gcalendar.calendars.get({ calendarId }),
+      gcalendar.events.list({
+        calendarId,
+        maxAttendees: 1, // Only return the participant in event.
+        maxResults: 2500, // TODO: paginate results.
+        singleEvents: true, // Convert recurring events to multiple events.
+        timeZone: 'UTC',
+        timeMin: timeMin.toISOString(),
+        timeMax: timeMax.toISOString(),
+      }),
+    ]);
+
+    if (events.data.items == null) {
+      throw new Error('Calendar event items should not be null.');
+    }
+
+    if (calendar.data.timeZone == null) {
+      throw new Error('Calendar timezone should not be null.');
+    }
+
+    return {
+      calendarId,
+      timeMin,
+      timeMax,
+      defaultTimeZone: calendar.data.timeZone,
+      events: events.data.items,
+    };
   }
 }
