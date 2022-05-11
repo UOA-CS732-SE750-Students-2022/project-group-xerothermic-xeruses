@@ -23,15 +23,14 @@ import CalendarList from '../../components/CalendarList';
 type CalendarsProps = {
   flockId: string;
 };
+type FlockParams = {
+  flockCode: string;
+};
 
 const Flock: React.FC = () => {
-  type FlockParams = {
-    flockCode: string;
-  };
   const { flockCode } = useParams<FlockParams>();
-
   const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
-    variables: { flockCode: { flockCode } },
+    variables: { flockCode: flockCode },
   });
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
   if (loading) return <CircularProgress />;
@@ -39,14 +38,17 @@ const Flock: React.FC = () => {
 
   let flockName = '';
   if (data) {
-    const { name } = data.getFlock;
+    const { name } = data.getFlockByCode;
     flockName = name;
   }
   return <TitleLayout title={flockName} content={<p>content</p>} />;
 };
 
 const FlockParticipantList: React.FC = () => {
-  const { loading, error, data } = useQuery<GetFlockParticipantResult>(GET_FLOCK_PARTICIPANTS);
+  const { flockCode } = useParams<FlockParams>();
+  const { loading, error, data } = useQuery<GetFlockParticipantResult>(GET_FLOCK_PARTICIPANTS, {
+    variables: { flockCode: flockCode },
+  });
   const errorMessage = <>Sorry, we couldn't get the participants of the meeting :(</>;
   if (loading) return <CircularProgress />;
   if (error) return errorMessage;
@@ -70,7 +72,10 @@ const FlockParticipantList: React.FC = () => {
 };
 
 const FlockCalendarList: React.FC = () => {
-  const { loading, error, data } = useQuery<GetCurrentUserCalendarsResult>(GET_USER_CALENDARS);
+  const { flockCode } = useParams<FlockParams>();
+  const { loading, error, data } = useQuery<GetCurrentUserCalendarsResult>(GET_USER_CALENDARS, {
+    variables: { flockCode: flockCode },
+  });
   const errorMessage = <>Sorry, we couldn't get your calendars :(</>;
   if (loading) return <CircularProgress />;
   if (error) return errorMessage;
@@ -97,18 +102,13 @@ const FlockCalendarList: React.FC = () => {
 };
 
 const CalendarViewSidebar: React.FC = () => {
-  //Participants list
-
-  //Calendars list
-
-  //Import calendar
-
   return (
-    <Sidebar>
-      <FlockParticipantList />
+    <div>
+      <h1 className={styles.sidebarHeadings}>Participants</h1>
+
       <Line />
-      <FlockCalendarList />
-    </Sidebar>
+      <h1 className={styles.sidebarHeadings}>Calendars</h1>
+    </div>
   );
 };
 
