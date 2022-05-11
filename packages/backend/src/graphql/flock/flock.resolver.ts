@@ -49,7 +49,7 @@ export class FlockResolver {
   async userManualAvailability(@Parent() flock: FlockDocument) {
     return Promise.all(
       flock.userManualAvailability.map((document) => ({
-        ...document,
+        intervals: document.intervals,
         user: this.userService.findOne(document.user),
       })),
     );

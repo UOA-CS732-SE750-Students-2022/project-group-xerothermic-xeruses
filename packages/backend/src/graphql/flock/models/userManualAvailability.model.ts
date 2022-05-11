@@ -8,6 +8,6 @@ export class UserManualAvailabilityGraphQLModel implements UserManualAvailabilit
   @Field(() => UserGraphQLModel, { nullable: false })
   user!: UserDTO;
 
-  @Field(() => ManualAvailabilityGraphQLModel, { nullable: false })
+  @Field(() => [ManualAvailabilityGraphQLModel], { nullable: false })
   intervals!: ManualAvailabilityDTO[];
 }
