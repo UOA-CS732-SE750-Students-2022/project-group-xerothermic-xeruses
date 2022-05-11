@@ -128,26 +128,17 @@ export class UserResolver {
 
     const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals);
 
-    let manualAvailability: AvailabilityInterval[] = [];
+    let manualAvailability = intervals.map((interval) => ({ ...interval, available: true }));
     for (const mAvailability of flock.userManualAvailability) {
-      if (mAvailability.user.toString() === user._id.toString()) {
+      if (mAvailability.user.equals(user._id.toString())) {
         manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
       }
-    }
-
-    if (manualAvailability.length > 0) {
-      return {
-        availability: intervals.map((interval, i) => ({
-          ...interval,
-          available: icalAvailability[i].available && manualAvailability[i].available,
-        })),
-      };
     }
 
     return {
       availability: intervals.map((interval, i) => ({
         ...interval,
-        available: icalAvailability[i].available, // google goes here
+        available: icalAvailability[i].available && manualAvailability[i].available,
       })),
     };
   }

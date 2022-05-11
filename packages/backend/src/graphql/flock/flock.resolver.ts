@@ -8,6 +8,7 @@ import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
+import { AvailabilityInterval } from '~/util/models';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockAvailabilityIntervalInput } from './inputs/flockAvailabilityInterval.input';
 import { UserFlockAvailabilityInput } from './inputs/userFlockAvailability.input';
@@ -36,8 +37,8 @@ export class FlockResolver {
     const userAvailability = await this.userService.findManyUserAvailability(userFlockAvailabilityIds);
 
     return Promise.all(
-      userAvailability.map((document, index) => ({
-        user: this.userService.findOne(document.userId),
+      userAvailability.map(async (document, index) => ({
+        user: await this.userService.findOne(document.userId),
         userAvailability: document.availabilityDocument,
         enabled: flock.userFlockAvailability[index].enabled,
       })),
@@ -47,9 +48,9 @@ export class FlockResolver {
   @ResolveField()
   async userManualAvailability(@Parent() flock: FlockDocument) {
     return Promise.all(
-      flock.userManualAvailability.map((document) => ({
+      flock.userManualAvailability.map(async (document) => ({
         intervals: document.intervals,
-        user: this.userService.findOne(document.user),
+        user: await this.userService.findOne(document.user),
       })),
     );
   }
@@ -208,29 +209,31 @@ export class FlockResolver {
     const userAvailabilities = await this.userService.findManyUserAvailability(availabilitiesToCheck);
 
     const availabilities = [];
+    const { intervals } = flockAvailabilityIntervalInput;
     for (const availability of userAvailabilities) {
       const { userId, availabilityDocument } = availability;
       if (availabilityDocument.type !== 'ical') {
         continue;
       }
 
-      let availabilityIntervals = await this.calendarUtil.convertIcalToIntervalsFromUris(
+      const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(
         [availabilityDocument.uri],
-        flockAvailabilityIntervalInput.intervals,
+        intervals,
       );
 
-      for (const manualAvailability of flock.userManualAvailability) {
-        if (manualAvailability.user.toString() === userId.toString()) {
-          availabilityIntervals = this.calendarUtil.calculateManualAvailability(
-            manualAvailability.intervals,
-            availabilityIntervals,
-          );
+      let manualAvailability = intervals.map((interval) => ({ ...interval, available: true }));
+      for (const mAvailability of flock.userManualAvailability) {
+        if (mAvailability.user.equals(userId.toString())) {
+          manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
         }
       }
 
       availabilities.push({
         userId,
-        intervals: availabilityIntervals,
+        intervals: intervals.map((interval, i) => ({
+          ...interval,
+          available: icalAvailability[i].available && manualAvailability[i].available,
+        })),
       });
     }
 
