@@ -76,6 +76,7 @@ describe(CalendarUtil.name, () => {
     })
       .useMocker((token) => {
         if (token === GoogleCalendarService) {
+          // Mock GoogleCalendarService methods here :)
           return {};
         }
         return {};

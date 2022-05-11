@@ -110,7 +110,7 @@ export class UserResolver {
     );
     const userAvailabilities = results.flatMap((userDocument) => userDocument?.availability ?? []);
 
-    // ICal URIs
+    // ICal URIs.
     const calendarUris = userAvailabilities
       .filter((availability): availability is UserAvailabilityICalDocument => availability.type === 'ical')
       .map((availability) => availability.uri);

@@ -6,7 +6,7 @@ import { async as icalParser, type CalendarResponse, type VEvent } from 'node-ic
 import { GoogleCalendarService } from '~/googleCalendar/googleCalendar.service';
 import { AvailabilityInterval, Interval } from './models';
 
-// Timezone handling, see https://day.js.org/docs/en/plugin/timezone
+// Timezone handling, see https://day.js.org/docs/en/plugin/timezone.
 extendDayjs(dayjsUtcPlugin);
 extendDayjs(dayjsTimezonePlugin);
 
