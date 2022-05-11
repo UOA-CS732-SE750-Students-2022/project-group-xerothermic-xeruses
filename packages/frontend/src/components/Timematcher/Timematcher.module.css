@@ -10,7 +10,7 @@
   position: sticky;
   background-color: white;
   left: 0;
-  z-index: 2;
+  z-index: 3;
 }
 
 .tableContent {
@@ -29,7 +29,7 @@
   position: sticky;
   background-color: white;
   left: 0;
-  z-index: 800;
+  z-index: 2;
 }
 
 .dates {
