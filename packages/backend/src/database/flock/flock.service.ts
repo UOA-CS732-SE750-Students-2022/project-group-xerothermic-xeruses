@@ -108,7 +108,7 @@ export class FlockService {
       .exec();
   }
 
-  addManualAvailability(
+  async addManualAvailability(
     _id: Types.ObjectId,
     manualAvailability: UserManualAvailability,
   ): Promise<FlockDocument | null> {
@@ -125,7 +125,7 @@ export class FlockService {
       .exec();
   }
 
-  updateManualAvailability(
+  async updateManualAvailability(
     _id: Types.ObjectId,
     userId: Types.ObjectId,
     intervals: ManualAvailability[],
@@ -134,6 +134,7 @@ export class FlockService {
       .findOneAndUpdate(
         { _id, 'userManualAvailability.user': userId },
         { 'userManualAvailability.$.intervals': intervals },
+        { new: true },
       )
       .exec();
   }
