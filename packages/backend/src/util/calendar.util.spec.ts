@@ -1,4 +1,6 @@
+import { Test } from '@nestjs/testing';
 import { sync as icalParser } from 'node-ical';
+import { GoogleCalendarService } from '~/googleCalendar/googleCalendar.service';
 import { CalendarUtil } from './calendar.util';
 import { Interval } from './models';
 
@@ -68,8 +70,19 @@ const UTC = (Y: number, M = 1, D = 1, h = 0, m = 0, s = 0, ms = 0) => new Date(D
 describe(CalendarUtil.name, () => {
   let calUtil: CalendarUtil;
 
-  beforeAll(() => {
-    calUtil = new CalendarUtil();
+  beforeAll(async () => {
+    const module = await Test.createTestingModule({
+      providers: [CalendarUtil],
+    })
+      .useMocker((token) => {
+        if (token === GoogleCalendarService) {
+          return {};
+        }
+        return {};
+      })
+      .compile();
+
+    calUtil = module.get<CalendarUtil>(CalendarUtil);
   });
 
   it('0_calendars_0events_0intervals', () => {
