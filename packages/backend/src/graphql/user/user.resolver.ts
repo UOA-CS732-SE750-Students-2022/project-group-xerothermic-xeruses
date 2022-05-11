@@ -12,7 +12,6 @@ import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { ValidateUser } from '~/decorators/validate-user-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
-import { AvailabilityInterval } from '~/util/models';
 import { AddUserInput } from './inputs/addUser.input';
 import { UserAvailabilityInput } from './inputs/common/userAvailability.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';

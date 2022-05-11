@@ -8,7 +8,6 @@ import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
-import { AvailabilityInterval } from '~/util/models';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockAvailabilityIntervalInput } from './inputs/flockAvailabilityInterval.input';
 import { UserFlockAvailabilityInput } from './inputs/userFlockAvailability.input';
