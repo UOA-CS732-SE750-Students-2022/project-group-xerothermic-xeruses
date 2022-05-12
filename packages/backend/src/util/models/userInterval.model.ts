@@ -12,5 +12,5 @@ export interface Interval {
 export interface AvailabilityInterval {
   start: Date;
   end: Date;
-  available: boolean;
+  available: boolean | null;
 }

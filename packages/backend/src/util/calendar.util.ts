@@ -86,7 +86,7 @@ export class CalendarUtil {
     manualAvailability: AvailabilityInterval[],
     intervals: Interval[],
   ): AvailabilityInterval[] {
-    const availabilities = intervals.map((interval) => ({ ...interval, available: true }));
+    const availabilities: AvailabilityInterval[] = intervals.map((interval) => ({ ...interval, available: null }));
 
     for (const mAvailability of manualAvailability) {
       const { start, end, available } = mAvailability;
