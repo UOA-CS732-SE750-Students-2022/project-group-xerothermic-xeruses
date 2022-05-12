@@ -137,7 +137,7 @@ export class UserResolver {
       calendarIdWithRefreshTokens,
       intervals,
     );
-    
+
     // Manual availability.
     let manualAvailability: AvailabilityInterval[] | null = null;
     for (const mAvailability of flock.userManualAvailability) {
@@ -149,7 +149,8 @@ export class UserResolver {
     return {
       availability: intervals.map((interval, i) => ({
         ...interval,
-        available: manualAvailability?.[i].available ?? icalAvailability[i].available && googleAvailability[i].available,
+        available:
+          manualAvailability?.[i].available ?? (icalAvailability[i].available && googleAvailability[i].available),
       })),
     };
   }

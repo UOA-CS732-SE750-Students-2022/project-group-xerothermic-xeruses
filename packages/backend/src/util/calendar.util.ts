@@ -98,10 +98,11 @@ export class CalendarUtil {
         if (this.isDuringInterval(start, availability.start, availability.end, eventDuration)) {
           availability.available = available;
         }
-
+      }
+    }
     return availabilities;
   }
-      
+
   public async convertGoogleCalendarToIntervals(
     calendarIdWithRefreshTokens: [string, string][],
     intervals: Interval[],
@@ -170,4 +171,8 @@ export class CalendarUtil {
           }
         }
       }
+    }
+
+    return availabilities;
+  }
 }
