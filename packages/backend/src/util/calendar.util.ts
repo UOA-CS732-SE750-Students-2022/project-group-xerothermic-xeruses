@@ -4,7 +4,7 @@ import dayjsTimezonePlugin from 'dayjs/plugin/timezone';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import { async as icalParser, type CalendarResponse, type VEvent } from 'node-ical';
 import { GoogleCalendarService } from '~/googleCalendar/googleCalendar.service';
-import { AvailabilityInterval, Interval } from './models';
+import { AvailabilityInterval, Interval, ManualAvailabilityInterval } from './models';
 
 // Timezone handling, see https://day.js.org/docs/en/plugin/timezone.
 extendDayjs(dayjsUtcPlugin);
@@ -68,12 +68,10 @@ export class CalendarUtil {
       });
     }
 
-    return intervals.map((interval, index) => {
-      return {
-        ...interval,
-        available: availabilityIntervals[index],
-      };
-    });
+    return intervals.map((interval, index) => ({
+      ...interval,
+      available: availabilityIntervals[index],
+    }));
   }
 
   private startsBeforeOrAtInterval(event: Date, intervalStart: Date, eventDuration: number): boolean {
@@ -82,6 +80,30 @@ export class CalendarUtil {
 
   private isDuringInterval(event: Date, intervalStart: Date, intervalEnd: Date, eventDuration: number): boolean {
     return event.getTime() < intervalEnd.getTime() && event.getTime() + eventDuration > intervalStart.getTime();
+  }
+
+  calculateManualAvailability(
+    manualAvailability: AvailabilityInterval[],
+    intervals: Interval[],
+  ): ManualAvailabilityInterval[] {
+    const availabilities: ManualAvailabilityInterval[] = intervals.map((interval) => ({
+      ...interval,
+      available: null,
+    }));
+
+    for (const mAvailability of manualAvailability) {
+      const { start, end, available } = mAvailability;
+
+      for (const availability of availabilities) {
+        const eventDuration = end.getTime() - start.getTime();
+
+        // Check if the event occurs during the interval
+        if (this.isDuringInterval(start, availability.start, availability.end, eventDuration)) {
+          availability.available = available;
+        }
+      }
+    }
+    return availabilities;
   }
 
   public async convertGoogleCalendarToIntervals(

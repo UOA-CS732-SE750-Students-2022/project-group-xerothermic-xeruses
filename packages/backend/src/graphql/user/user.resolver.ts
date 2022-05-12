@@ -14,6 +14,7 @@ import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { ValidateUser } from '~/decorators/validate-user-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
+import { ManualAvailabilityInterval } from '~/util/models';
 import { AddUserInput } from './inputs/addUser.input';
 import { UserAvailabilityInput } from './inputs/common/userAvailability.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
@@ -93,9 +94,18 @@ export class UserResolver {
   async getUserIntervals(
     @User() user: UserDocument,
     @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
+    @Args('flockCode', { type: () => [GraphQLString] }) flockCode: string,
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
   ) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    } else if (!flock.users.includes(user._id)) {
+      throw new BadRequestException('User is not in this flock');
+    }
+
     const { intervals } = userAvailabilityIntervalInput;
     intervals.forEach((interval) => {
       const { start, end } = interval;
@@ -128,10 +138,19 @@ export class UserResolver {
       intervals,
     );
 
+    // Manual availability.
+    let manualAvailability: ManualAvailabilityInterval[] | null = null;
+    for (const mAvailability of flock.userManualAvailability) {
+      if (mAvailability.user.equals(user._id)) {
+        manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
+      }
+    }
+
     return {
       availability: intervals.map((interval, i) => ({
         ...interval,
-        available: icalAvailability[i].available && googleAvailability[i].available,
+        available:
+          manualAvailability?.[i].available ?? (icalAvailability[i].available && googleAvailability[i].available),
       })),
     };
   }

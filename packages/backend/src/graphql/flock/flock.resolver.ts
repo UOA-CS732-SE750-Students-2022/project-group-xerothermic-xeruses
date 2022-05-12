@@ -8,8 +8,10 @@ import { UserService } from '~/database/user/user.service';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
+import { ManualAvailabilityInterval } from '~/util/models';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockAvailabilityIntervalInput } from './inputs/flockAvailabilityInterval.input';
+import { ManualAvailabilityIntervalInput } from './inputs/manualAvailabilityInterval.input';
 import { UserFlockAvailabilityInput } from './inputs/userFlockAvailability.input';
 import { FlockGraphQLModel } from './models/flock.model';
 import { FlockAvailabilityGraphQLModel } from './models/flockAvailability.model';
@@ -36,10 +38,20 @@ export class FlockResolver {
     const userAvailability = await this.userService.findManyUserAvailability(userFlockAvailabilityIds);
 
     return Promise.all(
-      userAvailability.map((document, index) => ({
-        user: this.userService.findOne(document.userId),
+      userAvailability.map(async (document, index) => ({
+        user: await this.userService.findOne(document.userId),
         userAvailability: document.availabilityDocument,
         enabled: flock.userFlockAvailability[index].enabled,
+      })),
+    );
+  }
+
+  @ResolveField()
+  async userManualAvailability(@Parent() flock: FlockDocument) {
+    return Promise.all(
+      flock.userManualAvailability.map(async (document) => ({
+        intervals: document.intervals,
+        user: await this.userService.findOne(document.user),
       })),
     );
   }
@@ -141,6 +153,41 @@ export class FlockResolver {
   }
 
   @Auth()
+  @Mutation(() => FlockGraphQLModel)
+  async setManualAvailabilityForFlock(
+    @User() user: UserDocument,
+    @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
+    @Args('manualAvailabilityIntervalInput') manualAvailabilityIntervalInput: ManualAvailabilityIntervalInput,
+  ) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    } else if (!flock.users.includes(user._id)) {
+      throw new BadRequestException('User is not in this flock');
+    }
+
+    const { intervals } = manualAvailabilityIntervalInput;
+    intervals.forEach((interval) => {
+      const { start, end } = interval;
+      if (start >= end) {
+        throw new BadRequestException('Invalid interval(s)');
+      }
+    });
+
+    for (const userManualAvailability of flock.userManualAvailability) {
+      if (userManualAvailability.user.equals(user._id)) {
+        return this.flockService.updateManualAvailability(flock._id, user._id, intervals);
+      }
+    }
+
+    return this.flockService.addManualAvailability(flock._id, {
+      user: user._id,
+      intervals,
+    });
+  }
+
+  @Auth()
   @Query(() => FlockAvailabilityGraphQLModel)
   async getUserIntervalsForFlock(
     @User() currentUser: UserDocument,
@@ -163,20 +210,31 @@ export class FlockResolver {
     const userAvailabilities = await this.userService.findManyUserAvailability(availabilitiesToCheck);
 
     const availabilities = [];
+    const { intervals } = flockAvailabilityIntervalInput;
     for (const availability of userAvailabilities) {
       const { userId, availabilityDocument } = availability;
       if (availabilityDocument.type !== 'ical') {
         continue;
       }
 
-      const availabilityIntervals = await this.calendarUtil.convertIcalToIntervalsFromUris(
+      const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(
         [availabilityDocument.uri],
-        flockAvailabilityIntervalInput.intervals,
+        intervals,
       );
+
+      let manualAvailability: ManualAvailabilityInterval[] | null = null;
+      for (const mAvailability of flock.userManualAvailability) {
+        if (mAvailability.user.equals(userId.toString())) {
+          manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
+        }
+      }
 
       availabilities.push({
         userId,
-        intervals: availabilityIntervals,
+        intervals: intervals.map((interval, i) => ({
+          ...interval,
+          available: manualAvailability?.[i].available ?? icalAvailability[i].available,
+        })),
       });
     }
 
