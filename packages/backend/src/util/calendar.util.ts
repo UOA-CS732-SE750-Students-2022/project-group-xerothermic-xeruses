@@ -4,7 +4,7 @@ import dayjsTimezonePlugin from 'dayjs/plugin/timezone';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import { async as icalParser, type CalendarResponse, type VEvent } from 'node-ical';
 import { GoogleCalendarService } from '~/googleCalendar/googleCalendar.service';
-import { AvailabilityInterval, Interval } from './models';
+import { AvailabilityInterval, Interval, ManualAvailabilityInterval } from './models';
 
 // Timezone handling, see https://day.js.org/docs/en/plugin/timezone.
 extendDayjs(dayjsUtcPlugin);
@@ -85,8 +85,11 @@ export class CalendarUtil {
   calculateManualAvailability(
     manualAvailability: AvailabilityInterval[],
     intervals: Interval[],
-  ): AvailabilityInterval[] {
-    const availabilities: AvailabilityInterval[] = intervals.map((interval) => ({ ...interval, available: null }));
+  ): ManualAvailabilityInterval[] {
+    const availabilities: ManualAvailabilityInterval[] = intervals.map((interval) => ({
+      ...interval,
+      available: null,
+    }));
 
     for (const mAvailability of manualAvailability) {
       const { start, end, available } = mAvailability;

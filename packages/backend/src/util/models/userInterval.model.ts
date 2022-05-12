@@ -12,5 +12,14 @@ export interface Interval {
 export interface AvailabilityInterval {
   start: Date;
   end: Date;
+  available: boolean;
+}
+
+/**
+ * Record a manual interval availability.
+ */
+export interface ManualAvailabilityInterval {
+  start: Date;
+  end: Date;
   available: boolean | null;
 }
