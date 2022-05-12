@@ -7,6 +7,8 @@ import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserAvailabilityGoogleCalendarDocument } from '~/database/user/userAvailabilityGoogleCalendar.schema';
+import { UserAvailabilityICalDocument } from '~/database/user/userAvailabilityICal.schema';
 import { UserAvailabilityUtil } from '~/database/user/util/userAvailability.util';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
@@ -104,19 +106,6 @@ export class UserResolver {
       throw new BadRequestException('User is not in this flock');
     }
 
-    const calendarUris = (
-      await Promise.all(
-        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
-      )
-    )
-      .flatMap((userDocument) => (userDocument ? userDocument.availability : []))
-      .flatMap((availability) => {
-        if (availability.type === 'ical') {
-          return availability.uri;
-        }
-        return [];
-      });
-
     const { intervals } = userAvailabilityIntervalInput;
     intervals.forEach((interval) => {
       const { start, end } = interval;
@@ -126,8 +115,30 @@ export class UserResolver {
       }
     });
 
+    const results = await Promise.all(
+      availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
+    );
+    const userAvailabilities = results.flatMap((userDocument) => userDocument?.availability ?? []);
+
+    // ICal URIs.
+    const calendarUris = userAvailabilities
+      .filter((availability): availability is UserAvailabilityICalDocument => availability.type === 'ical')
+      .map((availability) => availability.uri);
     const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals);
 
+    // Google Calendar.
+    const calendarIdWithRefreshTokens: [string, string][] = userAvailabilities
+      .filter(
+        (availability): availability is UserAvailabilityGoogleCalendarDocument =>
+          availability.type === 'googlecalendar',
+      )
+      .map((availability) => [availability.calendarId, availability.refreshToken]);
+    const googleAvailability = await this.calendarUtil.convertGoogleCalendarToIntervals(
+      calendarIdWithRefreshTokens,
+      intervals,
+    );
+    
+    // Manual availability.
     let manualAvailability: AvailabilityInterval[] | null = null;
     for (const mAvailability of flock.userManualAvailability) {
       if (mAvailability.user.equals(user._id)) {
@@ -135,12 +146,10 @@ export class UserResolver {
       }
     }
 
-    console.log(manualAvailability);
-    console.log(icalAvailability);
     return {
       availability: intervals.map((interval, i) => ({
         ...interval,
-        available: manualAvailability?.[i].available ?? icalAvailability[i].available,
+        available: manualAvailability?.[i].available ?? icalAvailability[i].available && googleAvailability[i].available,
       })),
     };
   }

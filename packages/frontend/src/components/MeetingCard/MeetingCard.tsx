@@ -14,7 +14,9 @@ const computeDateString = (date: Date): string =>
 const MeetingCard: React.FC<MeetingCardProps> = ({ title, numParticipants, dateRange, onClick }) => (
   <div className={styles.container} onClick={onClick}>
     <p className={styles.title}>{title}</p>
-    <p className={styles.participants}>{numParticipants} participants</p>
+    <p className={styles.participants}>
+      {numParticipants} {numParticipants === 1 ? 'participant' : 'participants'}
+    </p>
     <p className={styles.dates}>
       {computeDateString(dateRange[0])} - {computeDateString(dateRange[1])}
     </p>

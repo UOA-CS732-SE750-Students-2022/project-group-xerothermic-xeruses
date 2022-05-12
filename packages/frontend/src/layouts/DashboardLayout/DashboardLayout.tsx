@@ -1,25 +1,13 @@
 import React from 'react';
 import SidebarLayout from '../SidebarLayout';
+import StyledNavLink from '../../components/StyledNavLink';
 import styles from './DashboardLayout.module.css';
-import { Outlet, NavLink } from 'react-router-dom';
-
-const computeActiveClassName = (isActive: boolean) => (isActive ? styles.activeLink : '');
-
-type StyledNavLinkProps = {
-  to: string;
-};
-
-const StyledNavLink: React.FC<StyledNavLinkProps> = ({ to, children }) => (
-  <NavLink to={to} className={({ isActive }) => `${styles.link} ${computeActiveClassName(isActive)}`}>
-    {children}
-  </NavLink>
-);
+import { Outlet } from 'react-router-dom';
 
 const Navigation = () => (
   <nav className={styles.nav}>
-    {/* TODO: Uncomment these as the views become available */}
     <StyledNavLink to="meetings">My Meetings</StyledNavLink>
-    {/* <StyledNavLink to="create">Create New Meeting</StyledNavLink> */}
+    <StyledNavLink to="create-meeting">Create New Meeting</StyledNavLink>
   </nav>
 );
 

@@ -7,6 +7,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 type TimepickerProps = {
   label: string;
+  defaultValue?: string;
   timeChanged: (date: Date) => void;
 };
 
@@ -17,16 +18,15 @@ function getHours() {
   for (let i = 0; i < 24; i++) {
     const ampm = i >= 12 ? 'pm' : 'am';
     const timeString = i > 12 ? `${i - 12}:00 ${ampm}` : `${i}:00 ${ampm}`;
-    const timeAsDate = new Date();
-    timeAsDate.setHours(i, 0, 0, 0);
+    const timeAsDate = new Date(0, 0, 0, i, 0, 0, 0);
     hours.set(timeString, timeAsDate);
   }
 
   return hours;
 }
 
-const Timepicker = ({ label, timeChanged }: TimepickerProps) => {
-  const [time, setTime] = useState('');
+const Timepicker = ({ label, timeChanged, defaultValue }: TimepickerProps) => {
+  const [time, setTime] = useState(defaultValue ?? '');
   const hours = getHours();
 
   const handleChange = (event: SelectChangeEvent) => {
