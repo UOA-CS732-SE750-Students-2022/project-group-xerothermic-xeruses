@@ -12,6 +12,7 @@ import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { ValidateUser } from '~/decorators/validate-user-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
+import { AvailabilityInterval } from '~/util/models';
 import { AddUserInput } from './inputs/addUser.input';
 import { UserAvailabilityInput } from './inputs/common/userAvailability.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
@@ -127,17 +128,19 @@ export class UserResolver {
 
     const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals);
 
-    let manualAvailability = intervals.map((interval) => ({ ...interval, available: true }));
+    let manualAvailability: AvailabilityInterval[] | null = null;
     for (const mAvailability of flock.userManualAvailability) {
       if (mAvailability.user.equals(user._id)) {
         manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
       }
     }
 
+    console.log(manualAvailability);
+    console.log(icalAvailability);
     return {
       availability: intervals.map((interval, i) => ({
         ...interval,
-        available: icalAvailability[i].available && manualAvailability[i].available,
+        available: manualAvailability?.[i].available ?? icalAvailability[i].available,
       })),
     };
   }
