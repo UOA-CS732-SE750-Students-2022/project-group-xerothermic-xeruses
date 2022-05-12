@@ -1,14 +1,16 @@
+import { UserIntervalDTO } from '@flocker/api-types';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Args, Query, Parent, ResolveField, Mutation } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql';
+import { Types } from 'mongoose';
 import { FlockDocument } from '~/database/flock/flock.schema';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
+import { UserAvailability } from '~/database/user/userAvailability.schema';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
-import { ManualAvailabilityInterval } from '~/util/models';
 import { AddFlockInput } from './inputs/addFlock.input';
 import { FlockAvailabilityIntervalInput } from './inputs/flockAvailabilityInterval.input';
 import { ManualAvailabilityIntervalInput } from './inputs/manualAvailabilityInterval.input';
@@ -193,51 +195,48 @@ export class FlockResolver {
     @User() currentUser: UserDocument,
     @Args('flockCode', { type: () => GraphQLString }) flockCode: string,
     @Args('flockAvailabilityIntervalInput') flockAvailabilityIntervalInput: FlockAvailabilityIntervalInput,
-  ) {
+  ): Promise<{
+    availabilities: {
+      userId: Types.ObjectId;
+      intervals: UserIntervalDTO[];
+    }[];
+  }> {
     const flock = await this.flockService.findOneByCode(flockCode);
-
     if (!flock) {
       throw new NotFoundException(`Invalid flock code: ${flockCode}`);
     }
 
     const availabilitiesToCheck = flock.userFlockAvailability
-      .filter(
-        (userFlockAvailability) =>
-          userFlockAvailability.user.toString() !== currentUser._id.toString() && userFlockAvailability.enabled,
-      )
+      .filter((availability) => !availability.user.equals(currentUser._id) && availability.enabled)
       .map((userFlockAvailability) => userFlockAvailability.userAvailabilityId);
 
     const userAvailabilities = await this.userService.findManyUserAvailability(availabilitiesToCheck);
 
-    const availabilities = [];
-    const { intervals } = flockAvailabilityIntervalInput;
-    for (const availability of userAvailabilities) {
-      const { userId, availabilityDocument } = availability;
-      if (availabilityDocument.type !== 'ical') {
-        continue;
-      }
-
-      const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(
-        [availabilityDocument.uri],
-        intervals,
-      );
-
-      let manualAvailability: ManualAvailabilityInterval[] | null = null;
-      for (const mAvailability of flock.userManualAvailability) {
-        if (mAvailability.user.equals(userId.toString())) {
-          manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
-        }
-      }
-
-      availabilities.push({
-        userId,
-        intervals: intervals.map((interval, i) => ({
-          ...interval,
-          available: manualAvailability?.[i].available ?? icalAvailability[i].available,
-        })),
-      });
+    // Create map of userId => userAvailabilities.
+    const availabilitiesByUser = new Map<Types.ObjectId, UserAvailability[]>();
+    for (const { userId, availabilityDocument } of userAvailabilities) {
+      const availabilities = availabilitiesByUser.get(userId) || [];
+      availabilities.push(availabilityDocument);
+      availabilitiesByUser.set(userId, availabilities);
     }
 
-    return { availabilities };
+    const { intervals } = flockAvailabilityIntervalInput;
+
+    // Given a user's id & availability sources, return the user's calculated availability after applying manual overrides.
+    const getUserAvailability = async ([userId, availabilityDocuments]: [Types.ObjectId, UserAvailability[]]) => {
+      const manualAvailability = flock.userManualAvailability.find((availability) => availability.user.equals(userId));
+      return {
+        userId,
+        intervals: await this.calendarUtil.getAvailabilityIntervals(
+          intervals,
+          availabilityDocuments,
+          manualAvailability?.intervals,
+        ),
+      };
+    };
+
+    return {
+      availabilities: await Promise.all([...availabilitiesByUser.entries()].map(getUserAvailability)),
+    };
   }
 }

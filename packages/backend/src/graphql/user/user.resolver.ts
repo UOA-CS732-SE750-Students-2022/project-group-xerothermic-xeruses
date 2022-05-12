@@ -1,3 +1,4 @@
+import { UserAvailabilityIntervalDTO } from '@flocker/api-types';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
@@ -7,14 +8,11 @@ import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
 import { UserAvailability } from '~/database/user/userAvailability.schema';
-import { UserAvailabilityGoogleCalendarDocument } from '~/database/user/userAvailabilityGoogleCalendar.schema';
-import { UserAvailabilityICalDocument } from '~/database/user/userAvailabilityICal.schema';
 import { UserAvailabilityUtil } from '~/database/user/util/userAvailability.util';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { ValidateUser } from '~/decorators/validate-user-auth.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
-import { ManualAvailabilityInterval } from '~/util/models';
 import { AddUserInput } from './inputs/addUser.input';
 import { UserAvailabilityInput } from './inputs/common/userAvailability.input';
 import { UserAvailabilityIntervalInput } from './inputs/userAvailabilityInterval.input';
@@ -97,62 +95,29 @@ export class UserResolver {
     @Args('flockCode', { type: () => [GraphQLString] }) flockCode: string,
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
-  ) {
+  ): Promise<UserAvailabilityIntervalDTO> {
     const flock = await this.flockService.findOneByCode(flockCode);
-
     if (!flock) {
       throw new NotFoundException(`Invalid flock code: ${flockCode}`);
     } else if (!flock.users.includes(user._id)) {
       throw new BadRequestException('User is not in this flock');
     }
 
-    const { intervals } = userAvailabilityIntervalInput;
-    intervals.forEach((interval) => {
-      const { start, end } = interval;
-      // Ensure the start is after the end of the interval. Everything else should be handled since we are receiving valid dates
-      if (start >= end) {
-        throw new BadRequestException('Invalid interval(s)');
-      }
-    });
-
     const results = await Promise.all(
       availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
     );
     const userAvailabilities = results.flatMap((userDocument) => userDocument?.availability ?? []);
 
-    // ICal URIs.
-    const calendarUris = userAvailabilities
-      .filter((availability): availability is UserAvailabilityICalDocument => availability.type === 'ical')
-      .map((availability) => availability.uri);
-    const icalAvailability = await this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals);
+    const { intervals } = userAvailabilityIntervalInput;
 
-    // Google Calendar.
-    const calendarIdWithRefreshTokens: [string, string][] = userAvailabilities
-      .filter(
-        (availability): availability is UserAvailabilityGoogleCalendarDocument =>
-          availability.type === 'googlecalendar',
-      )
-      .map((availability) => [availability.calendarId, availability.refreshToken]);
-    const googleAvailability = await this.calendarUtil.convertGoogleCalendarToIntervals(
-      calendarIdWithRefreshTokens,
+    const manualAvailability = flock.userManualAvailability.find((availability) => availability.user.equals(user._id));
+    const availability = await this.calendarUtil.getAvailabilityIntervals(
       intervals,
+      userAvailabilities,
+      manualAvailability?.intervals,
     );
 
-    // Manual availability.
-    let manualAvailability: ManualAvailabilityInterval[] | null = null;
-    for (const mAvailability of flock.userManualAvailability) {
-      if (mAvailability.user.equals(user._id)) {
-        manualAvailability = this.calendarUtil.calculateManualAvailability(mAvailability.intervals, intervals);
-      }
-    }
-
-    return {
-      availability: intervals.map((interval, i) => ({
-        ...interval,
-        available:
-          manualAvailability?.[i].available ?? (icalAvailability[i].available && googleAvailability[i].available),
-      })),
-    };
+    return { availability };
   }
 
   @Auth()
