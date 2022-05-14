@@ -1,6 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { useDeviceLanguage } from 'firebase/auth';
 import { type Model, type Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
 import { FLOCK_MODEL_NAME, type Flock, type FlockDocument } from './flock.schema';
