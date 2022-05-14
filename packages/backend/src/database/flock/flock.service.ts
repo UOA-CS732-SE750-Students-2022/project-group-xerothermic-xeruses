@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { useDeviceLanguage } from 'firebase/auth';
 import { type Model, type Types } from 'mongoose';
 import { FlockUtil } from '~/util/flock.util';
 import { FLOCK_MODEL_NAME, type Flock, type FlockDocument } from './flock.schema';
@@ -134,6 +135,57 @@ export class FlockService {
       .findOneAndUpdate(
         { _id, 'userManualAvailability.user': userId },
         { 'userManualAvailability.$.intervals': intervals },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async removeUserFromFlock(
+    _id: Types.ObjectId | string,
+    userId: Types.ObjectId | string,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $pull: {
+            users: { $eq: userId },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async removeUserAvailability(
+    _id: Types.ObjectId | string,
+    userId: Types.ObjectId | string,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $pull: {
+            userFlockAvailability: { user: userId },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async removeUserManualAvailability(
+    _id: Types.ObjectId | string,
+    userId: Types.ObjectId | string,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $pull: {
+            userManualAvailability: { user: userId },
+          },
+        },
         { new: true },
       )
       .exec();
