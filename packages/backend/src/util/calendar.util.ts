@@ -3,6 +3,9 @@ import dayjs, { extend as extendDayjs } from 'dayjs';
 import dayjsTimezonePlugin from 'dayjs/plugin/timezone';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import { async as icalParser, type CalendarResponse, type VEvent } from 'node-ical';
+import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserAvailabilityGoogleCalendarDocument } from '~/database/user/userAvailabilityGoogleCalendar.schema';
+import { UserAvailabilityICalDocument } from '~/database/user/userAvailabilityICal.schema';
 import { GoogleCalendarService } from '~/googleCalendar/googleCalendar.service';
 import { AvailabilityInterval, Interval, ManualAvailabilityInterval } from './models';
 
@@ -104,6 +107,64 @@ export class CalendarUtil {
       }
     }
     return availabilities;
+  }
+
+  public async getAvailabilityIntervals(
+    intervals: Interval[],
+    availabilities: UserAvailability[],
+    availabilityOverrideIntervals: AvailabilityInterval[] | null = null,
+  ): Promise<AvailabilityInterval[]> {
+    // Every interval must have a positive duration..
+    for (const interval of intervals) {
+      if (interval.start >= interval.end) {
+        throw new Error(`Invalid interval: ${JSON.stringify(interval)}`);
+      }
+    }
+
+    const isUserAvailabilityICalDocument = (
+      availability: UserAvailability,
+    ): availability is UserAvailabilityICalDocument => availability.type === 'ical';
+    const isUserAvailabilityGoogleCalendarDocument = (
+      availability: UserAvailability,
+    ): availability is UserAvailabilityGoogleCalendarDocument => availability.type === 'googlecalendar';
+
+    // ICal URIs.
+    const calendarUris = availabilities //
+      .filter(isUserAvailabilityICalDocument)
+      .map((availability) => availability.uri);
+    const icalAvailability = await this.convertIcalToIntervalsFromUris(calendarUris, intervals);
+
+    // Google Calendar.
+    const calendarIdWithRefreshTokens: [string, string][] = availabilities
+      .filter(isUserAvailabilityGoogleCalendarDocument)
+      .map((availability) => [availability.calendarId, availability.refreshToken]);
+    const googleAvailability = await this.convertGoogleCalendarToIntervals(calendarIdWithRefreshTokens, intervals);
+
+    // Manual availability.
+    const overrideAvailability =
+      availabilityOverrideIntervals && this.calculateManualAvailability(availabilityOverrideIntervals, intervals);
+
+    // We rely on the convert/calculate functions returning an array in the same order as
+    // `intervals`. Check that the calculated intervals returned match the expected intervals.
+    for (let i = 0; i < intervals.length; i++) {
+      const { start, end } = intervals[i];
+      if (
+        start !== icalAvailability[i].start ||
+        start !== googleAvailability[i].start ||
+        (overrideAvailability && start !== overrideAvailability[i].start) ||
+        end !== icalAvailability[i].end ||
+        end !== googleAvailability[i].end ||
+        (overrideAvailability && end !== overrideAvailability[i].end)
+      ) {
+        throw new Error('Received invalid intervals when calculating availability.');
+      }
+    }
+
+    return intervals.map((interval, i) => ({
+      ...interval,
+      available:
+        overrideAvailability?.[i].available ?? (icalAvailability[i].available && googleAvailability[i].available),
+    }));
   }
 
   public async convertGoogleCalendarToIntervals(
