@@ -138,4 +138,18 @@ export class UserService {
     await user.save();
     return user;
   }
+
+  async removeFlock(_id: Types.ObjectId | string, flockId: Types.ObjectId | string): Promise<UserDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $pull: {
+            flocks: { $eq: flockId },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
 }

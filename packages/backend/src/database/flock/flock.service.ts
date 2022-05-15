@@ -138,4 +138,55 @@ export class FlockService {
       )
       .exec();
   }
+
+  async removeUserFromFlock(
+    _id: Types.ObjectId | string,
+    userId: Types.ObjectId | string,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $pull: {
+            users: { $eq: userId },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async removeUserAvailability(
+    _id: Types.ObjectId | string,
+    userId: Types.ObjectId | string,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $pull: {
+            userFlockAvailability: { user: userId },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async removeUserManualAvailability(
+    _id: Types.ObjectId | string,
+    userId: Types.ObjectId | string,
+  ): Promise<FlockDocument | null> {
+    return this.model
+      .findByIdAndUpdate(
+        { _id },
+        {
+          $pull: {
+            userManualAvailability: { user: userId },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+  }
 }

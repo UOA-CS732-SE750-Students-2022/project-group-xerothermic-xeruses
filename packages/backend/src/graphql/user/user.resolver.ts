@@ -153,4 +153,20 @@ export class UserResolver {
     // Can't return null, might as well give it a happy boolean.
     return true;
   }
+
+  @Auth()
+  @Mutation(() => UserGraphQLModel)
+  async leaveFlock(@User() user: UserDocument, @Args('flockCode', { type: () => GraphQLString }) flockCode: string) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    } else if (!flock.users.includes(user._id)) {
+      throw new BadRequestException('User is not in this flock');
+    }
+
+    await this.userService.removeFlock(user._id, flock._id);
+    await this.flockService.removeUserFromFlock(flock._id, user._id);
+    await this.flockService.removeUserAvailability(flock._id, user._id);
+    return this.flockService.removeUserManualAvailability(flock._id, user._id);
+  }
 }
