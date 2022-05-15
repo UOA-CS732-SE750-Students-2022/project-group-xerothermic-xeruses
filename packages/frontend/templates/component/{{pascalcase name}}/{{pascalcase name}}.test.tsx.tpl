@@ -2,6 +2,6 @@ import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import {{pascalcase name}} from './{{pascalcase name}}';
 
-test('first test', () => {
+it('should render', () => {
   render(<{{pascalcase name}} prop1="" />);
 });
