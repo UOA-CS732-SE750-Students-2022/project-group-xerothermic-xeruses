@@ -9,6 +9,6 @@
 }
 
 .content {
-  height: fit-content;
+  background-color: white;
   flex: 1;
 }
