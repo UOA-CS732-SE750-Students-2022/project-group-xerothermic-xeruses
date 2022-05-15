@@ -199,9 +199,9 @@ export class UserResolver {
       throw new BadRequestException('User is not in this flock');
     }
 
-    this.userService.removeFlock(user._id, flock._id);
-    this.flockService.removeUserFromFlock(flock._id, user._id);
-    this.flockService.removeUserAvailability(flock._id, user._id);
+    await this.userService.removeFlock(user._id, flock._id);
+    await this.flockService.removeUserFromFlock(flock._id, user._id);
+    await this.flockService.removeUserAvailability(flock._id, user._id);
     return this.flockService.removeUserManualAvailability(flock._id, user._id);
   }
 }
