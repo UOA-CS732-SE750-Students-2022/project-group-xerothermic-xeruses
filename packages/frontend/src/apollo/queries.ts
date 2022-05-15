@@ -51,3 +51,9 @@ export const JOIN_FLOCK = gql`
     }
   }
 `;
+
+export const GET_GOOGLE_CALENDAR_AUTH_URL = gql`
+  query Query {
+    googleCalendarAuthUrl
+  }
+`;
