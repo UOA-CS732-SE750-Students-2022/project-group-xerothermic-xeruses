@@ -1,25 +1,38 @@
+import { MockedProvider } from '@apollo/client/testing';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
+import { GET_GOOGLE_CALENDAR_AUTH_URL } from '../../apollo';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import HomeView from '../HomeView';
 import NotFoundView from './NotFoundView';
 
+const successMocks = [
+  {
+    request: { query: GET_GOOGLE_CALENDAR_AUTH_URL },
+    result: { data: { googleCalendarAuthUrl: 'https://accounts.google.com/o/oauth2/v2/auth?testing' } },
+  },
+];
+
 const renderViewsWithMemory = (goBackLink: string) => {
   render(
-    <MemoryRouter initialEntries={['/bad/route']}>
-      <HomeView />
-      <DashboardLayout />
-      <NotFoundView goBackLink={goBackLink} />
-    </MemoryRouter>,
+    <MockedProvider mocks={successMocks}>
+      <MemoryRouter initialEntries={['/bad/route']}>
+        <HomeView />
+        <DashboardLayout />
+        <NotFoundView goBackLink={goBackLink} />
+      </MemoryRouter>
+    </MockedProvider>,
   );
 };
 
 it('should render', () => {
   const { container } = render(
-    <BrowserRouter>
-      <NotFoundView goBackLink="/" />
-    </BrowserRouter>,
+    <MockedProvider mocks={successMocks}>
+      <BrowserRouter>
+        <NotFoundView goBackLink="/" />
+      </BrowserRouter>
+    </MockedProvider>,
   );
 
   expect(container).toBeVisible();
