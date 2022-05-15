@@ -2,19 +2,11 @@ import { MockedProvider } from '@apollo/client/testing';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { GET_GOOGLE_CALENDAR_AUTH_URL } from '../../apollo';
 import Sidebar from './Sidebar';
-
-const successMocks = [
-  {
-    request: { query: GET_GOOGLE_CALENDAR_AUTH_URL },
-    result: { data: { googleCalendarAuthUrl: 'https://accounts.google.com/o/oauth2/v2/auth?testing' } },
-  },
-];
 
 it('should render', () => {
   const { container } = render(
-    <MockedProvider mocks={successMocks}>
+    <MockedProvider>
       <MemoryRouter>
         <Sidebar />
       </MemoryRouter>
@@ -25,7 +17,7 @@ it('should render', () => {
 
 it("should render the user's name if it is supplied", () => {
   render(
-    <MockedProvider mocks={successMocks}>
+    <MockedProvider>
       <MemoryRouter>
         <Sidebar username="Goose" />
       </MemoryRouter>
@@ -37,7 +29,7 @@ it("should render the user's name if it is supplied", () => {
 
 it('should handle when username is not supplied', () => {
   render(
-    <MockedProvider mocks={successMocks}>
+    <MockedProvider>
       <MemoryRouter>
         <Sidebar />
       </MemoryRouter>
@@ -49,7 +41,7 @@ it('should handle when username is not supplied', () => {
 
 it('should render children', () => {
   render(
-    <MockedProvider mocks={successMocks}>
+    <MockedProvider>
       <MemoryRouter>
         <Sidebar>
           <div role="children">
@@ -64,4 +56,18 @@ it('should render children', () => {
   const child = screen.queryByRole('children');
   expect(child).toBeVisible();
   expect(child?.textContent).toEqual('ParagaphAnother paragraph');
+});
+
+it('should render button to add calendars from Google', () => {
+  render(
+    <MockedProvider>
+      <MemoryRouter>
+        <Sidebar />
+      </MemoryRouter>
+    </MockedProvider>,
+  );
+
+  const elem = screen.queryByText('Add calendars from Google');
+  expect(elem).toBeVisible();
+  expect(elem).toBeInstanceOf(HTMLAnchorElement);
 });
