@@ -188,6 +188,30 @@ describe(FlockService.name, () => {
     expect(updatedAvailability!.intervals[0].available).toEqual(intervals[0].available);
   });
 
+  it('should remove a user from a flock successfully', async () => {
+    const userId = flockDocument.users![0];
+    const flock: FlockDocument | null = await service.removeUserFromFlock(flockDocument._id!, userId);
+
+    expect(flock!.users.length).toEqual(flockDocument.users!.length - 1);
+    expect(flock!.users).not.toContain(userId);
+  });
+
+  it('should remove a user availability from a flock successfully', async () => {
+    const userId = flockDocument.users![0];
+    const flock: FlockDocument | null = await service.removeUserAvailability(flockDocument._id!, userId);
+
+    expect(flock!.userFlockAvailability.length).toEqual(flockDocument.userFlockAvailability!.length - 1);
+    expect(flock!.userFlockAvailability).not.toContain(flockDocument.userFlockAvailability![0]);
+  });
+
+  it('should remove a user manual availability from a flock successfully', async () => {
+    const userId = flockDocument.users![0];
+    const flock: FlockDocument | null = await service.removeUserManualAvailability(flockDocument._id!, userId);
+
+    expect(flock!.userManualAvailability.length).toEqual(flockDocument.userManualAvailability!.length - 1);
+    expect(flock!.userManualAvailability).not.toContain(flockDocument.userManualAvailability![0]);
+  });
+
   it('should delete a flock successfully', async () => {
     const flock: FlockDocument | null = await service.delete(flockDocument._id!);
     checkEquality(flock, flockDocument);
