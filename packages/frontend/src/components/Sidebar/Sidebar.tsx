@@ -3,6 +3,9 @@ import styles from './Sidebar.module.css';
 import Logo from '../Logo';
 import Line from '../Line';
 import StyledNavLink from '../StyledNavLink';
+import { useQuery } from '@apollo/client';
+import { GET_GOOGLE_CALENDAR_AUTH_URL, GoogleCalendarAuthUrlResult } from '../../apollo';
+import StyledExternalLink from '../StyledExternalLink';
 
 type SidebarProps = {
   username?: string | null | undefined;
@@ -19,6 +22,11 @@ const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
     );
   };
 
+  const { loading, data } = useQuery<GoogleCalendarAuthUrlResult>(GET_GOOGLE_CALENDAR_AUTH_URL);
+
+  // TODO: Better detection of mobile devices.
+  const popupOrNewTab = window.screen.availWidth > window.screen.availHeight ? 'popup' : 'new-tab';
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -29,6 +37,12 @@ const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
           </div>
         </div>
         {children}
+        <div className={styles.divider}>
+          <Line />
+        </div>
+        <StyledExternalLink href={(!loading && data?.googleCalendarAuthUrl) || '#'} openIn={popupOrNewTab}>
+          Add calendars from Google
+        </StyledExternalLink>
         <div className={styles.divider}>
           <Line />
         </div>

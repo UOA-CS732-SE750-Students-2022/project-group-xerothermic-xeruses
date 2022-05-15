@@ -1,13 +1,16 @@
+import { MockedProvider } from '@apollo/client/testing';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import DashboardLayout from './DashboardLayout';
 import { BrowserRouter } from 'react-router-dom';
+import DashboardLayout from './DashboardLayout';
 
 it('should render', () => {
   const { container } = render(
-    <BrowserRouter>
-      <DashboardLayout />
-    </BrowserRouter>,
+    <MockedProvider>
+      <BrowserRouter>
+        <DashboardLayout />
+      </BrowserRouter>
+    </MockedProvider>,
   );
   expect(container).toBeVisible();
 });
