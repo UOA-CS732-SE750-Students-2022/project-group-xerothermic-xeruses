@@ -1,3 +1,4 @@
+import { MockedProvider } from '@apollo/client/testing';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
@@ -7,11 +8,13 @@ import NotFoundView from './NotFoundView';
 
 const renderViewsWithMemory = (goBackLink: string) => {
   render(
-    <MemoryRouter initialEntries={['/bad/route']}>
-      <HomeView />
-      <DashboardLayout />
-      <NotFoundView goBackLink={goBackLink} />
-    </MemoryRouter>,
+    <MockedProvider>
+      <MemoryRouter initialEntries={['/bad/route']}>
+        <HomeView />
+        <DashboardLayout />
+        <NotFoundView goBackLink={goBackLink} />
+      </MemoryRouter>
+    </MockedProvider>,
   );
 };
 
