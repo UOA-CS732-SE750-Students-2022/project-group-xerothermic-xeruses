@@ -117,3 +117,20 @@ export const GET_USER_INTERVALS = gql`
     }
   }
 `;
+
+export const GET_FLOCK_INTERVALS = gql`
+  query GetUserIntervalsForFlock(
+    $flockCode: String!
+    $flockAvailabilityIntervalInput: FlockAvailabilityIntervalInput!
+  ) {
+    getUserIntervalsForFlock(flockCode: $flockCode, flockAvailabilityIntervalInput: $flockAvailabilityIntervalInput) {
+      availabilities {
+        intervals {
+          start
+          end
+          available
+        }
+      }
+    }
+  }
+`;

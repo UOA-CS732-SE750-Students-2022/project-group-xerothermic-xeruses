@@ -1,11 +1,18 @@
-import { AddFlockInputDTO, FlockDTO, UserAvailabilityDTO, UserDTO, UserIntervalDTO } from '@flocker/api-types';
+import {
+  AddFlockInputDTO,
+  FlockAvailabilityDTO,
+  FlockDTO,
+  UserAvailabilityIntervalDTO,
+  UserDTO,
+} from '@flocker/api-types';
 
 // Results
 export type GetCurrentUserResult = { getCurrentUser: UserDTO };
 export type AddFlockResult = { addFlock: FlockDTO };
 export type JoinFlockResult = { joinFlock: { flockCode: string } };
 export type GetCurrentFlockResult = { getFlockByCode: FlockDTO };
-export type GetUserIntervalsResult = { getUserIntervals: UserIntervalDTO[] };
+export type GetUserIntervalsResult = { getUserIntervals: UserAvailabilityIntervalDTO };
+export type GetFlockIntervalsResult = { getFlockIntervals: FlockAvailabilityDTO };
 
 // Inputs
 export type AddFlockInput = { addFlockInput: AddFlockInputDTO };
