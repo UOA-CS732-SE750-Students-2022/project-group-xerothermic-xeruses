@@ -133,10 +133,27 @@ const Flock: React.FC = () => {
               userAvailability={userAvailabilities}
               othersAvailability={flockAvailabilities}
             />
+            <Legend />
           </div>
         </>
       }
     />
+  );
+};
+
+const Legend: React.FC = () => {
+  return (
+    <div>
+      <h2>Legend</h2>
+      <div className={styles.legendKeys}>
+        <div className={styles.circleBothAvailable} />
+        <h3>All available</h3>
+        <div className={styles.circleUserAvailable} />
+        <h3>You're available</h3>
+        <div className={styles.circleFlockAvailable} />
+        <h3>Others available</h3>
+      </div>
+    </div>
   );
 };
 
@@ -199,9 +216,6 @@ const CalendarViewSidebar: React.FC = () => {
       <Line />
       <h1 className={styles.sidebarHeadings}>Calendars</h1>
       <CalendarList calendars={calendarList} onUpdate={() => {}} />
-      <div className={styles.importButton}>
-        <Button children={'Import Calendar'} variant="filled" color="white" onClick={() => {}} />
-      </div>
     </div>
   );
 };

@@ -4,11 +4,48 @@
   margin-top: 16px;
 }
 
-.importButton {
-  margin-top: 16px;
-}
-
 .timeMatcher {
   width: 60vw;
   height: 70vh;
+}
+
+h2 {
+  font-size: var(--flocker-font-size-body);
+  font-weight: var(--flocker-font-weight-light);
+  padding: 16px 0 8px 0;
+}
+
+h3 {
+  font-size: var(--flocker-font-size-small);
+  font-weight: var(--flocker-font-weight-light);
+  padding: 0 10px 0 10px;
+}
+
+.legendKeys {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.circleBothAvailable {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--flocker-color-tertiary);
+  opacity: 70%;
+  border-radius: 50%;
+}
+
+.circleUserAvailable {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--flocker-color-secondary);
+  opacity: 70%;
+  border-radius: 50%;
+}
+.circleFlockAvailable {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--flocker-color-primary);
+  opacity: 70%;
+  border-radius: 50%;
 }
