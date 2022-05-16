@@ -83,13 +83,33 @@ export const GET_FLOCK_PARTICIPANTS = gql`
 `;
 
 export const GET_USER_CALENDARS = gql`
-  query GetFlockByCode($flockCode: String!) {
-    getFlockByCode(flockCode: $flockCode) {
-      userFlockAvailability {
-        userAvailability {
-          id
-          name
+  query GetCurrentUser {
+    getCurrentUser {
+      flocks {
+        flockCode
+        userFlockAvailability {
+          userAvailability {
+            id
+            type
+            name
+            uri
+            refreshToken
+            calendarId
+          }
+          enabled
         }
+      }
+    }
+  }
+`;
+
+export const GET_USER_INTERVALS = gql`
+  query GetUserIntervals($availabilityIds: [String!]!, $userIntervalInput: UserAvailabilityIntervalInput!) {
+    getUserIntervals(availabilityIds: $availabilityIds, userIntervalInput: $userIntervalInput) {
+      availability {
+        start
+        end
+        available
       }
     }
   }

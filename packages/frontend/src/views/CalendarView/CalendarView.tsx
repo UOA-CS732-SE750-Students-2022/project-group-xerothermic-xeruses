@@ -7,11 +7,14 @@ import TitleLayout from '../../layouts/TitleLayout';
 import styles from './CalendarView.module.css';
 import {
   GET_USER_FLOCK,
+  GET_USER_FLOCKS,
+  GetCurrentUserResult,
   GetCurrentFlockResult,
   GET_FLOCK_PARTICIPANTS,
-  GetFlockParticipantResult,
   GET_USER_CALENDARS,
-  GetCurrentUserCalendarsResult,
+  GetCurrentUserFlocksResult,
+  GET_USER_INTERVALS,
+  GetUserIntervalsResult,
 } from '../../apollo';
 import { UserAvailabilityPartialDTO } from '../../../../api-types';
 import { CircularProgress } from '@mui/material';
@@ -20,28 +23,41 @@ import ParticipantList from '../../components/ParticipantList';
 import Line from '../../components/Line';
 import CalendarList from '../../components/CalendarList';
 
-type CalendarsProps = {
-  flockId: string;
-};
 type FlockParams = {
   flockCode: string;
 };
 
+type Availability = {
+  start: Date;
+  end: Date;
+  available: boolean;
+};
+
 const Flock: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
-  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
+  const {
+    loading: loadingFlock,
+    error: errorFlock,
+    data: dataFlock,
+  } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
     variables: { flockCode: flockCode },
   });
+  const {
+    loading: loadingUserAvailability,
+    error: errorUserAvailability,
+    data: dataUserAvailability,
+  } = useQuery<GetUserIntervalsResult>(GET_USER_INTERVALS);
+
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
-  if (loading) return <CircularProgress />;
-  if (error) return errorMessage;
+  if (loadingFlock || loadingUserAvailability) return <CircularProgress />;
+  if (errorFlock || errorUserAvailability) return errorMessage;
 
   let flockName = '';
   let datesPicked: Date[] = [];
   let timeRange: [Date, Date] = [new Date(), new Date()];
-  if (data) {
+  if (dataFlock) {
     //dates
-    const { name, flockDays } = data.getFlockByCode;
+    const { name, flockDays } = dataFlock.getFlockByCode;
     flockName = name;
     flockDays.forEach(function (day) {
       const date = new Date(day.start);
@@ -51,7 +67,6 @@ const Flock: React.FC = () => {
     const startTime = new Date(flockDays[0].start);
     const endTime = new Date(flockDays[0].end);
     timeRange = [startTime, endTime];
-    //useravailability
   }
 
   return (
@@ -95,12 +110,14 @@ const FlockParticipantList: React.FC = () => {
 
 const FlockCalendarList: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
-  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_USER_CALENDARS, {
-    variables: { flockCode: flockCode },
-  });
-  const errorMessage = <>Sorry, we couldn't get your calendars :(</>;
+  const { loading, error, data } = useQuery<GetCurrentUserResult>(GET_USER_FLOCKS);
+  const errorMessage = <>Sorry, we couldn't get your calendars</>;
+
   if (loading) return <CircularProgress />;
   if (error) return errorMessage;
+  if (data) {
+    const { flocks } = data.getCurrentUser;
+  }
 
   type Calendar = {
     id: string;
@@ -110,15 +127,6 @@ const FlockCalendarList: React.FC = () => {
   };
 
   let calendars: Calendar[] = [];
-
-  if (data) {
-    const { userFlockAvailability } = data.getFlockByCode;
-    userFlockAvailability.forEach(function (calendar) {
-      const { enabled } = calendar;
-      const { id, name } = calendar.userAvailability as UserAvailabilityPartialDTO;
-      calendars.push({ id, name, enabled, onEnabledChanged: () => {} });
-    });
-  }
 
   return <CalendarList calendars={calendars} onUpdate={() => {}} />;
 };
