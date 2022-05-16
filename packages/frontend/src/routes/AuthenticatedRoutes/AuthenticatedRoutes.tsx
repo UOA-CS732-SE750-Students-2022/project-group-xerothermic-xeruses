@@ -3,7 +3,6 @@ import SignIn from '../../auth/SignIn';
 import SignOut from '../../auth/SignOut';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import CalendarView from '../../views/CalendarView';
-import Calendarview from '../../views/CalendarView';
 import CreateMeetingView from '../../views/CreateMeetingView';
 import MeetingsView from '../../views/MeetingsView';
 import NotFoundView from '../../views/NotFoundView';

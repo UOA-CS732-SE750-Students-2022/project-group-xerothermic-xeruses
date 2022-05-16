@@ -5,7 +5,7 @@ import Timematcher from '../../components/Timematcher';
 import SidebarLayout from '../../layouts/SidebarLayout';
 import TitleLayout from '../../layouts/TitleLayout';
 import styles from './CalendarView.module.css';
-import { GET_USER_FLOCK, GetCurrentFlockResult, GET_FLOCK_PARTICIPANTS, GetFlockParticipantResult } from '../../apollo';
+import { GET_USER_FLOCK, GetCurrentFlockResult, GET_FLOCK_PARTICIPANTS } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import ParticipantList from '../../components/ParticipantList';
@@ -63,8 +63,10 @@ const Flock: React.FC = () => {
 };
 
 const CalendarViewSidebar: React.FC = () => {
-  //Participants list
-  const { loading, error, data } = useQuery<GetFlockParticipantResult>(GET_FLOCK_PARTICIPANTS);
+  const { flockCode } = useParams<FlockParams>();
+  const { loading, error, data } = useQuery<GetCurrentFlockResult>(GET_FLOCK_PARTICIPANTS, {
+    variables: { flockCode: flockCode },
+  });
   const errorMessage = <>Sorry, we couldn't get the participants of the meeting :(</>;
   if (loading) return <CircularProgress />;
   if (error) return errorMessage;
@@ -77,21 +79,20 @@ const CalendarViewSidebar: React.FC = () => {
   let participants: Participant[] = [];
 
   if (data) {
-    const { users } = data.getParticipants;
+    const { users } = data.getFlockByCode;
     users.forEach(function (user) {
       const { id, name } = user;
       participants.push({ id, name });
     });
   }
 
-  //Calendars list
-  //Import calendar
-
   return (
-    <Sidebar>
+    <div>
+      <h1 className={styles.sidebarHeadings}>Participants</h1>
       <ParticipantList participants={participants} />
       <Line />
-    </Sidebar>
+      <h1 className={styles.sidebarHeadings}>Calendars</h1>
+    </div>
   );
 };
 
