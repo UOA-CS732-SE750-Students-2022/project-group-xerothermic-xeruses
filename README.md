@@ -20,6 +20,7 @@ in parallel with one command, or in isolation.
 - GraphQL 
 - NestJS
 - Firebase Auth
+- Mongoose
 - MongoDB
 - Mongo Memory DB
 - Jest 
