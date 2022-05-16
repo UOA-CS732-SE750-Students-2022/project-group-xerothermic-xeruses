@@ -85,16 +85,19 @@ export const GET_FLOCK_PARTICIPANTS = gql`
 export const GET_USER_CALENDARS = gql`
   query GetCurrentUser {
     getCurrentUser {
+      availability {
+        id
+        type
+        name
+        uri
+        refreshToken
+        calendarId
+      }
       flocks {
         flockCode
         userFlockAvailability {
           userAvailability {
             id
-            type
-            name
-            uri
-            refreshToken
-            calendarId
           }
           enabled
         }

@@ -40,6 +40,7 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, onUpdate }) => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   handleChange(e.target.checked, calendar);
                 }}
+                defaultChecked={calendar.enabled}
               />
             }
             label={calendar.name}
