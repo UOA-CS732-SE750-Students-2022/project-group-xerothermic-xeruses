@@ -10,38 +10,45 @@ import {
   GET_FLOCK_PARTICIPANTS,
   GET_USER_CALENDARS,
   GetCurrentUserResult,
+  GET_USER_INTERVALS,
+  GetUserIntervalsResult,
+  /*   GetFlockIntervalsResult,
+  GET_FLOCK_INTERVALS, */
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import ParticipantList from '../../components/ParticipantList';
 import Line from '../../components/Line';
-import { UserAvailabilityPartialDTO } from '@flocker/api-types';
+import { UserAvailabilityPartialDTO, UserIntervalInputDTO } from '@flocker/api-types';
 import CalendarList from '../../components/CalendarList';
 
 type FlockParams = {
   flockCode: string;
 };
 
+type Availability = {
+  start: Date;
+  end: Date;
+  available: boolean;
+};
+
+let availabilityIds: string[] = [];
+
 const Flock: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
-  const {
-    loading: loadingFlock,
-    error: errorFlock,
-    data: dataFlock,
-  } = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
+  const flock = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
     variables: { flockCode: flockCode },
   });
 
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
-  if (loadingFlock) return <CircularProgress />;
-  if (errorFlock) return errorMessage;
 
   let flockName = '';
   let datesPicked: Date[] = [];
   let timeRange: [Date, Date] = [new Date(), new Date()];
-  if (dataFlock) {
+  let intervals: UserIntervalInputDTO[] = [];
+  if (flock.data) {
     //dates
-    const { name, flockDays } = dataFlock.getFlockByCode;
+    const { name, flockDays } = flock.data.getFlockByCode;
     flockName = name;
     flockDays.forEach(function (day) {
       const date = new Date(day.start);
@@ -51,13 +58,60 @@ const Flock: React.FC = () => {
     const startTime = new Date(flockDays[0].start);
     const endTime = new Date(flockDays[0].end);
     timeRange = [startTime, endTime];
+
+    flockDays.forEach(function (day) {
+      let startInterval = new Date(day.start);
+      let endInterval = new Date(day.end);
+      console.log(endInterval);
+      const FIFTEEN_MINUTES = 15 * 60000;
+      while (startInterval < endInterval) {
+        let endPartialInterval = new Date(startInterval.getTime() + FIFTEEN_MINUTES);
+        intervals.push({ start: startInterval, end: endPartialInterval });
+        startInterval = endPartialInterval;
+      }
+    });
   }
+
+  const userIntervals = useQuery<GetUserIntervalsResult>(GET_USER_INTERVALS, {
+    variables: {
+      availabilityIds: availabilityIds,
+      userIntervalInput: { intervals: intervals },
+    },
+  });
+
+  let userAvailabilities: Availability[] = [];
+  if (userIntervals.data) {
+    const { availability } = userIntervals.data.getUserIntervals;
+    availability.forEach(function (avail) {
+      const { start, end, available } = avail;
+      const startInterval = new Date(start);
+      const endInterval = new Date(end);
+      userAvailabilities.push({ start: startInterval, end: endInterval, available });
+    });
+  }
+  /*   let flockAvailabilities: Availability[] = [];
+  const flockIntervals = useQuery<GetFlockIntervalsResult>(GET_FLOCK_INTERVALS, {
+    variables: {
+      flockCode: flockCode,
+      flockAvailabilityIntervalInput: { intervals: intervals },
+    },
+  }); */
+
+  if (flock.loading || userIntervals.loading) return <CircularProgress />;
+  if (flock.error) return errorMessage;
+
+  console.log(userAvailabilities);
 
   return (
     <TitleLayout
       title={flockName}
       content={
-        <Timematcher datesPicked={datesPicked} timeRange={timeRange} userAvailability={[]} othersAvailability={[]} />
+        <Timematcher
+          datesPicked={datesPicked}
+          timeRange={timeRange}
+          userAvailability={userAvailabilities}
+          othersAvailability={userAvailabilities}
+        />
       }
     />
   );
@@ -65,34 +119,26 @@ const Flock: React.FC = () => {
 
 const CalendarViewSidebar: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
-  const {
-    loading: loadingParticipants,
-    error: participantsError,
-    data: participantsData,
-  } = useQuery<GetCurrentFlockResult>(GET_FLOCK_PARTICIPANTS, {
+  const participants = useQuery<GetCurrentFlockResult>(GET_FLOCK_PARTICIPANTS, {
     variables: { flockCode: flockCode },
   });
-  const {
-    loading: loadingCalendars,
-    error: calendarsError,
-    data: calendarsData,
-  } = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS);
+  const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS);
   const errorMessage = <>Sorry, we couldn't get the participants of the meeting :(</>;
-  if (loadingParticipants || loadingCalendars) return <CircularProgress />;
-  if (participantsError || calendarsError) return errorMessage;
+  if (participants.loading || calendars.loading) return <CircularProgress />;
+  if (participants.error || calendars.error) return errorMessage;
 
   type Participant = {
     id: string;
     name: string;
   };
 
-  let participants: Participant[] = [];
+  let participantList: Participant[] = [];
 
-  if (participantsData) {
-    const { users } = participantsData.getFlockByCode;
+  if (participants.data) {
+    const { users } = participants.data.getFlockByCode;
     users.forEach(function (user) {
       const { id, name } = user;
-      participants.push({ id, name });
+      participantList.push({ id, name });
     });
   }
 
@@ -103,9 +149,9 @@ const CalendarViewSidebar: React.FC = () => {
     onEnabledChanged: (enabled: boolean) => void;
   };
 
-  let calendars: Calendar[] = [];
-  if (calendarsData) {
-    const { flocks, availability } = calendarsData.getCurrentUser;
+  let calendarList: Calendar[] = [];
+  if (calendars.data) {
+    const { flocks, availability } = calendars.data.getCurrentUser;
     const userAvailabilityForFlock = flocks.filter((flock) => flock.flockCode === flockCode)[0].userFlockAvailability;
 
     availability.forEach(function (availability) {
@@ -118,18 +164,18 @@ const CalendarViewSidebar: React.FC = () => {
         const enabled = true;
         isEnabled = enabled;
       }
-
-      calendars.push({ name, id, enabled: isEnabled, onEnabledChanged: () => {} });
+      calendarList.push({ name, id, enabled: isEnabled, onEnabledChanged: () => {} });
+      availabilityIds.push(id);
     });
   }
 
   return (
     <div>
       <h1 className={styles.sidebarHeadings}>Participants</h1>
-      <ParticipantList participants={participants} />
+      <ParticipantList participants={participantList} />
       <Line />
       <h1 className={styles.sidebarHeadings}>Calendars</h1>
-      <CalendarList calendars={calendars} onUpdate={() => {}} />
+      <CalendarList calendars={calendarList} onUpdate={() => {}} />
     </div>
   );
 };
