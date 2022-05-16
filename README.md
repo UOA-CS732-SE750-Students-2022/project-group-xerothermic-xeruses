@@ -50,6 +50,11 @@ To run or test the front and backend in isolation, consult the relevant READMEs.
 2. Test
    `npm test`
 
+## Documentation
+All features/improvements were recorded through GitHub Issues and managed using the Flocker project board. Any change to the existing code was reviewed by at least one other team member via pull requests. 
+
+Meeting minutes can be found in the Wiki.
+
 # Contributors
 Backend
 - Matt Moran
