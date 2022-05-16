@@ -199,7 +199,9 @@ const CalendarViewSidebar: React.FC = () => {
       <Line />
       <h1 className={styles.sidebarHeadings}>Calendars</h1>
       <CalendarList calendars={calendarList} onUpdate={() => {}} />
-      <Button variant="filled" color="white" onClick={() => {}} />
+      <div className={styles.importButton}>
+        <Button children={'Import Calendar'} variant="filled" color="white" onClick={() => {}} />
+      </div>
     </div>
   );
 };
