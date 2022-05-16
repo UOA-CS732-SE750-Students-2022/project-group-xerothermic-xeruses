@@ -27,12 +27,13 @@ in parallel with one command, or in isolation.
 ### Frontend
 - TypeScript
 - React
+- Apollo GraphQL client
 - MUI
 - FirebaseUI for auth
 - React Testing Library
 - Jest
 
-## Running the app locally
+## Running Locally
 To run the front and backend simultaneously, follow the steps below. 
 
 To run or test the front and backend in isolation, consult the relevant READMEs.
