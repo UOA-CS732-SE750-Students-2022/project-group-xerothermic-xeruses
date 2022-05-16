@@ -12,8 +12,8 @@ import {
   GetCurrentUserResult,
   GET_USER_INTERVALS,
   GetUserIntervalsResult,
-  /*   GetFlockIntervalsResult,
-  GET_FLOCK_INTERVALS, */
+  GetFlockIntervalsResult,
+  GET_FLOCK_INTERVALS,
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -21,6 +21,7 @@ import ParticipantList from '../../components/ParticipantList';
 import Line from '../../components/Line';
 import { UserAvailabilityPartialDTO, UserIntervalInputDTO } from '@flocker/api-types';
 import CalendarList from '../../components/CalendarList';
+import Button from '../../components/Button';
 
 type FlockParams = {
   flockCode: string;
@@ -31,6 +32,7 @@ type Availability = {
   end: Date;
   available: boolean;
 };
+const FIFTEEN_MINUTES = 15 * 60000;
 
 let availabilityIds: string[] = [];
 
@@ -50,7 +52,7 @@ const Flock: React.FC = () => {
     //dates
     const { name, flockDays } = flock.data.getFlockByCode;
     flockName = name;
-    flockDays.forEach(function (day) {
+    flockDays.forEach((day) => {
       const date = new Date(day.start);
       datesPicked.push(date);
     });
@@ -59,11 +61,10 @@ const Flock: React.FC = () => {
     const endTime = new Date(flockDays[0].end);
     timeRange = [startTime, endTime];
 
-    flockDays.forEach(function (day) {
+    flockDays.forEach((day) => {
       let startInterval = new Date(day.start);
       let endInterval = new Date(day.end);
-      console.log(endInterval);
-      const FIFTEEN_MINUTES = 15 * 60000;
+
       while (startInterval < endInterval) {
         let endPartialInterval = new Date(startInterval.getTime() + FIFTEEN_MINUTES);
         intervals.push({ start: startInterval, end: endPartialInterval });
@@ -82,36 +83,58 @@ const Flock: React.FC = () => {
   let userAvailabilities: Availability[] = [];
   if (userIntervals.data) {
     const { availability } = userIntervals.data.getUserIntervals;
-    availability.forEach(function (avail) {
+    availability.forEach((avail) => {
       const { start, end, available } = avail;
       const startInterval = new Date(start);
       const endInterval = new Date(end);
       userAvailabilities.push({ start: startInterval, end: endInterval, available });
     });
   }
-  /*   let flockAvailabilities: Availability[] = [];
+  let flockAvailabilities: Availability[] = [];
   const flockIntervals = useQuery<GetFlockIntervalsResult>(GET_FLOCK_INTERVALS, {
     variables: {
       flockCode: flockCode,
       flockAvailabilityIntervalInput: { intervals: intervals },
     },
-  }); */
+  });
+
+  if (flockIntervals.data) {
+    const flockAvailabilityMap = new Map<Date, boolean>();
+    const { availabilities } = flockIntervals.data.getUserIntervalsForFlock;
+    if (availabilities.length > 0) {
+      availabilities.forEach((user) => {
+        user.intervals.forEach((interval) => {
+          if (flockAvailabilityMap.has(interval.start)) {
+            //If even one other person in the flock is not available, it will show as unavailable
+            if (flockAvailabilityMap.get(interval.start)) flockAvailabilityMap.set(interval.start, interval.available);
+          }
+        });
+      });
+    }
+
+    flockAvailabilityMap.forEach((value, key) => {
+      const end = new Date(key.getTime() + FIFTEEN_MINUTES);
+      flockAvailabilities.push({ start: key, end: end, available: value });
+    });
+  }
 
   if (flock.loading || userIntervals.loading) return <CircularProgress />;
   if (flock.error) return errorMessage;
-
-  console.log(userAvailabilities);
 
   return (
     <TitleLayout
       title={flockName}
       content={
-        <Timematcher
-          datesPicked={datesPicked}
-          timeRange={timeRange}
-          userAvailability={userAvailabilities}
-          othersAvailability={userAvailabilities}
-        />
+        <>
+          <div className={styles.timeMatcher}>
+            <Timematcher
+              datesPicked={datesPicked}
+              timeRange={timeRange}
+              userAvailability={userAvailabilities}
+              othersAvailability={flockAvailabilities}
+            />
+          </div>
+        </>
       }
     />
   );
@@ -136,7 +159,7 @@ const CalendarViewSidebar: React.FC = () => {
 
   if (participants.data) {
     const { users } = participants.data.getFlockByCode;
-    users.forEach(function (user) {
+    users.forEach((user) => {
       const { id, name } = user;
       participantList.push({ id, name });
     });
@@ -154,7 +177,7 @@ const CalendarViewSidebar: React.FC = () => {
     const { flocks, availability } = calendars.data.getCurrentUser;
     const userAvailabilityForFlock = flocks.filter((flock) => flock.flockCode === flockCode)[0].userFlockAvailability;
 
-    availability.forEach(function (availability) {
+    availability.forEach((availability) => {
       const { id, name } = availability as UserAvailabilityPartialDTO;
       let isEnabled = false;
       const availabilityForFlock = userAvailabilityForFlock.filter(
@@ -176,6 +199,7 @@ const CalendarViewSidebar: React.FC = () => {
       <Line />
       <h1 className={styles.sidebarHeadings}>Calendars</h1>
       <CalendarList calendars={calendarList} onUpdate={() => {}} />
+      <Button variant="filled" color="white" onClick={() => {}} />
     </div>
   );
 };

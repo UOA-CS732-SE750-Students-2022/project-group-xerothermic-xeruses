@@ -12,7 +12,7 @@ export type AddFlockResult = { addFlock: FlockDTO };
 export type JoinFlockResult = { joinFlock: { flockCode: string } };
 export type GetCurrentFlockResult = { getFlockByCode: FlockDTO };
 export type GetUserIntervalsResult = { getUserIntervals: UserAvailabilityIntervalDTO };
-export type GetFlockIntervalsResult = { getFlockIntervals: FlockAvailabilityDTO };
+export type GetFlockIntervalsResult = { getUserIntervalsForFlock: FlockAvailabilityDTO };
 
 // Inputs
 export type AddFlockInput = { addFlockInput: AddFlockInputDTO };

@@ -1,8 +1,7 @@
 .table {
-  display: inline-block;
-  width: fit-content;
+  display: block;
   max-width: 80vw;
-  max-height: 50vh;
+  max-height: 80vh;
 }
 
 .time {
@@ -14,7 +13,7 @@
 }
 
 .tableContent {
-  width: max-content;
+  width: 100%;
   height: max-content;
 }
 

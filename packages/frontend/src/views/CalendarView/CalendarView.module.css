@@ -3,3 +3,8 @@
   font-weight: var(--flocker-font-weight-light);
   margin-top: 16px;
 }
+
+.timeMatcher {
+  width: 60vw;
+  height: 70vh;
+}
