@@ -19,6 +19,7 @@ type Availability = {
   end: Date;
   available: boolean;
 };
+const FIFTEEN_MINUTES = 15 * 60000;
 
 const generateDates = (dates: Date[]) =>
   new Map(
@@ -30,8 +31,8 @@ const generateTimes = (times: [Date, Date]) => {
   const [startTime, endTime] = times;
   timeMap.set(formatTime(startTime), startTime);
   let time = startTime;
-  const FIFTEEN_MINUTES = 15 * 60000;
-  while (time < endTime) {
+  const actualEndTime = new Date(endTime.getTime() - FIFTEEN_MINUTES);
+  while (time < actualEndTime) {
     let newTime = new Date(time.getTime() + FIFTEEN_MINUTES);
     let newTimeString = formatTime(newTime);
     timeMap.set(newTimeString, newTime);
