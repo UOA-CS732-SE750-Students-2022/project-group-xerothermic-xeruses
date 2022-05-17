@@ -8,6 +8,7 @@
 
 .listItem {
   padding-left: 0;
+  padding-right: 0;
 }
 
 .name {
@@ -19,4 +20,6 @@
 .avatar {
   background-color: white;
   color: var(--flocker-color-primary);
+  width: 2rem;
+  height: 2rem;
 }
