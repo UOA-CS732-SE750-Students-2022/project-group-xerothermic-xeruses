@@ -132,7 +132,8 @@ export const GET_FLOCK_INTERVALS = gql`
         }
       }
     }
-   `;
+  }
+`;
 
 export const GET_GOOGLE_CALENDAR_AUTH_URL = gql`
   query Query {
