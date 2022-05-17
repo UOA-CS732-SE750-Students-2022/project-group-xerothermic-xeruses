@@ -1,3 +1,4 @@
+import { UserAvailabilityIntervalDTO } from '@flocker/api-types';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Args, Query, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 // eslint-disable-next-line import/no-unresolved
@@ -91,34 +92,32 @@ export class UserResolver {
   async getUserIntervals(
     @User() user: UserDocument,
     @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
+    @Args('flockCode', { type: () => [GraphQLString] }) flockCode: string,
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
-  ) {
-    const calendarUris = (
-      await Promise.all(
-        availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
-      )
-    )
-      .flatMap((userDocument) => (userDocument ? userDocument.availability : []))
-      .flatMap((availability) => {
-        if (availability.type === 'ical') {
-          return availability.uri;
-        }
-        return [];
-      });
+  ): Promise<UserAvailabilityIntervalDTO> {
+    const flock = await this.flockService.findOneByCode(flockCode);
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    } else if (!flock.users.includes(user._id)) {
+      throw new BadRequestException('User is not in this flock');
+    }
+
+    const results = await Promise.all(
+      availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
+    );
+    const userAvailabilities = results.flatMap((userDocument) => userDocument?.availability ?? []);
 
     const { intervals } = userAvailabilityIntervalInput;
-    intervals.forEach((interval) => {
-      const { start, end } = interval;
-      // Ensure the start is after the end of the interval. Everything else should be handled since we are receiving valid dates
-      if (start >= end) {
-        throw new BadRequestException('Invalid interval(s)');
-      }
-    });
 
-    return {
-      availability: this.calendarUtil.convertIcalToIntervalsFromUris(calendarUris, intervals),
-    };
+    const manualAvailability = flock.userManualAvailability.find((availability) => availability.user.equals(user._id));
+    const availability = await this.calendarUtil.getAvailabilityIntervals(
+      intervals,
+      userAvailabilities,
+      manualAvailability?.intervals,
+    );
+
+    return { availability };
   }
 
   @Auth()
@@ -153,5 +152,21 @@ export class UserResolver {
 
     // Can't return null, might as well give it a happy boolean.
     return true;
+  }
+
+  @Auth()
+  @Mutation(() => UserGraphQLModel)
+  async leaveFlock(@User() user: UserDocument, @Args('flockCode', { type: () => GraphQLString }) flockCode: string) {
+    const flock = await this.flockService.findOneByCode(flockCode);
+    if (!flock) {
+      throw new NotFoundException(`Invalid flock code: ${flockCode}`);
+    } else if (!flock.users.includes(user._id)) {
+      throw new BadRequestException('User is not in this flock');
+    }
+
+    await this.userService.removeFlock(user._id, flock._id);
+    await this.flockService.removeUserFromFlock(flock._id, user._id);
+    await this.flockService.removeUserAvailability(flock._id, user._id);
+    return this.flockService.removeUserManualAvailability(flock._id, user._id);
   }
 }

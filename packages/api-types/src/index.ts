@@ -7,6 +7,7 @@ export * from './userAvailabilityICal';
 export * from './userSettings';
 export * from './userInterval';
 export * from './userFlockAvailability';
+export * from './userManualAvailability';
 export * from './flockAvailability';
 
 export * from './mutations/index';

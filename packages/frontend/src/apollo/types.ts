@@ -13,6 +13,8 @@ export type JoinFlockResult = { joinFlock: { flockCode: string } };
 export type GetCurrentFlockResult = { getFlockByCode: FlockDTO };
 export type GetUserIntervalsResult = { getUserIntervals: UserAvailabilityIntervalDTO };
 export type GetFlockIntervalsResult = { getUserIntervalsForFlock: FlockAvailabilityDTO };
+export type GoogleCalendarAuthUrlResult = { googleCalendarAuthUrl: string };
+
 
 // Inputs
 export type AddFlockInput = { addFlockInput: AddFlockInputDTO };

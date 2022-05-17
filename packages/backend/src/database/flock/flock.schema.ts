@@ -6,6 +6,7 @@ import {
   UserFlockAvailabilityDocument,
   UserFlockAvailabilitySchema,
 } from './userFlockAvailability.schema';
+import { UserManualAvailabilityDocument, UserManualAvailabilitySchema } from './userManualAvailability.schema';
 
 export const FLOCK_MODEL_NAME = 'Flock';
 
@@ -18,6 +19,7 @@ export interface Flock {
   flockCode: string;
   users: Types.ObjectId[];
   userFlockAvailability: UserFlockAvailability[];
+  userManualAvailability: UserManualAvailabilityDocument[];
 }
 
 @Schema()
@@ -36,6 +38,9 @@ class FlockClass implements Flock {
 
   @Prop({ type: [UserFlockAvailabilitySchema], required: true })
   userFlockAvailability!: UserFlockAvailabilityDocument[];
+
+  @Prop({ type: [UserManualAvailabilitySchema], required: true })
+  userManualAvailability!: UserManualAvailabilityDocument[];
 }
 
 /**
