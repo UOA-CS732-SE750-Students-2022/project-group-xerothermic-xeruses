@@ -23,6 +23,11 @@ const calendar2: Calendar = {
   onEnabledChanged: () => {},
 };
 
+beforeEach(() => {
+  calendar1.enabled = false;
+  calendar2.enabled = false;
+});
+
 it('should render', () => {
   const { container } = render(<CalendarList calendars={[]} onUpdate={() => {}} />);
   expect(container).toBeVisible();

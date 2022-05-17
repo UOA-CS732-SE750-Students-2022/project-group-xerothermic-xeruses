@@ -82,6 +82,9 @@ it('should render multiple times', () => {
   const time2 = new Date('05/04/2022');
   time2.setHours(9, 15, 0, 0);
 
+  const time3 = new Date('05/04/2022');
+  time3.setHours(9, 30, 0, 0);
+
   type Availability = {
     start: Date;
     end: Date;
@@ -94,12 +97,18 @@ it('should render multiple times', () => {
     available: true,
   };
 
-  const freeTimes = [freeTime1];
+  const freeTime2: Availability = {
+    start: time2,
+    end: time3,
+    available: true,
+  };
+
+  const freeTimes = [freeTime1, freeTime2];
 
   render(
     <Timematcher
       datesPicked={[new Date('05/04/2022')]}
-      timeRange={[time1, time2]}
+      timeRange={[time1, time3]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
     />,
