@@ -2,12 +2,12 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import Logo from './Logo';
 
-test('exists', () => {
+it('should render', () => {
   const { container } = render(<Logo size="footer" />);
   expect(container).toBeInTheDocument();
 });
 
-test('applies correct color class names', () => {
+it('should apply correct color class names', () => {
   render(<Logo size="footer" colored />);
   render(<Logo size="footer" />);
   const logos = screen.getAllByText('Flocker');
@@ -16,7 +16,7 @@ test('applies correct color class names', () => {
   expect(logos[1]).not.toHaveClass('colored');
 });
 
-test('applies correct sizing class names', () => {
+it('should apply correct sizing class names', () => {
   render(<Logo size="footer" />);
   render(<Logo size="display" />);
   const logos = screen.getAllByText('Flocker');
