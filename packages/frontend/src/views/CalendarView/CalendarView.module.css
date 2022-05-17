@@ -1,5 +1,5 @@
 .sidebarHeadings {
-  font-size: var(--flocker-font-size-subtitle);
+  font-size: var(--flocker-font-size-medium);
   font-weight: var(--flocker-font-weight-light);
   margin-top: 16px;
 }
