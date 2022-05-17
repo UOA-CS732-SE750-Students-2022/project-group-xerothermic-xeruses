@@ -214,16 +214,23 @@ const CalendarView: React.FC = () => {
         user.intervals.forEach((interval) => {
           if (flockAvailabilityMap.has(interval.start)) {
             //If even one other person in the flock is not available, it will show as unavailable
-            if (flockAvailabilityMap.get(interval.start)) flockAvailabilityMap.set(interval.start, interval.available);
+            if (flockAvailabilityMap.get(interval.start)) {
+              flockAvailabilityMap.set(interval.start, interval.available);
+            }
+          } else {
+            flockAvailabilityMap.set(interval.start, interval.available);
           }
         });
       });
     }
 
     flockAvailabilityMap.forEach((value, key) => {
-      const end = new Date(key.getTime() + FIFTEEN_MINUTES);
-      flockAvailabilities.push({ start: key, end: end, available: value });
+      const date = new Date(key);
+      const end = new Date(date.getTime() + FIFTEEN_MINUTES);
+      flockAvailabilities.push({ start: date, end: end, available: value });
     });
+
+    console.log(flockAvailabilities);
   }
 
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
