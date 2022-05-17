@@ -107,8 +107,12 @@ export const GET_USER_CALENDARS = gql`
 `;
 
 export const GET_USER_INTERVALS = gql`
-  query GetUserIntervals($availabilityIds: [String!]!, $userIntervalInput: UserAvailabilityIntervalInput!) {
-    getUserIntervals(availabilityIds: $availabilityIds, userIntervalInput: $userIntervalInput) {
+  query GetUserIntervals(
+    $availabilityIds: [String!]!
+    $flockCode: [String!]!
+    $userIntervalInput: UserAvailabilityIntervalInput!
+  ) {
+    getUserIntervals(availabilityIds: $availabilityIds, flockCode: $flockCode, userIntervalInput: $userIntervalInput) {
       availability {
         start
         end

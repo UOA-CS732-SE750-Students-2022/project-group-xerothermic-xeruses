@@ -183,6 +183,7 @@ const CalendarView: React.FC = () => {
   //User and Flock interval queries placed here so availabilityIds and interval data retrieved first
   const userIntervals = useQuery<GetUserIntervalsResult>(GET_USER_INTERVALS, {
     variables: {
+      flockCode: flockCode,
       availabilityIds: availabilityIds,
       userIntervalInput: { intervals: intervals },
     },
