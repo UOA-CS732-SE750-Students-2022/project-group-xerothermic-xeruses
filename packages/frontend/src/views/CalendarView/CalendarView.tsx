@@ -139,7 +139,7 @@ const CalendarView: React.FC = () => {
       if (availabilityForFlock) {
         isEnabled = true;
       }
-      console.log(isEnabled);
+
       calendarList.push({
         name,
         id,
