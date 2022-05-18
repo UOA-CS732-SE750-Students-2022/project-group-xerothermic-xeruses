@@ -8,3 +8,66 @@
 .divider {
   width: 150%;
 }
+
+.modal {
+  padding: 2em;
+  background-color: white;
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  min-width: 500px;
+}
+
+form > div {
+  width: 100%;
+}
+
+h1 {
+  margin-bottom: 0.5em;
+}
+
+label {
+  display: block;
+}
+
+input {
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 0.8em;
+  padding: 0.5em;
+  font-size: var(--flocker-font-size-small);
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid var(--flocker-color-primary);
+  box-shadow: 0 0 2px var(--flocker-color-primary);
+}
+
+.errorText {
+  color: red;
+  font-size: var(--flocker-font-size-small);
+  margin-bottom: 1em;
+  font-style: italic;
+}
+
+.modalSignInLink,
+.modalSignUpLink {
+  color: var(--flocker-color-primary);
+}
+
+.modalFooterText {
+  font-size: var(--flocker-font-size-small);
+}
+
+.hideForm {
+  display: none;
+}
