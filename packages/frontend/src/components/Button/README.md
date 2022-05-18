@@ -25,6 +25,11 @@ A Flocker button with multiple variants and colors. Use where needed.
 - default: `'primary'`
 - description: The primary color is the Flocker primary color.
 
+`type` - _optional_
+
+- type: `'button'` | `'submit'` | `'reset'`
+- description: The type of the button.
+
 `style` - _optional_
 
 - type: `React.CSSProperties`

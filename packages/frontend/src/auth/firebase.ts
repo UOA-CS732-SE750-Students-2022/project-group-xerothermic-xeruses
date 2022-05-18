@@ -1,5 +1,12 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from 'firebase/auth';
 
 const firebaseConfigEnv = process.env.REACT_APP_FIREBASE_CONFIG_JSON;
 if (!firebaseConfigEnv) {
@@ -17,6 +24,15 @@ export const auth = getAuth(app);
 export const signInWithGoogle = () => {
   const provider = new GoogleAuthProvider();
   signInWithPopup(auth, provider);
+};
+
+export const signUpWithEmail = async (email: string, password: string, displayName: string) => {
+  const user = await createUserWithEmailAndPassword(auth, email, password);
+  await updateProfile(user.user, { displayName });
+};
+
+export const signInWithEmail = async (email: string, password: string) => {
+  await signInWithEmailAndPassword(auth, email, password);
 };
 
 export const signOut = () => auth.signOut();
