@@ -16,9 +16,8 @@ const AuthenticatedRoutes = () => (
       <Route path="meetings" element={<MeetingsView />} />
       <Route path="create-meeting" element={<CreateMeetingView />} />
     </Route>
-    <Route path="/:flockCode">
-      <Route index element={<Navigate to="calendar" />} />
-      <Route path="calendar" element={<CalendarView />} />
+    <Route path="/meeting/:flockCode">
+      <Route index element={<CalendarView />} />
     </Route>
     <Route path="/signout" element={<SignOut />} />
     <Route path="*" element={<NotFoundView goBackLink="/dashboard" />} />
