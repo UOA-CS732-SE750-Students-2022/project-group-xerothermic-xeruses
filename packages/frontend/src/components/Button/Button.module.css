@@ -3,6 +3,7 @@
   border: none;
   border-radius: 2em;
   font-weight: var(--flocker-font-weight-light);
+  font-size: var(--flocker-font-size-small);
   transition: ease-in-out 0.2s;
 }
 

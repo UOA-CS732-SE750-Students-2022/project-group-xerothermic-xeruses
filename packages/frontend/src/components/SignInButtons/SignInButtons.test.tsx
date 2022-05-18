@@ -7,7 +7,7 @@ it('should render', () => {
   render(<SignInButtons />);
   expect(screen.getByText('Sign in with Google')).toBeVisible();
   expect(screen.getByText('or')).toBeVisible();
-  expect(screen.getByText('Continue as Guest')).toBeVisible();
+  expect(screen.getByText('Continue with Email')).toBeVisible();
 });
 
 it('should sign in with google', () => {

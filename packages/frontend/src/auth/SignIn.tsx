@@ -27,7 +27,7 @@ const SignIn: React.FC = () => {
     if (errorCode === '404' && user) {
       // User does not exist
       await createFlockerUser(user);
-      navigate('/dashboard', { replace: true });
+      getCurrentUser();
     } else {
       navigate('/', { replace: true }); // TODO: redirect to an "account could not be created" page
     }

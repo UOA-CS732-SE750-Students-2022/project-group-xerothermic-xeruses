@@ -6,11 +6,13 @@ type ButtonProps = {
   variant?: ButtonVariant;
   color?: ButtonColor;
   style?: React.CSSProperties;
+  type?: ButtonType;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 type ButtonVariant = 'filled' | 'outlined';
 type ButtonColor = 'primary' | 'black' | 'white';
+type ButtonType = 'button' | 'submit' | 'reset';
 
 const computeVariantClass = (variant: ButtonVariant): string => {
   if (variant === 'filled') return styles.filled;
@@ -25,11 +27,11 @@ const computeColorClass = (color: ButtonColor): string => {
   return '';
 };
 
-const Button = ({ children, onClick, variant = 'filled', color = 'black', style }: ButtonProps) => {
+const Button = ({ children, onClick, variant = 'filled', color = 'black', style, type }: ButtonProps) => {
   const variantClass = computeVariantClass(variant);
   const colorClass = computeColorClass(color);
   return (
-    <button className={`${styles.button} ${variantClass} ${colorClass}`} onClick={onClick} style={style}>
+    <button className={`${styles.button} ${variantClass} ${colorClass}`} onClick={onClick} style={style} type={type}>
       {children}
     </button>
   );

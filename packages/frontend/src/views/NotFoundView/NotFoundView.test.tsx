@@ -39,7 +39,7 @@ it('should take the user back to the home page when they are unauthenticated', (
 
   // Ensure we go back to the home page
   expect(screen.getByText('Sign in with Google')).toBeInTheDocument();
-  expect(screen.getByText('Continue as Guest')).toBeInTheDocument();
+  expect(screen.getByText('Continue with Email')).toBeInTheDocument();
 });
 
 it('should take the user back to the dashboard when they are authenticated', () => {
