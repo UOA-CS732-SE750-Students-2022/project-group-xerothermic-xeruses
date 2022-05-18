@@ -98,8 +98,6 @@ const Legend: React.FC = () => {
 const CalendarView: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
 
-  const [flockCodeStr, setFlockCodestr] = useState(flockCode ?? '');
-
   const flock = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_USER_FLOCK, {
     variables: { flockCode: flockCode as string },
   });
