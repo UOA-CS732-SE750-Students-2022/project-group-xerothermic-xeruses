@@ -17,6 +17,7 @@ import {
   UPDATE_CALENDAR_ENABLEMENT,
   UpdateCalendarEnablementResult,
   UpdateCalendarEnablementInput,
+  GetFlockInput,
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -97,12 +98,14 @@ const Legend: React.FC = () => {
 const CalendarView: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
 
-  const flock = useQuery<GetCurrentFlockResult>(GET_USER_FLOCK, {
-    variables: { flockCode: flockCode },
+  const [flockCodeStr, setFlockCodestr] = useState(flockCode ?? '');
+
+  const flock = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_USER_FLOCK, {
+    variables: { flockCode: flockCode as string },
   });
 
-  const participants = useQuery<GetCurrentFlockResult>(GET_FLOCK_PARTICIPANTS, {
-    variables: { flockCode: flockCode },
+  const participants = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_FLOCK_PARTICIPANTS, {
+    variables: { flockCode: flockCode as string },
   });
   const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS);
 
@@ -111,22 +114,17 @@ const CalendarView: React.FC = () => {
     name,
   }));
 
-  const [updateCalendarEnablement, { loading: updateCalendarEnablementLoading }] = useMutation<
-    UpdateCalendarEnablementResult,
-    UpdateCalendarEnablementInput
-  >(UPDATE_CALENDAR_ENABLEMENT, {
-    onError: () => setErrorText("Sorry, we couldn't update your calendars"),
-  });
+  const [updateCalendarEnablement, { loading: updateCalendarEnablementLoading, reset: updateCalendarEnablementReset }] =
+    useMutation<UpdateCalendarEnablementResult, UpdateCalendarEnablementInput>(UPDATE_CALENDAR_ENABLEMENT, {});
 
   const handleUpdateCalendarEnablement = (id: string, enabled: boolean) => {
     updateCalendarEnablement({
       variables: {
-        updateAvailabilityEnablement: {
-          flockCode: flockCode as string,
-          userFlockAvailabilityInput: { userAvailabilityId: id, enabled: enabled },
-        },
+        flockCode: flockCode || '',
+        userFlockAvailabilityInput: { userAvailabilityId: id, enabled: enabled },
       },
     });
+    updateCalendarEnablementReset();
   };
   let calendarList: Calendar[] = [];
   let availabilityIds: string[] = [];
@@ -143,7 +141,13 @@ const CalendarView: React.FC = () => {
       if (availabilityForFlock) {
         isEnabled = true;
       }
-      calendarList.push({ name, id, enabled: isEnabled, onEnabledChanged: handleUpdateCalendarEnablement });
+      console.log(isEnabled);
+      calendarList.push({
+        name,
+        id,
+        enabled: isEnabled,
+        onEnabledChanged: handleUpdateCalendarEnablement,
+      });
       availabilityIds.push(id);
     });
   }
@@ -277,6 +281,3 @@ const CalendarView: React.FC = () => {
 };
 
 export default CalendarView;
-function setErrorText(arg0: string): void {
-  throw new Error('Function not implemented.');
-}

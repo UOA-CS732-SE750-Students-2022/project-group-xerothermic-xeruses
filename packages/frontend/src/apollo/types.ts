@@ -20,6 +20,8 @@ export type UpdateCalendarEnablementResult = { updateAvailabilityEnablement: Flo
 // Inputs
 export type AddFlockInput = { addFlockInput: AddFlockInputDTO };
 export type JoinFlockInput = { flockCode: string };
+export type GetFlockInput = { flockCode: string };
 export type UpdateCalendarEnablementInput = {
-  updateAvailabilityEnablement: { flockCode: string; userFlockAvailabilityInput: UserFlockAvailabilityInputDTO };
+  flockCode: string;
+  userFlockAvailabilityInput: UserFlockAvailabilityInputDTO;
 };
