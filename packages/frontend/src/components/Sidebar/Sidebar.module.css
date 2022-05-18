@@ -1,13 +1,11 @@
 .container {
   height: 100%;
-  width: 250px;
   background-color: var(--flocker-color-primary);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
-  padding-top: 36px;
+  padding: 2em;
   color: white;
 }
 

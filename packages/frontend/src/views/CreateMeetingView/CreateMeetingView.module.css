@@ -38,6 +38,7 @@
   border: 1px solid black;
   border-radius: 0.8em;
   padding: 0.5em;
+  font-size: var(--flocker-font-size-small);
 }
 
 .meetingName input:invalid {
