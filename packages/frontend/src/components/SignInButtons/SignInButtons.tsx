@@ -5,7 +5,6 @@ import Line from '../Line';
 import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../../auth/firebase';
 import { Modal } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
-import { style } from '@mui/system';
 
 type ModalProps = {
   open: boolean;
