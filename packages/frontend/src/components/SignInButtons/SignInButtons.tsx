@@ -50,7 +50,7 @@ const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
       sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
     >
       <div className={styles.modal}>
-        <div className={showSignUp ? '' : styles.hideForm}>
+        <div className={showSignUp ? '' : styles.hide}>
           <h1>Sign Up</h1>
           <p className={styles.errorText}>{signUpErrorText}</p>
           <form className={styles.form} onSubmit={signUp}>
@@ -90,14 +90,14 @@ const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
             </Button>
             <p className={styles.modalFooterText}>
               Already have an account?{' '}
-              <a href="#" className={styles.modalSignInLink} onClick={() => setShowSignUp(false)}>
+              <button className={styles.modalSignInLink} onClick={() => setShowSignUp(false)}>
                 Sign in
-              </a>
+              </button>
             </p>
           </form>
         </div>
 
-        <div className={showSignUp ? styles.hideForm : ''}>
+        <div className={showSignUp ? styles.hide : ''}>
           <h1>Sign In</h1>
           <p className={styles.errorText}>{signInErrorText}</p>
           <form className={styles.form} onSubmit={signIn}>
@@ -126,9 +126,9 @@ const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
             </Button>
             <p className={styles.modalFooterText}>
               Don't have an account?{' '}
-              <a href="#" className={styles.modalSignUpLink} onClick={() => setShowSignUp(true)}>
+              <button className={styles.modalSignUpLink} onClick={() => setShowSignUp(true)}>
                 Sign up
-              </a>
+              </button>
             </p>
           </form>
         </div>

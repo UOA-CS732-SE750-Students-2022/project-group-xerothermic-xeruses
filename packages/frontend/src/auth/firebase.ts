@@ -28,7 +28,7 @@ export const signInWithGoogle = () => {
 
 export const signUpWithEmail = async (email: string, password: string, displayName: string) => {
   const user = await createUserWithEmailAndPassword(auth, email, password);
-  updateProfile(user.user, { displayName });
+  await updateProfile(user.user, { displayName });
 };
 
 export const signInWithEmail = async (email: string, password: string) => {

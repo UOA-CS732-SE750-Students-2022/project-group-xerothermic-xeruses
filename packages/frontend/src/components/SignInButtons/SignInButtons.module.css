@@ -62,12 +62,16 @@ input:focus {
 .modalSignInLink,
 .modalSignUpLink {
   color: var(--flocker-color-primary);
+  border: none;
+  background: none;
+  text-decoration: underline;
+  font-size: inherit;
 }
 
 .modalFooterText {
   font-size: var(--flocker-font-size-small);
 }
 
-.hideForm {
+.hide {
   display: none;
 }
