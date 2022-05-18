@@ -83,11 +83,11 @@ const Legend: React.FC = () => {
     <div>
       <h2>Legend</h2>
       <div className={styles.legendKeys}>
-        <div className={(styles.circleAvailability, styles.circleBothAvailable)} />
+        <div className={`${styles.circleAvailability} ${styles.circleBothAvailable}`} />
         <h3>All available</h3>
-        <div className={(styles.circleAvailability, styles.circleUserAvailable)} />
+        <div className={`${styles.circleAvailability} ${styles.circleUserAvailable}`} />
         <h3>You're available</h3>
-        <div className={(styles.circleAvailability, styles.circleFlockAvailable)} />
+        <div className={`${styles.circleAvailability} ${styles.circleFlockAvailable}`} />
         <h3>Others available</h3>
       </div>
     </div>
