@@ -26,25 +26,20 @@ h3 {
   align-items: center;
 }
 
-.circleBothAvailable {
+.circleAvailability {
   width: 2rem;
   height: 2rem;
-  background-color: var(--flocker-color-tertiary);
+  background-color: var(--flocker-circle-availability-color);
   opacity: 70%;
   border-radius: 50%;
+}
+.circleBothAvailable {
+  background-color: var(--flocker-color-tertiary);
 }
 
 .circleUserAvailable {
-  width: 2rem;
-  height: 2rem;
   background-color: var(--flocker-color-secondary);
-  opacity: 70%;
-  border-radius: 50%;
 }
 .circleFlockAvailable {
-  width: 2rem;
-  height: 2rem;
   background-color: var(--flocker-color-primary);
-  opacity: 70%;
-  border-radius: 50%;
 }
