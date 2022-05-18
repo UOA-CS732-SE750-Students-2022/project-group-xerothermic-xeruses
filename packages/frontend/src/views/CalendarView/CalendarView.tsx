@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import React, { useState } from 'react';
 import Timematcher from '../../components/Timematcher';
 import SidebarLayout from '../../layouts/SidebarLayout';
@@ -14,6 +14,9 @@ import {
   GetUserIntervalsResult,
   GetFlockIntervalsResult,
   GET_FLOCK_INTERVALS,
+  UPDATE_CALENDAR_ENABLEMENT,
+  UpdateCalendarEnablementResult,
+  UpdateCalendarEnablementInput,
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -32,7 +35,7 @@ type Calendar = {
   name: string;
   id: string;
   enabled: boolean;
-  onEnabledChanged: (enabled: boolean) => void;
+  onEnabledChanged: (id: string, enabled: boolean) => void;
 };
 
 type Participant = {
@@ -103,15 +106,28 @@ const CalendarView: React.FC = () => {
   });
   const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS);
 
-  let participantList: Participant[] = [];
-  if (participants.data) {
-    const { users } = participants.data.getFlockByCode;
-    users.forEach((user) => {
-      const { id, name } = user;
-      participantList.push({ id, name });
-    });
-  }
+  const participantList: Participant[] = (participants.data?.getFlockByCode?.users ?? []).map(({ id, name }) => ({
+    id,
+    name,
+  }));
 
+  const [updateCalendarEnablement, { loading: updateCalendarEnablementLoading }] = useMutation<
+    UpdateCalendarEnablementResult,
+    UpdateCalendarEnablementInput
+  >(UPDATE_CALENDAR_ENABLEMENT, {
+    onError: () => setErrorText("Sorry, we couldn't update your calendars"),
+  });
+
+  const handleUpdateCalendarEnablement = (id: string, enabled: boolean) => {
+    updateCalendarEnablement({
+      variables: {
+        updateAvailabilityEnablement: {
+          flockCode: flockCode as string,
+          userFlockAvailabilityInput: { userAvailabilityId: id, enabled: enabled },
+        },
+      },
+    });
+  };
   let calendarList: Calendar[] = [];
   let availabilityIds: string[] = [];
   if (calendars.data) {
@@ -127,7 +143,7 @@ const CalendarView: React.FC = () => {
       if (availabilityForFlock) {
         isEnabled = true;
       }
-      calendarList.push({ name, id, enabled: isEnabled, onEnabledChanged: () => {} });
+      calendarList.push({ name, id, enabled: isEnabled, onEnabledChanged: handleUpdateCalendarEnablement });
       availabilityIds.push(id);
     });
   }
@@ -141,10 +157,7 @@ const CalendarView: React.FC = () => {
     //dates
     const { name, flockDays } = flock.data.getFlockByCode;
     flockName = name;
-    flockDays.forEach((day) => {
-      const date = new Date(day.start);
-      datesPicked.push(date);
-    });
+    datesPicked = flockDays.map((day) => new Date(day.start));
     //timerange
     const startTime = new Date(flockDays[0].start);
     const endTime = new Date(flockDays[0].end);
@@ -153,7 +166,7 @@ const CalendarView: React.FC = () => {
     //make intervals which represent every cell
     flockDays.forEach((day) => {
       let startInterval = new Date(day.start);
-      let endInterval = new Date(day.end);
+      const endInterval = new Date(day.end);
       while (startInterval < endInterval) {
         let endPartialInterval = new Date(startInterval.getTime() + FIFTEEN_MINUTES);
         intervals.push({ start: startInterval, end: endPartialInterval });
@@ -230,15 +243,13 @@ const CalendarView: React.FC = () => {
       const end = new Date(date.getTime() + FIFTEEN_MINUTES);
       flockAvailabilities.push({ start: date, end: end, available: value });
     });
-
-    console.log(flockAvailabilities);
   }
 
   const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
   if (participants.loading || calendars.loading) return <CircularProgress />;
   if (participants.error || calendars.error) return errorMessage;
 
-  if (flock.loading || userIntervals.loading) return <CircularProgress />;
+  if (flock.loading || userIntervals.loading || updateCalendarEnablementLoading) return <CircularProgress />;
   if (flock.error) return errorMessage;
 
   return (
@@ -266,3 +277,6 @@ const CalendarView: React.FC = () => {
 };
 
 export default CalendarView;
+function setErrorText(arg0: string): void {
+  throw new Error('Function not implemented.');
+}

@@ -12,13 +12,13 @@ type Calendar = {
   name: string;
   id: string;
   enabled: boolean;
-  onEnabledChanged: (enabled: boolean) => void;
+  onEnabledChanged: (id: string, enabled: boolean) => void;
 };
 
 const CalendarList: React.FC<CalendarListProps> = ({ calendars, onUpdate }) => {
   const handleChange = (checked: boolean, calendar: Calendar) => {
     calendar.enabled = checked;
-    calendar.onEnabledChanged(checked);
+    calendar.onEnabledChanged(calendar.id, checked);
     onUpdate(calendars);
   };
 

@@ -139,6 +139,14 @@ export const GET_FLOCK_INTERVALS = gql`
   }
 `;
 
+export const UPDATE_CALENDAR_ENABLEMENT = gql`
+  mutation Mutation($flockCode: String!, $userFlockAvailabilityInput: UserFlockAvailabilityInput!) {
+    updateAvailabilityEnablement(flockCode: $flockCode, userFlockAvailabilityInput: $userFlockAvailabilityInput) {
+      flockCode
+    }
+  }
+`;
+
 export const GET_GOOGLE_CALENDAR_AUTH_URL = gql`
   query Query {
     googleCalendarAuthUrl

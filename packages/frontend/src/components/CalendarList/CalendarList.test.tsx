@@ -6,7 +6,7 @@ type Calendar = {
   name: string;
   id: string;
   enabled: boolean;
-  onEnabledChanged: (enabled: boolean) => void;
+  onEnabledChanged: (id: string, enabled: boolean) => void;
 };
 
 const calendar1: Calendar = {
