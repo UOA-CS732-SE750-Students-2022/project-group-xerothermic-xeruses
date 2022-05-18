@@ -18,7 +18,11 @@ const Datepicker = ({ datesPicked }: DatepickerProps) => {
   };
 
   const footer =
-    days && days.length > 0 ? <p>You selected {days.length} day(s).</p> : <p>Please pick one or more days.</p>;
+    days && days.length > 0 ? (
+      <p className={customStyles.footer}>You selected {days.length} day(s).</p>
+    ) : (
+      <p className={customStyles.footer}>Please pick one or more days.</p>
+    );
 
   return (
     <div>

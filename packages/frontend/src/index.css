@@ -40,20 +40,14 @@
   }
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (min-width: 1366px) {
   :root {
     font-size: 18px;
   }
 }
 
-@media screen and (min-width: 1920px) {
-  :root {
-    font-size: 22px;
-  }
-}
-
 @media screen and (min-width: 2560px) {
   :root {
-    font-size: 26px;
+    font-size: 22px;
   }
 }

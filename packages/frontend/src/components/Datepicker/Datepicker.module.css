@@ -6,3 +6,8 @@
   background-color: var(--flocker-color-primary);
   color: white;
 }
+
+.footer {
+  font-size: var(--flocker-font-size-small);
+  margin-top: 1em;
+}
