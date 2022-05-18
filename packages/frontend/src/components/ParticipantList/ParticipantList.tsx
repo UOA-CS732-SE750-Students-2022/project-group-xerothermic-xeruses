@@ -24,7 +24,7 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants }) => (
     <List className={styles.listContent}>
       {Array.from(participants as Participant[]).map((participant) => (
         <ListItem className={styles.listItem} key={participant.id}>
-          <ListItemAvatar>
+          <ListItemAvatar sx={{ '&': { minWidth: 45 } }}>
             <Avatar className={`${styles.avatar}`}>{getFirstLetter(participant.name)}</Avatar>
           </ListItemAvatar>
           <ListItemText className={styles.name} primary={`${participant.name}`} />

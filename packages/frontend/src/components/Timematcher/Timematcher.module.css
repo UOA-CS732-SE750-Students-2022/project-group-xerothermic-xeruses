@@ -1,8 +1,7 @@
 .table {
-  display: inline-block;
-  width: fit-content;
+  display: block;
   max-width: 80vw;
-  max-height: 50vh;
+  max-height: 70vh;
 }
 
 .time {
@@ -10,11 +9,11 @@
   position: sticky;
   background-color: white;
   left: 0;
-  z-index: 2;
+  z-index: 3;
 }
 
 .tableContent {
-  width: max-content;
+  width: 100%;
   height: max-content;
 }
 
@@ -29,7 +28,7 @@
   position: sticky;
   background-color: white;
   left: 0;
-  z-index: 800;
+  z-index: 2;
 }
 
 .dates {

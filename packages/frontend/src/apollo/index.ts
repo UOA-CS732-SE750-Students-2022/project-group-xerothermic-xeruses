@@ -39,7 +39,21 @@ const httpLink = new HttpLink({
  * @returns the Apollo client
  */
 export const useApolloClient = (user: User | null) => {
-  const [client] = useState(new ApolloClient({ cache: new InMemoryCache() }));
+  const [client] = useState(
+    new ApolloClient({
+      cache: new InMemoryCache({
+        typePolicies: {
+          Query: {
+            fields: {
+              getFlockByCode: {
+                merge: true,
+              },
+            },
+          },
+        },
+      }),
+    }),
+  );
 
   // If the user changes, reset the authorization header, and clear the cache
   // so that queries can be rerun on the new user.

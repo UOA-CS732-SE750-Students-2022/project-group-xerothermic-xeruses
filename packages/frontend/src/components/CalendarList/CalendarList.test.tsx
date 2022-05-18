@@ -6,7 +6,7 @@ type Calendar = {
   name: string;
   id: string;
   enabled: boolean;
-  onEnabledChanged: (enabled: boolean) => void;
+  onEnabledChanged: (id: string, enabled: boolean) => void;
 };
 
 const calendar1: Calendar = {
@@ -22,6 +22,11 @@ const calendar2: Calendar = {
   enabled: false,
   onEnabledChanged: () => {},
 };
+
+beforeEach(() => {
+  calendar1.enabled = false;
+  calendar2.enabled = false;
+});
 
 it('should render', () => {
   const { container } = render(<CalendarList calendars={[]} onUpdate={() => {}} />);

@@ -19,6 +19,7 @@ type Availability = {
   end: Date;
   available: boolean;
 };
+const FIFTEEN_MINUTES = 15 * 60000;
 
 const generateDates = (dates: Date[]) =>
   new Map(
@@ -30,8 +31,8 @@ const generateTimes = (times: [Date, Date]) => {
   const [startTime, endTime] = times;
   timeMap.set(formatTime(startTime), startTime);
   let time = startTime;
-  const FIFTEEN_MINUTES = 15 * 60000;
-  while (time < endTime) {
+  const actualEndTime = new Date(endTime.getTime() - FIFTEEN_MINUTES);
+  while (time < actualEndTime) {
     let newTime = new Date(time.getTime() + FIFTEEN_MINUTES);
     let newTimeString = formatTime(newTime);
     timeMap.set(newTimeString, newTime);
@@ -62,6 +63,9 @@ const isAvailable = (
     if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
       userAvailable = userAvailability[i].available;
     }
+  }
+
+  for (let i = 0; i < othersAvailability.length; i++) {
     if (othersAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
       othersAvailable = othersAvailability[i].available;
     }
@@ -93,40 +97,38 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
   };
 
   return (
-    <div>
-      <TableContainer component={Paper} className={styles.table}>
-        <Table stickyHeader className={styles.tableContent}>
-          <TableHead>
-            <TableRow className={styles.headerRow} key={rowKey++}>
-              <TableCell className={(styles.dates, styles.time)} key={cellKey++}>
-                Time
+    <TableContainer component={Paper} className={styles.table}>
+      <Table stickyHeader className={styles.tableContent}>
+        <TableHead>
+          <TableRow className={styles.headerRow} key={rowKey++}>
+            <TableCell className={(styles.dates, styles.time)} key={cellKey++}>
+              Time
+            </TableCell>
+            {Array.from(dates.keys()).map((date) => (
+              <TableCell align="center" className={styles.dates} key={cellKey++}>
+                {date}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {Array.from(times.keys()).map((time) => (
+            <TableRow key={rowKey++}>
+              <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
+                {time}
               </TableCell>
               {Array.from(dates.keys()).map((date) => (
-                <TableCell align="center" className={styles.dates} key={cellKey++}>
-                  {date}
-                </TableCell>
+                <TableCell
+                  className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
+                  key={cellKey++}
+                  data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
+                />
               ))}
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.from(times.keys()).map((time) => (
-              <TableRow key={rowKey++}>
-                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
-                  {time}
-                </TableCell>
-                {Array.from(dates.keys()).map((date) => (
-                  <TableCell
-                    className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
-                    key={cellKey++}
-                    data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
-                  />
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
