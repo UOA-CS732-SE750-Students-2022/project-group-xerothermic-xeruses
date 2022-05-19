@@ -114,7 +114,7 @@ export class UserResolver {
     const availability = await this.calendarUtil.getAvailabilityIntervals(
       intervals,
       userAvailabilities,
-      manualAvailability?.intervals,
+      manualAvailability,
     );
 
     return { availability };

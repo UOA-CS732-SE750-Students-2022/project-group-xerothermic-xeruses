@@ -3,11 +3,13 @@ import dayjs, { extend as extendDayjs } from 'dayjs';
 import dayjsTimezonePlugin from 'dayjs/plugin/timezone';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import { async as icalParser, type CalendarResponse, type VEvent } from 'node-ical';
-import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserManualAvailabilityDocument } from '~/database/flock/userManualAvailability.schema';
+import { UserAvailability, UserAvailabilityDocument } from '~/database/user/userAvailability.schema';
 import { UserAvailabilityGoogleCalendarDocument } from '~/database/user/userAvailabilityGoogleCalendar.schema';
 import { UserAvailabilityICalDocument } from '~/database/user/userAvailabilityICal.schema';
 import { GoogleCalendarService } from '~/googleCalendar/googleCalendar.service';
-import { AvailabilityInterval, Interval, ManualAvailabilityInterval } from './models';
+import { Availability, AvailabilityInterval, Interval, ManualAvailabilityInterval } from './models';
+import { Types } from 'mongoose';
 
 // Timezone handling, see https://day.js.org/docs/en/plugin/timezone.
 extendDayjs(dayjsUtcPlugin);
@@ -19,62 +21,76 @@ const MILLISECONDS_IN_ONE_DAY = 86400000;
 export class CalendarUtil {
   public constructor(private readonly googleCalendarService: GoogleCalendarService) {}
 
-  async convertIcalToIntervalsFromUris(uris: string[], intervals: Interval[]): Promise<AvailabilityInterval[]> {
-    const calendars = await Promise.all(uris.map((uri) => icalParser.fromURL(uri)));
-    return this.convertIcalToIntervals(calendars, intervals);
+  async convertIcalToIntervalsFromUris(
+    icalIdUris: [Types.ObjectId, string][],
+    intervals: Interval[],
+  ): Promise<AvailabilityInterval[]> {
+    const calendars = await Promise.all(icalIdUris.map(([_id, uri]) => icalParser.fromURL(uri)));
+    const icalCalendars = icalIdUris.map(([_id], index) => ({ _id, calendar: calendars[index] }));
+    return this.convertIcalToIntervals(icalCalendars, intervals);
   }
 
-  convertIcalToIntervals(calendars: CalendarResponse[], intervals: Interval[]): AvailabilityInterval[] {
-    const events = calendars.flatMap((event) => Object.values(event));
+  convertIcalToIntervals(
+    calendars: { _id: Types.ObjectId; calendar: CalendarResponse }[],
+    intervals: Interval[],
+  ): AvailabilityInterval[] {
+    const calendarEvents = calendars.map(({ _id, calendar }) => ({ events: Object.values(calendar), _id }));
 
-    const availabilityIntervals: boolean[] = new Array(intervals.length).fill(true);
-    for (const event of events) {
-      if (event.type !== 'VEVENT') {
-        continue;
-      }
+    const availability: AvailabilityInterval[] = intervals.map((interval) => ({
+      ...interval,
+      availability: calendars.map(({ _id }) => ({ id: _id, available: true, manual: false })),
+    }));
 
-      const vevent = event as VEvent;
+    let i = 0;
+    for (const calendarEvent of calendarEvents) {
+      const { events } = calendarEvent;
 
-      const allOccurences: Date[] = [];
-      intervals.forEach((interval, index) => {
-        const { start, end } = interval;
-
-        const eventDuration = vevent.end.getTime() - vevent.start.getTime();
-
-        // If the event is date only, it means it is an all day event e.g. Christmas
-        if (event.datetype === 'date' && this.isDuringInterval(vevent.start, start, end, MILLISECONDS_IN_ONE_DAY)) {
-          availabilityIntervals[index] = false;
-          // If the event is recurring, we need to check if it occurs during the interval
-        } else if (vevent.rrule) {
-          const eventsAtInterval = vevent.rrule.between(start, end, true);
-
-          // If there are one or more events, then the user is unavailable
-          if (eventsAtInterval.length > 0) {
-            eventsAtInterval.forEach((recurringEvent) => {
-              if (recurringEvent.getTime() !== end.getTime()) {
-                availabilityIntervals[index] = false;
-              }
-            });
-
-            allOccurences.push(...eventsAtInterval);
-          } else {
-            allOccurences.forEach((recurringEvent) => {
-              if (this.startsBeforeOrAtInterval(recurringEvent, start, eventDuration)) {
-                availabilityIntervals[index] = false;
-              }
-            });
-          }
-          // If the event is not recurring check if it occurs during the interval
-        } else if (this.isDuringInterval(vevent.start, start, end, eventDuration)) {
-          availabilityIntervals[index] = false;
+      for (const event of events) {
+        if (event.type !== 'VEVENT') {
+          continue;
         }
-      });
+
+        const vevent = event as VEvent;
+
+        const allOccurences: Date[] = [];
+        intervals.forEach((interval, index) => {
+          const { start, end } = interval;
+
+          const eventDuration = vevent.end.getTime() - vevent.start.getTime();
+
+          // If the event is date only, it means it is an all day event e.g. Christmas
+          if (event.datetype === 'date' && this.isDuringInterval(vevent.start, start, end, MILLISECONDS_IN_ONE_DAY)) {
+            availability[index].availability[i].available = false;
+            // If the event is recurring, we need to check if it occurs during the interval
+          } else if (vevent.rrule) {
+            const eventsAtInterval = vevent.rrule.between(start, end, true);
+
+            // If there are one or more events, then the user is unavailable
+            if (eventsAtInterval.length > 0) {
+              eventsAtInterval.forEach((recurringEvent) => {
+                if (recurringEvent.getTime() !== end.getTime()) {
+                  availability[index].availability[i].available = false;
+                }
+              });
+
+              allOccurences.push(...eventsAtInterval);
+            } else {
+              allOccurences.forEach((recurringEvent) => {
+                if (this.startsBeforeOrAtInterval(recurringEvent, start, eventDuration)) {
+                  availability[index].availability[i].available = false;
+                }
+              });
+            }
+            // If the event is not recurring check if it occurs during the interval
+          } else if (this.isDuringInterval(vevent.start, start, end, eventDuration)) {
+            availability[index].availability[i].available = false;
+          }
+        });
+      }
+      i++;
     }
 
-    return intervals.map((interval, index) => ({
-      ...interval,
-      available: availabilityIntervals[index],
-    }));
+    return availability;
   }
 
   private startsBeforeOrAtInterval(event: Date, intervalStart: Date, eventDuration: number): boolean {
@@ -86,12 +102,17 @@ export class CalendarUtil {
   }
 
   calculateManualAvailability(
-    manualAvailability: AvailabilityInterval[],
+    manualAvailability: UserManualAvailabilityDocument[],
     intervals: Interval[],
   ): ManualAvailabilityInterval[] {
     const availabilities: ManualAvailabilityInterval[] = intervals.map((interval) => ({
       ...interval,
       available: null,
+    }));
+
+    const availability: AvailabilityInterval[] = intervals.map((interval) => ({
+      ...interval,
+      availability: calendars.map(({ _id }) => ({ id: _id, available: true, manual: false })),
     }));
 
     for (const mAvailability of manualAvailability) {
@@ -111,8 +132,8 @@ export class CalendarUtil {
 
   public async getAvailabilityIntervals(
     intervals: Interval[],
-    availabilities: UserAvailability[],
-    availabilityOverrideIntervals: AvailabilityInterval[] | null = null,
+    availabilities: UserAvailabilityDocument[],
+    availabilityOverrideIntervals: UserManualAvailabilityDocument | undefined = undefined,
   ): Promise<AvailabilityInterval[]> {
     // Every interval must have a positive duration..
     for (const interval of intervals) {
@@ -129,15 +150,15 @@ export class CalendarUtil {
     ): availability is UserAvailabilityGoogleCalendarDocument => availability.type === 'googlecalendar';
 
     // ICal URIs.
-    const calendarUris = availabilities //
+    const calendarUris: [Types.ObjectId, string][] = availabilities //
       .filter(isUserAvailabilityICalDocument)
-      .map((availability) => availability.uri);
+      .map((availability) => [availability._id, availability.uri]);
     const icalAvailability = await this.convertIcalToIntervalsFromUris(calendarUris, intervals);
 
     // Google Calendar.
-    const calendarIdWithRefreshTokens: [string, string][] = availabilities
+    const calendarIdWithRefreshTokens: [Types.ObjectId, string, string][] = availabilities
       .filter(isUserAvailabilityGoogleCalendarDocument)
-      .map((availability) => [availability.calendarId, availability.refreshToken]);
+      .map((availability) => [availability._id, availability.calendarId, availability.refreshToken]);
     const googleAvailability = await this.convertGoogleCalendarToIntervals(calendarIdWithRefreshTokens, intervals);
 
     // Manual availability.
@@ -160,15 +181,28 @@ export class CalendarUtil {
       }
     }
 
-    return intervals.map((interval, i) => ({
-      ...interval,
-      available:
-        overrideAvailability?.[i].available ?? (icalAvailability[i].available && googleAvailability[i].available),
-    }));
+    return intervals.map((interval, i) => {
+      const intervalAvailability = { ...interval, availability: [] };
+      const icalAvailabilityInterval = icalAvailability[i];
+      const googleAvailabilityInterval = googleAvailability[i];
+      const manualAvailabilityInterval = overrideAvailability && overrideAvailability[i];
+
+      if (overrideAvailability?.[i]) {
+        intervalAvailability.availability.push({
+          ...overrideAvailability[i],
+        });
+      }
+
+      return {
+        ...interval,
+        available:
+          overrideAvailability?.[i].available ?? (icalAvailability[i].available && googleAvailability[i].available),
+      };
+    });
   }
 
   public async convertGoogleCalendarToIntervals(
-    calendarIdWithRefreshTokens: [string, string][],
+    idCalendarIdWithRefreshTokens: [Types.ObjectId, string, string][],
     intervals: Interval[],
   ): Promise<AvailabilityInterval[]> {
     if (intervals.length === 0) {
@@ -194,9 +228,17 @@ export class CalendarUtil {
     timeMax.setDate(timeMax.getDate() + 1);
 
     const oAuth2Client = this.googleCalendarService.createOAuth2Client();
-    const availabilities = intervals.map((interval) => ({ ...interval, available: true }));
+    const availabilities = intervals.map((interval) => ({
+      ...interval,
+      availability: idCalendarIdWithRefreshTokens.map(([id]) => ({
+        id,
+        available: true,
+        manual: false,
+      })),
+    }));
 
-    for (const [calendarId, refreshToken] of calendarIdWithRefreshTokens) {
+    let i = 0;
+    for (const [_id, calendarId, refreshToken] of idCalendarIdWithRefreshTokens) {
       oAuth2Client.setCredentials({ refresh_token: refreshToken });
       const { events, defaultTimeZone } = await this.googleCalendarService.getCalendarEvents(
         oAuth2Client,
@@ -231,10 +273,11 @@ export class CalendarUtil {
 
         for (const availability of availabilities) {
           if (start.isBefore(availability.end) && end.isAfter(availability.start)) {
-            availability.available = false;
+            availability.availability[i].available = false;
           }
         }
       }
+      i++;
     }
 
     return availabilities;
