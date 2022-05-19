@@ -250,7 +250,6 @@ const CalendarView: React.FC = () => {
   const getUserCalendarsContent = () => {
     if (calendars.loading) return <CircularProgress />;
     if (calendars.error) return <p>Sorry, an error occured</p>;
-    console.log(calendarList);
     return <CalendarList calendars={calendarList} onUpdate={setUserCalendarList} />;
   };
 
