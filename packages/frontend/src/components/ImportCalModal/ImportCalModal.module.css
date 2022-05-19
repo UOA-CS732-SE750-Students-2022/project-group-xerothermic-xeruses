@@ -41,9 +41,16 @@ input:focus {
   box-shadow: 0 0 2px var(--flocker-color-primary);
 }
 
+.statusText {
+  font-size: var(--flocker-font-size-small);
+  margin-bottom: 0.2em;
+  font-style: italic;
+}
+
 .successText {
   color: green;
-  font-size: var(--flocker-font-size-small);
-  margin-bottom: 1em;
-  font-style: italic;
+}
+
+.errorText {
+  color: red;
 }

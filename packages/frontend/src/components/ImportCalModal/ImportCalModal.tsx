@@ -11,9 +11,11 @@ const ImportCalModal: React.FC<ImportCalModalProps> = ({ open, onClose }) => {
   const [name, setName] = useState<string>('');
   const [icalLink, setIcalLink] = useState<string>('');
   const [importSuccessText, setImportSuccessText] = useState<string>('');
+  const [importErrorText, setImportErrorText] = useState<string>('');
 
-  const [importCal, { loading }] = useMutation<AddiCalResult, AddiCalInput>(ADD_ICAL, {
+  const [importCal] = useMutation<AddiCalResult, AddiCalInput>(ADD_ICAL, {
     onCompleted: () => setImportSuccessText('Import successful'),
+    onError: () => setImportErrorText('Sorry, something went wrong :('),
   });
 
   const importCalendar = (e: React.FormEvent) => {
@@ -30,7 +32,8 @@ const ImportCalModal: React.FC<ImportCalModalProps> = ({ open, onClose }) => {
     >
       <div className={styles.modal}>
         <h1>Import Calendar</h1>
-        <p className={styles.successText}>{importSuccessText}</p>
+        <p className={`${styles.successText} ${styles.statusText}`}>{importSuccessText}</p>
+        <p className={`${styles.errorText} ${styles.statusText}`}>{importErrorText}</p>
         <form className={styles.form} onSubmit={importCalendar}>
           <div>
             <label htmlFor="calendar-name">Name</label>
