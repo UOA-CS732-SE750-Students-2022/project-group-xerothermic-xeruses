@@ -51,31 +51,23 @@ type FlockParams = {
 const FIFTEEN_MINUTES = 15 * 60000;
 
 type FlockProps = {
-  flockName: string;
   datesPicked: Date[];
   timeRange: [Date, Date];
   userAvailability: Availability[];
   othersAvailability: Availability[];
 };
 
-const Flock: React.FC<FlockProps> = ({ flockName, datesPicked, timeRange, userAvailability, othersAvailability }) => {
+const Flock: React.FC<FlockProps> = ({ datesPicked, timeRange, userAvailability, othersAvailability }) => {
   return (
-    <TitleLayout
-      title={flockName}
-      content={
-        <>
-          <div className={styles.timeMatcher}>
-            <Timematcher
-              datesPicked={datesPicked}
-              timeRange={timeRange}
-              userAvailability={userAvailability}
-              othersAvailability={othersAvailability}
-            />
-            <Legend />
-          </div>
-        </>
-      }
-    />
+    <div className={styles.timeMatcher}>
+      <Timematcher
+        datesPicked={datesPicked}
+        timeRange={timeRange}
+        userAvailability={userAvailability}
+        othersAvailability={othersAvailability}
+      />
+      <Legend />
+    </div>
   );
 };
 
@@ -112,8 +104,10 @@ const CalendarView: React.FC = () => {
     name,
   }));
 
-  const [updateCalendarEnablement, { loading: updateCalendarEnablementLoading, reset: updateCalendarEnablementReset }] =
-    useMutation<UpdateCalendarEnablementResult, UpdateCalendarEnablementInput>(UPDATE_CALENDAR_ENABLEMENT, {});
+  const [updateCalendarEnablement, { reset: updateCalendarEnablementReset }] = useMutation<
+    UpdateCalendarEnablementResult,
+    UpdateCalendarEnablementInput
+  >(UPDATE_CALENDAR_ENABLEMENT, {});
 
   const handleUpdateCalendarEnablement = (id: string, enabled: boolean) => {
     updateCalendarEnablement({
@@ -247,33 +241,46 @@ const CalendarView: React.FC = () => {
     });
   }
 
-  const errorMessage = <>Sorry, we couldn't get your meeting :(</>;
-  if (participants.loading || calendars.loading) return <CircularProgress />;
-  if (participants.error || calendars.error) return errorMessage;
+  const getParticipantsContent = () => {
+    if (participants.loading) return <CircularProgress />;
+    if (participants.error) return <p>Sorry, an error occured</p>;
+    return <ParticipantList participants={participantList} />;
+  };
 
-  if (flock.loading || userIntervals.loading || updateCalendarEnablementLoading) return <CircularProgress />;
-  if (flock.error) return errorMessage;
+  const getUserCalendarsContent = () => {
+    if (calendars.loading) return <CircularProgress />;
+    if (calendars.error) return <p>Sorry, an error occured</p>;
+    console.log(calendarList);
+    return <CalendarList calendars={calendarList} onUpdate={setUserCalendarList} />;
+  };
+
+  const getFlockContent = () => {
+    if (flock.loading || userIntervals.loading || flockIntervals.loading) return <CircularProgress />;
+    if (flock.error || userIntervals.error || flockIntervals.error) return <p>Sorry, an error occured</p>;
+    return (
+      <Flock
+        datesPicked={datesPicked}
+        timeRange={timeRange}
+        userAvailability={userAvailabilities}
+        othersAvailability={flockAvailabilities}
+      />
+    );
+  };
 
   return (
     <SidebarLayout
       sidebarContent={
         <div>
           <h1 className={styles.sidebarHeadings}>Participants</h1>
-          <ParticipantList participants={participantList} />
-          <Line />
+          {getParticipantsContent()}
+          <div className={styles.sidebarDivider}>
+            <Line />
+          </div>
           <h1 className={styles.sidebarHeadings}>Calendars</h1>
-          <CalendarList calendars={calendarList} onUpdate={() => setUserCalendarList(calendarList)} />
+          {getUserCalendarsContent()}
         </div>
       }
-      bodyContent={
-        <Flock
-          flockName={flockName}
-          datesPicked={datesPicked}
-          timeRange={timeRange}
-          userAvailability={userAvailabilities}
-          othersAvailability={flockAvailabilities}
-        />
-      }
+      bodyContent={<TitleLayout title={flockName} content={getFlockContent()} />}
     />
   );
 };

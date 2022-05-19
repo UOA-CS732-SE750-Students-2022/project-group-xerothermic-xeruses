@@ -40,6 +40,11 @@ h3 {
 .circleUserAvailable {
   background-color: var(--flocker-color-secondary);
 }
+
 .circleFlockAvailable {
   background-color: var(--flocker-color-primary);
+}
+
+.sidebarDivider {
+  margin-top: 8px;
 }
