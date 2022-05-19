@@ -126,21 +126,19 @@ const CalendarView: React.FC = () => {
 
     availability.forEach((availability) => {
       const { id, name } = availability as UserAvailabilityPartialDTO;
-      let isEnabled = false;
-      const availabilityForFlock = userAvailabilityForFlock.filter(
-        (userAvailability) => userAvailability.userAvailability === availability,
+      const availabilityForFlock = userAvailabilityForFlock.find(
+        (userAvailability) => (userAvailability.userAvailability as UserAvailabilityPartialDTO).id === id,
       );
-      if (availabilityForFlock) {
-        isEnabled = true;
-      }
+      const enabled = !!availabilityForFlock?.enabled;
 
       calendarList.push({
         name,
         id,
-        enabled: isEnabled,
+        enabled,
         onEnabledChanged: handleUpdateCalendarEnablement,
       });
-      availabilityIds.push(id);
+
+      if (enabled) availabilityIds.push(id);
     });
   }
 
