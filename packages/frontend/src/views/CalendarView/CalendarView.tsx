@@ -18,6 +18,13 @@ import {
   UpdateCalendarEnablementResult,
   UpdateCalendarEnablementInput,
   GetFlockInput,
+  GET_CURRENT_USER_NAME,
+  JoinFlockResult,
+  JoinFlockInput,
+  JOIN_FLOCK,
+  LeaveFlockResult,
+  LeaveFlockInput,
+  LEAVE_FLOCK,
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -25,6 +32,9 @@ import ParticipantList from '../../components/ParticipantList';
 import Line from '../../components/Line';
 import { UserAvailabilityPartialDTO, UserIntervalInputDTO } from '@flocker/api-types';
 import CalendarList from '../../components/CalendarList';
+import { start } from 'repl';
+import Button from '../../components/Button';
+import { errorPrefix } from '@firebase/util';
 
 type Availability = {
   start: Date;
@@ -88,11 +98,15 @@ const Legend: React.FC = () => {
 };
 
 const CalendarView: React.FC = () => {
+  let userInFlock = true;
+
   const { flockCode } = useParams<FlockParams>();
 
   const flock = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_USER_FLOCK, {
     variables: { flockCode: flockCode as string },
   });
+
+  const user = useQuery<GetCurrentUserResult>(GET_CURRENT_USER_NAME);
 
   const participants = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_FLOCK_PARTICIPANTS, {
     variables: { flockCode: flockCode as string },
@@ -103,6 +117,14 @@ const CalendarView: React.FC = () => {
     id,
     name,
   }));
+
+  if (participants.data && user.data) {
+    const { users } = participants.data.getFlockByCode;
+    const { id } = user.data.getCurrentUser;
+    if (!users.find((user) => user.id === id)) {
+      userInFlock = false;
+    }
+  }
 
   const [updateCalendarEnablement, { reset: updateCalendarEnablementReset }] = useMutation<
     UpdateCalendarEnablementResult,
@@ -120,26 +142,44 @@ const CalendarView: React.FC = () => {
   };
   let calendarList: Calendar[] = [];
   let availabilityIds: string[] = [];
+
   if (calendars.data) {
     const { flocks, availability } = calendars.data.getCurrentUser;
-    const userAvailabilityForFlock = flocks.filter((flock) => flock.flockCode === flockCode)[0].userFlockAvailability;
+    if (userInFlock) {
+      const userAvailabilityForFlock = flocks.filter((flock) => flock.flockCode === flockCode)[0].userFlockAvailability;
 
-    availability.forEach((availability) => {
-      const { id, name } = availability as UserAvailabilityPartialDTO;
-      const availabilityForFlock = userAvailabilityForFlock.find(
-        (userAvailability) => (userAvailability.userAvailability as UserAvailabilityPartialDTO).id === id,
-      );
-      const enabled = !!availabilityForFlock?.enabled;
+      availability.forEach((availability) => {
+        const { id, name } = availability as UserAvailabilityPartialDTO;
+        const availabilityForFlock = userAvailabilityForFlock.find(
+          (userAvailability) => (userAvailability.userAvailability as UserAvailabilityPartialDTO).id === id,
+        );
+        const enabled = !!availabilityForFlock?.enabled;
 
-      calendarList.push({
-        name,
-        id,
-        enabled,
-        onEnabledChanged: handleUpdateCalendarEnablement,
+        calendarList.push({
+          name,
+          id,
+          enabled,
+          onEnabledChanged: handleUpdateCalendarEnablement,
+        });
+
+        if (enabled) availabilityIds.push(id);
       });
+    } else {
+      const { availability } = calendars.data.getCurrentUser;
 
-      if (enabled) availabilityIds.push(id);
-    });
+      availability.forEach((availability) => {
+        const { id, name } = availability as UserAvailabilityPartialDTO;
+
+        const enabled = false;
+
+        calendarList.push({
+          name,
+          id,
+          enabled,
+          onEnabledChanged: handleUpdateCalendarEnablement,
+        });
+      });
+    }
   }
 
   let flockName = '';
@@ -172,19 +212,20 @@ const CalendarView: React.FC = () => {
   let userCalendars: Calendar[] = [];
   let userAvailabilities: Availability[] = [];
   const [userCalendarList, setUserCalendarList] = useState(userCalendars);
-
-  if (userCalendarList) {
-    userCalendarList.forEach((calendar) => {
-      if (calendar.enabled === false) {
-        if (availabilityIds.includes(calendar.id)) {
-          availabilityIds = availabilityIds.filter((id) => id !== calendar.id);
+  if (userInFlock) {
+    if (userCalendarList) {
+      userCalendarList.forEach((calendar) => {
+        if (calendar.enabled === false) {
+          if (availabilityIds.includes(calendar.id)) {
+            availabilityIds = availabilityIds.filter((id) => id !== calendar.id);
+          }
+        } else {
+          if (!availabilityIds.includes(calendar.id)) {
+            availabilityIds.push(calendar.id);
+          }
         }
-      } else {
-        if (!availabilityIds.includes(calendar.id)) {
-          availabilityIds.push(calendar.id);
-        }
-      }
-    });
+      });
+    }
   }
 
   //User and Flock interval queries placed here so availabilityIds and interval data retrieved first
@@ -194,6 +235,7 @@ const CalendarView: React.FC = () => {
       availabilityIds: availabilityIds,
       userIntervalInput: { intervals: intervals },
     },
+    skip: !userInFlock,
   });
 
   if (userIntervals.data) {
@@ -207,6 +249,7 @@ const CalendarView: React.FC = () => {
   }
 
   let flockAvailabilities: Availability[] = [];
+
   const flockIntervals = useQuery<GetFlockIntervalsResult>(GET_FLOCK_INTERVALS, {
     variables: {
       flockCode: flockCode,
@@ -239,6 +282,47 @@ const CalendarView: React.FC = () => {
     });
   }
 
+  const flockAvailabilityMap = new Map<Date, boolean>();
+  let flockAvailabilityIds: string[] = [];
+
+  if (!userInFlock) {
+    if (flock.data) {
+      const { userFlockAvailability } = flock.data.getFlockByCode;
+
+      if (userFlockAvailability.length > 0) {
+        userFlockAvailability.forEach((flockAvailability) => {
+          if (flockAvailability.enabled) {
+            const { userAvailability } = flockAvailability;
+            const { id } = userAvailability as UserAvailabilityPartialDTO;
+            flockAvailabilityIds.push(id);
+          }
+        });
+      }
+    }
+  }
+
+  const [errorText, setErrorText] = useState('');
+
+  const [joinFlock] = useMutation<JoinFlockResult, JoinFlockInput>(JOIN_FLOCK, {
+    // onCompleted: (data) => navigate(`/meeting/${data.joinFlock.flockCode}`), // TODO: Uncomment this when the meeting view becomes available
+    onCompleted: () => alert('Successfully created. Meeting view coming soon'), // TODO: Delete this when meeting view becomes available
+    onError: () => setErrorText("Sorry, we couldn't add you to the meeting"),
+  });
+
+  const handleJoinFlock = () => {
+    joinFlock({ variables: { flockCode: flockCode as string } });
+  };
+
+  const [leaveFlock] = useMutation<LeaveFlockResult, LeaveFlockInput>(LEAVE_FLOCK, {
+    // onCompleted: (data) => navigate(`/meeting/${data.joinFlock.flockCode}`), // TODO: Uncomment this when the meeting view becomes available
+    onCompleted: () => alert('Successfully created. Meeting view coming soon'), // TODO: Delete this when meeting view becomes available
+    onError: () => setErrorText("Sorry, we couldn't add you to the meeting"),
+  });
+
+  const handleLeaveFlock = () => {
+    leaveFlock({ variables: { flockCode: flockCode as string } });
+  };
+
   const getParticipantsContent = () => {
     if (participants.loading) return <CircularProgress />;
     if (participants.error) return <p>Sorry, an error occured</p>;
@@ -248,19 +332,47 @@ const CalendarView: React.FC = () => {
   const getUserCalendarsContent = () => {
     if (calendars.loading) return <CircularProgress />;
     if (calendars.error) return <p>Sorry, an error occured</p>;
-    return <CalendarList calendars={calendarList} onUpdate={setUserCalendarList} />;
+    if (!userInFlock)
+      return (
+        <div>
+          <p className={styles.joinFlockPrompt}>Please join flock to add your availabilities :)</p>
+          <CalendarList calendars={calendarList} disabled={true} onUpdate={setUserCalendarList} />
+        </div>
+      );
+    return <CalendarList calendars={calendarList} disabled={false} onUpdate={setUserCalendarList} />;
   };
 
   const getFlockContent = () => {
     if (flock.loading || userIntervals.loading || flockIntervals.loading) return <CircularProgress />;
     if (flock.error || userIntervals.error || flockIntervals.error) return <p>Sorry, an error occured</p>;
+    if (!userInFlock)
+      return (
+        <div>
+          <p className={styles.joinFlockPrompt}>You are not part of this flock</p>
+          <div className={styles.joinFlockButton}>
+            <Button color="primary" children={'Join Flock'} onClick={handleJoinFlock} />
+          </div>
+          <Flock
+            datesPicked={datesPicked}
+            timeRange={timeRange}
+            userAvailability={userAvailabilities}
+            othersAvailability={flockAvailabilities}
+          />
+        </div>
+      );
     return (
-      <Flock
-        datesPicked={datesPicked}
-        timeRange={timeRange}
-        userAvailability={userAvailabilities}
-        othersAvailability={flockAvailabilities}
-      />
+      <div>
+        <p className={styles.joinFlockPrompt}>{errorText}</p>
+        <Flock
+          datesPicked={datesPicked}
+          timeRange={timeRange}
+          userAvailability={userAvailabilities}
+          othersAvailability={flockAvailabilities}
+        />
+        <div className={styles.leaveFlockButton}>
+          <Button color="primary" children={'Leave Flock'} onClick={handleLeaveFlock} />
+        </div>
+      </div>
     );
   };
 

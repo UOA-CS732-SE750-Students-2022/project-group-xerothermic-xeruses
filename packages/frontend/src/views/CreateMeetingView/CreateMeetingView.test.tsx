@@ -6,7 +6,7 @@ import { CREATE_FLOCK, GET_CURRENT_USER_NAME, JOIN_FLOCK } from '../../apollo';
 import MockDate from 'mockdate';
 
 const successMocks = [
-  { request: { query: GET_CURRENT_USER_NAME }, result: { data: { getCurrentUser: { name: 'User' } } } },
+  { request: { query: GET_CURRENT_USER_NAME }, result: { data: { getCurrentUser: { id: '1', name: 'User' } } } },
   {
     request: {
       query: CREATE_FLOCK,

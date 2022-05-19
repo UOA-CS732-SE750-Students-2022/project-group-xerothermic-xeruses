@@ -18,6 +18,7 @@ export type GetFlockIntervalsResult = { getUserIntervalsForFlock: FlockAvailabil
 export type GoogleCalendarAuthUrlResult = { googleCalendarAuthUrl: string };
 export type UpdateCalendarEnablementResult = { updateAvailabilityEnablement: FlockDTO };
 export type AddiCalResult = { availability: UserAvailabilityDTO };
+export type LeaveFlockResult = { leaveFlock: UserDTO };
 
 // Inputs
 export type AddFlockInput = { addFlockInput: AddFlockInputDTO };
@@ -28,3 +29,4 @@ export type UpdateCalendarEnablementInput = {
   userFlockAvailabilityInput: UserFlockAvailabilityInputDTO;
 };
 export type AddiCalInput = { userAvailabilitySources: { type: string; name: string; uri: string }[] };
+export type LeaveFlockInput = { flockCode: string };

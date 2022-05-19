@@ -59,9 +59,11 @@ const isAvailable = (
   let userAvailable = false;
   let othersAvailable = false;
 
-  for (let i = 0; i < userAvailability.length; i++) {
-    if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
-      userAvailable = userAvailability[i].available;
+  if (userAvailability.length > 0) {
+    for (let i = 0; i < userAvailability.length; i++) {
+      if (userAvailability[i].start.getTime() === currentCell.cellStartDateTime.getTime()) {
+        userAvailable = userAvailability[i].available;
+      }
     }
   }
 

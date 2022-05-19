@@ -48,3 +48,18 @@ h3 {
 .sidebarDivider {
   margin-top: 8px;
 }
+
+.joinFlockButton {
+  margin-top: 8px;
+  margin-bottom: 30px;
+}
+
+.joinFlockPrompt {
+  font-size: var(--flocker-font-size-small);
+  max-width: 20em;
+}
+
+.leaveFlockButton {
+  margin-top: 100px;
+  margin-bottom: 30px;
+}

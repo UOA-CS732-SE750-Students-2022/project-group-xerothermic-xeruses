@@ -29,12 +29,12 @@ beforeEach(() => {
 });
 
 it('should render', () => {
-  const { container } = render(<CalendarList calendars={[]} onUpdate={() => {}} />);
+  const { container } = render(<CalendarList calendars={[]} disabled={false} onUpdate={() => {}} />);
   expect(container).toBeVisible();
 });
 
 it('should be able show list of calendars names and checkboxes', () => {
-  render(<CalendarList calendars={[calendar1, calendar2]} onUpdate={() => {}} />);
+  render(<CalendarList calendars={[calendar1, calendar2]} disabled={false} onUpdate={() => {}} />);
   const calendar1Name = screen.getByText(/cal1/i);
   const calendar2Name = screen.getByText(/cal2/i);
   const checkboxes = screen.getAllByRole('checkbox');
@@ -45,7 +45,7 @@ it('should be able show list of calendars names and checkboxes', () => {
 
 it('should be able to select calendars', () => {
   const getSelectedCalendars = jest.fn();
-  render(<CalendarList calendars={[calendar1]} onUpdate={getSelectedCalendars} />);
+  render(<CalendarList calendars={[calendar1]} disabled={false} onUpdate={getSelectedCalendars} />);
   const checkbox = screen.getByRole('checkbox');
   fireEvent.click(checkbox);
   expect(getSelectedCalendars).toHaveBeenCalledTimes(1);
@@ -54,7 +54,7 @@ it('should be able to select calendars', () => {
 
 it('should be able to unselect calendars', () => {
   const getSelectedCalendars = jest.fn();
-  render(<CalendarList calendars={[calendar1]} onUpdate={getSelectedCalendars} />);
+  render(<CalendarList calendars={[calendar1]} disabled={false} onUpdate={getSelectedCalendars} />);
   const checkbox = screen.getByRole('checkbox');
   fireEvent.click(checkbox);
   expect(checkbox).toHaveProperty('checked', true);
