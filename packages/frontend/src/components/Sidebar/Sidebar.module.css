@@ -27,3 +27,9 @@
 .username {
   font-weight: var(--flocker-font-weight-medium);
 }
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}

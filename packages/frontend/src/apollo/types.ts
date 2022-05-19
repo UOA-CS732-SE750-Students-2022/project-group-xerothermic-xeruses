@@ -2,6 +2,7 @@ import {
   AddFlockInputDTO,
   FlockAvailabilityDTO,
   FlockDTO,
+  UserAvailabilityDTO,
   UserAvailabilityIntervalDTO,
   UserDTO,
   UserFlockAvailabilityInputDTO,
@@ -16,6 +17,7 @@ export type GetUserIntervalsResult = { getUserIntervals: UserAvailabilityInterva
 export type GetFlockIntervalsResult = { getUserIntervalsForFlock: FlockAvailabilityDTO };
 export type GoogleCalendarAuthUrlResult = { googleCalendarAuthUrl: string };
 export type UpdateCalendarEnablementResult = { updateAvailabilityEnablement: FlockDTO };
+export type AddiCalResult = { availability: UserAvailabilityDTO };
 
 // Inputs
 export type AddFlockInput = { addFlockInput: AddFlockInputDTO };
@@ -25,3 +27,4 @@ export type UpdateCalendarEnablementInput = {
   flockCode: string;
   userFlockAvailabilityInput: UserFlockAvailabilityInputDTO;
 };
+export type AddiCalInput = { userAvailabilitySources: { type: string; name: string; uri: string }[] };

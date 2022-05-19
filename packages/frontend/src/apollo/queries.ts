@@ -152,3 +152,16 @@ export const GET_GOOGLE_CALENDAR_AUTH_URL = gql`
     googleCalendarAuthUrl
   }
 `;
+
+export const ADD_ICAL = gql`
+  mutation Mutation($userAvailabilitySources: [UserAvailabilityInput!]!) {
+    addUserAvailabilitySources(userAvailabilitySources: $userAvailabilitySources) {
+      availability {
+        id
+        name
+        uri
+        calendarId
+      }
+    }
+  }
+`;

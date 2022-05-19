@@ -7,12 +7,18 @@ import ViewportHeightLayout from '../../layouts/ViewportHeightLayout';
 import { useQuery } from '@apollo/client';
 import { GET_GOOGLE_CALENDAR_AUTH_URL, GoogleCalendarAuthUrlResult } from '../../apollo';
 import StyledExternalLink from '../StyledExternalLink';
+import StyledLink from '../StyledLink';
+import ImportCalModal from '../ImportCalModal';
 
 type SidebarProps = {
   username?: string | null | undefined;
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
+
   const getTitle = () => {
     return username ? (
       <p className={styles.title}>
@@ -42,9 +48,12 @@ const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
           <div className={styles.divider}>
             <Line />
           </div>
-          <StyledExternalLink href={(!loading && data?.googleCalendarAuthUrl) || '#'} openIn={popupOrNewTab}>
-            Add calendars from Google
-          </StyledExternalLink>
+          <div className={styles.links}>
+            <StyledLink onClick={handleModalOpen}>Import iCal</StyledLink>
+            <StyledExternalLink href={(!loading && data?.googleCalendarAuthUrl) || '#'} openIn={popupOrNewTab}>
+              Add calendars from Google
+            </StyledExternalLink>
+          </div>
           <div className={styles.divider}>
             <Line />
           </div>
@@ -52,6 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
         </div>
         <Logo size="footer" />
       </div>
+      <ImportCalModal open={modalOpen} onClose={handleModalClose} />
     </ViewportHeightLayout>
   );
 };
