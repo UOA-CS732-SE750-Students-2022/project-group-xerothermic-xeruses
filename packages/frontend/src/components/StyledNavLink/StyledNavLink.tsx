@@ -6,10 +6,14 @@ const computeActiveClassName = (isActive: boolean) => (isActive ? styles.activeL
 
 type StyledNavLinkProps = {
   to: string;
+  colored?: boolean;
 };
 
-const StyledNavLink: React.FC<StyledNavLinkProps> = ({ to, children }) => (
-  <NavLink to={to} className={({ isActive }) => `${styles.link} ${computeActiveClassName(isActive)}`}>
+const StyledNavLink: React.FC<StyledNavLinkProps> = ({ to, colored = false, children }) => (
+  <NavLink
+    to={to}
+    className={({ isActive }) => `${styles.link} ${colored ? styles.colored : ''} ${computeActiveClassName(isActive)}`}
+  >
     {children}
   </NavLink>
 );

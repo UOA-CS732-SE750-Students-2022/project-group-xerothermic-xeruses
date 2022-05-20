@@ -4,6 +4,8 @@ import SignOut from '../../auth/SignOut';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import CalendarView from '../../views/CalendarView';
 import CreateMeetingView from '../../views/CreateMeetingView';
+import EnterFlockCodeDashView from '../../views/EnterFlockCodeDashView';
+import EnterFlockCodeView from '../../views/EnterFlockCodeView';
 import MeetingsView from '../../views/MeetingsView';
 import NotFoundView from '../../views/NotFoundView';
 
@@ -15,9 +17,11 @@ const AuthenticatedRoutes = () => (
       <Route index element={<Navigate to="meetings" />} />
       <Route path="meetings" element={<MeetingsView />} />
       <Route path="create-meeting" element={<CreateMeetingView />} />
+      <Route path="join" element={<EnterFlockCodeDashView />} />
     </Route>
-    <Route path="/meeting/:flockCode">
-      <Route index element={<CalendarView />} />
+    <Route path="/meeting">
+      <Route index element={<EnterFlockCodeView />} />
+      <Route path=":flockCode" element={<CalendarView />} />
     </Route>
     <Route path="/signout" element={<SignOut />} />
     <Route path="*" element={<NotFoundView goBackLink="/dashboard" />} />

@@ -173,3 +173,11 @@ export const LEAVE_FLOCK = gql`
     }
   }
 `;
+
+export const GET_FLOCK_NAME = gql`
+  query GetFlock($flockCode: String!) {
+    getFlockByCode(flockCode: $flockCode) {
+      name
+    }
+  }
+`;

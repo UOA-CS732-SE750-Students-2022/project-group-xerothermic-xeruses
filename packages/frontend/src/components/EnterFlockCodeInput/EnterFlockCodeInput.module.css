@@ -1,0 +1,21 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.form.centered {
+  align-items: center;
+}
+
+.errorText {
+  font-size: var(--flocker-font-size-small);
+  font-style: italic;
+  color: red;
+}
+
+.input {
+  display: flex;
+  width: fit-content;
+  gap: 1em;
+}
