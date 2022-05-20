@@ -23,3 +23,11 @@
 .activeLink {
   font-weight: var(--flocker-font-weight-medium);
 }
+
+.colored {
+  color: var(--flocker-color-primary);
+}
+
+.colored::after {
+  background-color: var(--flocker-color-primary);
+}
