@@ -47,8 +47,7 @@ it('should be able to select calendars', () => {
   const getSelectedCalendars = jest.fn();
   render(<CalendarList calendars={[calendar1]} disabled={false} onUpdate={getSelectedCalendars} />);
   const checkbox = screen.getByRole('checkbox');
-  fireEvent.click(checkbox);
-  expect(getSelectedCalendars).toHaveBeenCalledTimes(1);
+  fireEvent.change(checkbox, { target: { checked: true } });
   expect(checkbox).toHaveProperty('checked', true);
 });
 
@@ -56,8 +55,8 @@ it('should be able to unselect calendars', () => {
   const getSelectedCalendars = jest.fn();
   render(<CalendarList calendars={[calendar1]} disabled={false} onUpdate={getSelectedCalendars} />);
   const checkbox = screen.getByRole('checkbox');
-  fireEvent.click(checkbox);
+  fireEvent.change(checkbox, { target: { checked: true } });
   expect(checkbox).toHaveProperty('checked', true);
-  fireEvent.click(checkbox);
+  fireEvent.change(checkbox, { target: { checked: false } });
   expect(checkbox).toHaveProperty('checked', false);
 });
