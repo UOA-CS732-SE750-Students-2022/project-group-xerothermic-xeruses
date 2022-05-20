@@ -173,7 +173,7 @@ const CalendarView: React.FC = () => {
         userIntervalInput: { intervals },
       },
     });
-  }, [flockCode, availabilityIds, intervals]);
+  }, [flockCode, availabilityIds, intervals, getUserIntervals]);
 
   useEffect(() => {
     if (userInFlock && availabilityIdsReady && intervalsReady) {
@@ -187,7 +187,7 @@ const CalendarView: React.FC = () => {
       const flockAvailabilityMap = new Map<Date, boolean>();
       const { availabilities } = data.getUserIntervalsForFlock;
 
-      availabilities.map((user) => {
+      availabilities.forEach((user) => {
         user.intervals.forEach((interval) => {
           if (flockAvailabilityMap.has(interval.start)) {
             // If even one other person in the flock is not available, it will show as unavailable
@@ -218,7 +218,7 @@ const CalendarView: React.FC = () => {
           flockAvailabilityIntervalInput: { intervals },
         },
       }),
-    [flockCode, intervals],
+    [flockCode, intervals, getFlockIntervals],
   );
 
   useEffect(() => {
