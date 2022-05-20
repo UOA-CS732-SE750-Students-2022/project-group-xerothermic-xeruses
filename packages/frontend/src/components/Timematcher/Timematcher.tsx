@@ -128,7 +128,7 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody sx={{ '.MuiTableCell-root': { padding: '0.2em 1em' } }}>
             {Array.from(times.keys()).map((time) => (
               <TableRow key={rowKey++}>
                 <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
