@@ -91,11 +91,7 @@ export const GET_USER_CALENDARS = gql`
     getCurrentUser {
       availability {
         id
-        type
         name
-        uri
-        refreshToken
-        calendarId
       }
       flocks {
         flockCode
