@@ -19,6 +19,7 @@ type Availability = {
   end: Date;
   available: boolean;
 };
+
 const FIFTEEN_MINUTES = 15 * 60000;
 
 const generateDates = (dates: Date[]) =>
@@ -83,6 +84,19 @@ const getCell = (time: Date, date: Date) => {
   return { cellStartDateTime, cellEndDateTime };
 };
 
+const Legend: React.FC = () => {
+  return (
+    <div className={styles.legend}>
+      <div className={`${styles.circleAvailability} ${styles.circleBothAvailable}`} />
+      <h3>All available</h3>
+      <div className={`${styles.circleAvailability} ${styles.circleUserAvailable}`} />
+      <h3>You're available</h3>
+      <div className={`${styles.circleAvailability} ${styles.circleFlockAvailable}`} />
+      <h3>Others available</h3>
+    </div>
+  );
+};
+
 const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
   const dates = generateDates(datesPicked);
   const times = generateTimes(timeRange);
@@ -99,38 +113,41 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
   };
 
   return (
-    <TableContainer component={Paper} className={styles.table}>
-      <Table stickyHeader className={styles.tableContent}>
-        <TableHead>
-          <TableRow className={styles.headerRow} key={rowKey++}>
-            <TableCell className={styles.time} key={cellKey++}>
-              Time
-            </TableCell>
-            {Array.from(dates.keys()).map((date) => (
-              <TableCell align="center" className={styles.dates} key={cellKey++}>
-                {date}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {Array.from(times.keys()).map((time) => (
-            <TableRow key={rowKey++}>
-              <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
-                {time}
+    <>
+      <TableContainer component={Paper} className={styles.table}>
+        <Table stickyHeader className={styles.tableContent}>
+          <TableHead>
+            <TableRow className={styles.headerRow} key={rowKey++}>
+              <TableCell className={styles.time} key={cellKey++}>
+                Time
               </TableCell>
               {Array.from(dates.keys()).map((date) => (
-                <TableCell
-                  className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
-                  key={cellKey++}
-                  data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
-                />
+                <TableCell align="center" className={styles.dates} key={cellKey++}>
+                  {date}
+                </TableCell>
               ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {Array.from(times.keys()).map((time) => (
+              <TableRow key={rowKey++}>
+                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
+                  {time}
+                </TableCell>
+                {Array.from(dates.keys()).map((date) => (
+                  <TableCell
+                    className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
+                    key={cellKey++}
+                    data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
+                  />
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Legend />
+    </>
   );
 };
 
