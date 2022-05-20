@@ -24,6 +24,28 @@
   --flocker-font-size-display: 4em;
 }
 
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--flocker-color-secondary);
+  border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #ffa05d;
+}
+
 * {
   margin: 0;
   padding: 0;

@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './ParticipantList.module.css';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 
@@ -24,10 +23,10 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants }) => (
     <List className={styles.listContent}>
       {Array.from(participants as Participant[]).map((participant) => (
         <ListItem className={styles.listItem} key={participant.id}>
-          <ListItemAvatar sx={{ '&': { minWidth: 45 } }}>
-            <Avatar className={`${styles.avatar}`}>{getFirstLetter(participant.name)}</Avatar>
-          </ListItemAvatar>
-          <ListItemText className={styles.name} primary={`${participant.name}`} />
+          <Avatar className={styles.avatar}>
+            <p className={styles.avatarText}>{getFirstLetter(participant.name)}</p>
+          </Avatar>
+          <ListItemText primary={<p className={styles.name}>{participant.name}</p>} />
         </ListItem>
       ))}
     </List>

@@ -21,6 +21,12 @@
 .avatar {
   background-color: white;
   color: var(--flocker-color-primary);
-  width: 2rem;
-  height: 2rem;
+  font-size: var(--flocker-font-size-body);
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.5em;
+}
+
+.avatarText {
+  font-size: var(--flocker-font-size-small);
 }

@@ -55,7 +55,7 @@ const CalendarList: React.FC<CalendarListProps> = ({ calendars, disabled, onUpda
                 opacity: '50%',
               },
             }}
-            label={calendar.name}
+            label={<p className={styles.calendarName}>{calendar.name}</p>}
           />
         );
       })}
