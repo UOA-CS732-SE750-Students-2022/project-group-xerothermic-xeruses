@@ -20,3 +20,8 @@ A sidebar which contains a heading at the top and the Flocker logo at the bottom
 - type: `string`
 - default: `null`
 - description: The user's name that the header will display. If set, the header will display `Hi ${username}`. If not, it will simply say `Hello!`
+
+`returnTo` - _optional_
+
+- type: `{ route: string, name: string }`
+- description: If defined, a return link on the sidebar that navigates to the specified route.
