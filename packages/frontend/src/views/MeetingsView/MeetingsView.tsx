@@ -2,13 +2,13 @@ import React from 'react';
 import styles from './MeetingsView.module.css';
 import MeetingCard from '../../components/MeetingCard';
 import TitleLayout from '../../layouts/TitleLayout';
-// import { useNavigate } from 'react-router-dom'; TODO: Uncomment this when the "create new meeting" view becomes available
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { GET_USER_FLOCKS, GetCurrentUserResult } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 
 const MeetingsList: React.FC = () => {
-  // const navigate = useNavigate(); // TODO: Uncomment this when the "create new meeting" view becomes available
+  const navigate = useNavigate();
   const { loading, error, data } = useQuery<GetCurrentUserResult>(GET_USER_FLOCKS);
   const errorMessage = <>Sorry, we couldn't get your meetings :(</>;
 
@@ -33,7 +33,7 @@ const MeetingsList: React.FC = () => {
                 numParticipants={numParticipants}
                 dateRange={dateRange}
                 key={flockCode}
-                // onClick={() => navigate(`/meeting/${flockCode}`)} // TODO: Uncomment this when the view becomes available
+                onClick={() => navigate(`/meeting/${flockCode}`)}
               />
             );
           })}

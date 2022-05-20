@@ -4,6 +4,7 @@ import CreateMeetingView from './CreateMeetingView';
 import { MockedProvider } from '@apollo/client/testing';
 import { CREATE_FLOCK, GET_CURRENT_USER_NAME, JOIN_FLOCK } from '../../apollo';
 import MockDate from 'mockdate';
+import { MemoryRouter } from 'react-router-dom';
 
 const successMocks = [
   {
@@ -57,6 +58,12 @@ const errorMocks = [
   { request: { query: JOIN_FLOCK }, error: new Error('Error!') },
 ];
 
+const getComponent = () => (
+  <MemoryRouter>
+    <CreateMeetingView />
+  </MemoryRouter>
+);
+
 beforeAll(() => {
   MockDate.set(new Date(2022, 0, 3));
 });
@@ -66,11 +73,7 @@ afterAll(() => {
 });
 
 it('should render', async () => {
-  render(
-    <MockedProvider>
-      <CreateMeetingView />
-    </MockedProvider>,
-  );
+  render(<MockedProvider>{getComponent()}</MockedProvider>);
   await act(() => new Promise((resolve) => setTimeout(resolve, 0))); // To get past loading: https://www.apollographql.com/docs/react/development-testing/testing/#testing-the-success-state
 
   const nameMeetingLabel = screen.queryByLabelText('Name your meeting');
@@ -93,7 +96,7 @@ it('should render', async () => {
 it('should fill in default meeting name', async () => {
   render(
     <MockedProvider mocks={successMocks} addTypename={false}>
-      <CreateMeetingView />
+      {getComponent()}
     </MockedProvider>,
   );
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
@@ -104,7 +107,7 @@ it('should fill in default meeting name', async () => {
 it('should fill in default meeting name if username not supplied', async () => {
   render(
     <MockedProvider mocks={errorMocks} addTypename={false}>
-      <CreateMeetingView />
+      {getComponent()}
     </MockedProvider>,
   );
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
@@ -115,7 +118,7 @@ it('should fill in default meeting name if username not supplied', async () => {
 it('should show error message when inputs are invalid', async () => {
   render(
     <MockedProvider mocks={successMocks} addTypename={false}>
-      <CreateMeetingView />
+      {getComponent()}
     </MockedProvider>,
   );
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
@@ -156,7 +159,7 @@ it('should create a flock', async () => {
   window.alert = () => {};
   render(
     <MockedProvider mocks={successMocks} addTypename={false}>
-      <CreateMeetingView />
+      {getComponent()}
     </MockedProvider>,
   );
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
@@ -179,7 +182,7 @@ it('should create a flock', async () => {
 it('should show error message when creating a flock fails', async () => {
   render(
     <MockedProvider mocks={errorMocks} addTypename={false}>
-      <CreateMeetingView />
+      {getComponent()}
     </MockedProvider>,
   );
   await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
