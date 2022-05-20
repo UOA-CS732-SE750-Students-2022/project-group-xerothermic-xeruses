@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from '@apollo/client';
-import React, { useState } from 'react';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import React, { useCallback, useEffect, useState } from 'react';
 import Timematcher from '../../components/Timematcher';
 import SidebarLayout from '../../layouts/SidebarLayout';
 import TitleLayout from '../../layouts/TitleLayout';
@@ -18,7 +18,6 @@ import {
   UpdateCalendarEnablementResult,
   UpdateCalendarEnablementInput,
   GetFlockInput,
-  GET_CURRENT_USER_NAME,
   JoinFlockResult,
   JoinFlockInput,
   JOIN_FLOCK,
@@ -75,155 +74,123 @@ const Participants: React.FC<{ flockCode: string }> = ({ flockCode }) => {
 const CalendarView: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
 
-  const flock = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_USER_FLOCK, {
-    variables: { flockCode: flockCode as string },
-  });
+  const [updateCalendarEnablement] = useMutation<UpdateCalendarEnablementResult, UpdateCalendarEnablementInput>(
+    UPDATE_CALENDAR_ENABLEMENT,
+  );
 
-  const user = useQuery<GetCurrentUserResult>(GET_CURRENT_USER_NAME);
-
-  const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS);
-
-  const userInFlock = !!user.data?.getCurrentUser.flocks.find((flock) => flock.flockCode === flockCode);
-
-  const [updateCalendarEnablement, { reset: updateCalendarEnablementReset }] = useMutation<
-    UpdateCalendarEnablementResult,
-    UpdateCalendarEnablementInput
-  >(UPDATE_CALENDAR_ENABLEMENT, {});
-
-  const handleUpdateCalendarEnablement = (id: string, enabled: boolean) => {
-    updateCalendarEnablement({
+  const [userInFlock, setUserInFlock] = useState<boolean>(false);
+  const [calendarList, setCalendarList] = useState<Calendar[]>([]);
+  const [availabilityIds, setAvailabilityIds] = useState<Set<string>>(new Set<string>());
+  const [availabilityIdsReady, setAvailibilityIdsReady] = useState<boolean>(false);
+  const onEnabledChanged = async (id: string, enabled: boolean) => {
+    setAvailibilityIdsReady(false);
+    await updateCalendarEnablement({
       variables: {
-        flockCode: flockCode || '',
-        userFlockAvailabilityInput: { userAvailabilityId: id, enabled: enabled },
+        flockCode: flockCode as string,
+        userFlockAvailabilityInput: { userAvailabilityId: id, enabled },
       },
     });
-    updateCalendarEnablementReset();
+    setAvailibilityIdsReady(true);
   };
-  let calendarList: Calendar[] = [];
-  let availabilityIds: string[] = [];
 
-  if (calendars.data) {
-    const { flocks, availability } = calendars.data.getCurrentUser;
-    if (userInFlock) {
-      const userAvailabilityForFlock = flocks.filter((flock) => flock.flockCode === flockCode)[0].userFlockAvailability;
+  const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS, {
+    onCompleted: (data) => {
+      const { availability, flocks } = data.getCurrentUser;
+      const userAvailabilityForFlock = flocks.find((flock) => flock.flockCode === flockCode)?.userFlockAvailability;
+      setUserInFlock(!!userAvailabilityForFlock);
 
-      availability.forEach((availability) => {
-        const { id, name } = availability as UserAvailabilityPartialDTO;
-        const availabilityForFlock = userAvailabilityForFlock.find(
+      const tempCalList: Calendar[] = [];
+      const tempAvailabilityIds: Set<string> = new Set<string>();
+      availability.forEach((avail) => {
+        const { id, name } = avail as UserAvailabilityPartialDTO;
+        const availabilityForFlock = userAvailabilityForFlock?.find(
           (userAvailability) => (userAvailability.userAvailability as UserAvailabilityPartialDTO).id === id,
         );
+
         const enabled = !!availabilityForFlock?.enabled;
-
-        calendarList.push({
-          name,
-          id,
-          enabled,
-          onEnabledChanged: handleUpdateCalendarEnablement,
-        });
-
-        if (enabled) availabilityIds.push(id);
+        tempCalList.push({ id, name, enabled, onEnabledChanged: (id, enabled) => onEnabledChanged(id, enabled) });
+        if (enabled) tempAvailabilityIds.add(id);
       });
-    } else {
-      const { availability } = calendars.data.getCurrentUser;
 
-      availability.forEach((availability) => {
-        const { id, name } = availability as UserAvailabilityPartialDTO;
+      setCalendarList(tempCalList);
+      setAvailabilityIds(tempAvailabilityIds);
+      setAvailibilityIdsReady(true);
+    },
+  });
 
-        const enabled = false;
+  const [flockName, setFlockName] = useState<string>('');
+  const [datesPicked, setDatesPicked] = useState<Date[]>([]);
+  const [timeRange, setTimeRange] = useState<[Date, Date]>([new Date(), new Date()]);
+  const [intervals, setIntervals] = useState<UserIntervalInputDTO[]>([]);
+  const [intervalsReady, setIntervalsReady] = useState<boolean>(false);
+  const flock = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_USER_FLOCK, {
+    variables: { flockCode: flockCode as string },
+    onCompleted: (data) => {
+      const { name, flockDays } = data.getFlockByCode;
+      setFlockName(name);
+      setDatesPicked(flockDays.map((d) => new Date(d.start)));
 
-        calendarList.push({
-          name,
-          id,
-          enabled,
-          onEnabledChanged: handleUpdateCalendarEnablement,
-        });
-      });
-    }
-  }
+      const startTime = new Date(flockDays[0].start);
+      const endTime = new Date(flockDays[0].end);
+      setTimeRange([startTime, endTime]);
 
-  let flockName = '';
-  let datesPicked: Date[] = [];
-  let timeRange: [Date, Date] = [new Date(), new Date()];
-  let intervals: UserIntervalInputDTO[] = [];
-
-  if (flock.data) {
-    //dates
-    const { name, flockDays } = flock.data.getFlockByCode;
-    flockName = name;
-    datesPicked = flockDays.map((day) => new Date(day.start));
-    //timerange
-    const startTime = new Date(flockDays[0].start);
-    const endTime = new Date(flockDays[0].end);
-    timeRange = [startTime, endTime];
-
-    //make intervals which represent every cell
-    flockDays.forEach((day) => {
-      let startInterval = new Date(day.start);
-      const endInterval = new Date(day.end);
-      while (startInterval < endInterval) {
-        let endPartialInterval = new Date(startInterval.getTime() + FIFTEEN_MINUTES);
-        intervals.push({ start: startInterval, end: endPartialInterval });
-        startInterval = endPartialInterval;
-      }
-    });
-  }
-
-  let userCalendars: Calendar[] = [];
-  let userAvailabilities: Availability[] = [];
-  const [userCalendarList, setUserCalendarList] = useState(userCalendars);
-  if (userInFlock) {
-    if (userCalendarList) {
-      userCalendarList.forEach((calendar) => {
-        if (calendar.enabled === false) {
-          if (availabilityIds.includes(calendar.id)) {
-            availabilityIds = availabilityIds.filter((id) => id !== calendar.id);
-          }
-        } else {
-          if (!availabilityIds.includes(calendar.id)) {
-            availabilityIds.push(calendar.id);
-          }
+      const tempIntervals: UserIntervalInputDTO[] = [];
+      flockDays.forEach((day) => {
+        let startInterval = new Date(day.start);
+        const endInterval = new Date(day.end);
+        while (startInterval < endInterval) {
+          let endPartialInterval = new Date(startInterval.getTime() + FIFTEEN_MINUTES);
+          tempIntervals.push({ start: startInterval, end: endPartialInterval });
+          startInterval = endPartialInterval;
         }
       });
-    }
-  }
-
-  //User and Flock interval queries placed here so availabilityIds and interval data retrieved first
-  const userIntervals = useQuery<GetUserIntervalsResult>(GET_USER_INTERVALS, {
-    variables: {
-      flockCode: flockCode,
-      availabilityIds: availabilityIds,
-      userIntervalInput: { intervals: intervals },
+      setIntervals(tempIntervals);
+      setIntervalsReady(true);
     },
-    skip: !userInFlock,
   });
 
-  if (userIntervals.data) {
-    const { availability } = userIntervals.data.getUserIntervals;
-    availability.forEach((avail) => {
-      const { start, end, available } = avail;
-      const startInterval = new Date(start);
-      const endInterval = new Date(end);
-      userAvailabilities.push({ start: startInterval, end: endInterval, available });
+  const [userAvailabilities, setUserAvailabilities] = useState<Availability[]>([]);
+  const [getUserIntervals, userIntervals] = useLazyQuery<GetUserIntervalsResult>(GET_USER_INTERVALS, {
+    onCompleted: (data) => {
+      const { availability } = data.getUserIntervals;
+      const tempAvail: Availability[] = [];
+      availability.forEach((avail) => {
+        const { start, end, available } = avail;
+        const startInterval = new Date(start);
+        const endInterval = new Date(end);
+        tempAvail.push({ start: startInterval, end: endInterval, available });
+      });
+
+      setUserAvailabilities(tempAvail);
+    },
+  });
+
+  const getUserIntervalsCallback = useCallback(() => {
+    getUserIntervals({
+      variables: {
+        flockCode: flockCode,
+        availabilityIds: Array.from(availabilityIds),
+        userIntervalInput: { intervals },
+      },
     });
-  }
+  }, [flockCode, availabilityIds, intervals, getUserIntervals]);
 
-  let flockAvailabilities: Availability[] = [];
+  useEffect(() => {
+    if (userInFlock && availabilityIdsReady && intervalsReady) {
+      getUserIntervalsCallback();
+    }
+  }, [userInFlock, availabilityIdsReady, intervalsReady, getUserIntervalsCallback]);
 
-  const flockIntervals = useQuery<GetFlockIntervalsResult>(GET_FLOCK_INTERVALS, {
-    variables: {
-      flockCode: flockCode,
-      flockAvailabilityIntervalInput: { intervals: intervals },
-    },
-  });
+  const [flockAvailabilities, setFlockAvailabilities] = useState<Availability[]>([]);
+  const [getFlockIntervals, flockIntervals] = useLazyQuery<GetFlockIntervalsResult>(GET_FLOCK_INTERVALS, {
+    onCompleted: (data) => {
+      const flockAvailabilityMap = new Map<Date, boolean>();
+      const { availabilities } = data.getUserIntervalsForFlock;
 
-  if (flockIntervals.data) {
-    const flockAvailabilityMap = new Map<Date, boolean>();
-    const { availabilities } = flockIntervals.data.getUserIntervalsForFlock;
-    if (availabilities.length > 0) {
       availabilities.forEach((user) => {
         user.intervals.forEach((interval) => {
           if (flockAvailabilityMap.has(interval.start)) {
-            //If even one other person in the flock is not available, it will show as unavailable
+            // If even one other person in the flock is not available, it will show as unavailable
             if (flockAvailabilityMap.get(interval.start)) {
               flockAvailabilityMap.set(interval.start, interval.available);
             }
@@ -232,32 +199,31 @@ const CalendarView: React.FC = () => {
           }
         });
       });
-    }
 
-    flockAvailabilityMap.forEach((value, key) => {
-      const date = new Date(key);
-      const end = new Date(date.getTime() + FIFTEEN_MINUTES);
-      flockAvailabilities.push({ start: date, end: end, available: value });
-    });
-  }
+      const tempAvail: Availability[] = [];
+      flockAvailabilityMap.forEach((value, key) => {
+        const date = new Date(key);
+        const end = new Date(date.getTime() + FIFTEEN_MINUTES);
+        tempAvail.push({ start: date, end: end, available: value });
+      });
+      setFlockAvailabilities(tempAvail);
+    },
+  });
 
-  let flockAvailabilityIds: string[] = [];
+  const getFlockIntervalsCallback = useCallback(
+    () =>
+      getFlockIntervals({
+        variables: {
+          flockCode: flockCode,
+          flockAvailabilityIntervalInput: { intervals },
+        },
+      }),
+    [flockCode, intervals, getFlockIntervals],
+  );
 
-  if (!userInFlock) {
-    if (flock.data) {
-      const { userFlockAvailability } = flock.data.getFlockByCode;
-
-      if (userFlockAvailability.length > 0) {
-        userFlockAvailability.forEach((flockAvailability) => {
-          if (flockAvailability.enabled) {
-            const { userAvailability } = flockAvailability;
-            const { id } = userAvailability as UserAvailabilityPartialDTO;
-            flockAvailabilityIds.push(id);
-          }
-        });
-      }
-    }
-  }
+  useEffect(() => {
+    if (intervalsReady) getFlockIntervalsCallback();
+  }, [intervalsReady, getFlockIntervalsCallback]);
 
   const [errorText, setErrorText] = useState('');
 
@@ -282,14 +248,17 @@ const CalendarView: React.FC = () => {
   const getUserCalendarsContent = () => {
     if (calendars.loading) return <CircularProgress />;
     if (calendars.error) return <p>Sorry, an error occured</p>;
-    if (!userInFlock)
-      return (
-        <div>
-          <p className={styles.joinSidebarFlockPrompt}>Please join flock to add your availabilities</p>
-          <CalendarList calendars={calendarList} disabled={true} onUpdate={setUserCalendarList} />
-        </div>
-      );
-    return <CalendarList calendars={calendarList} disabled={false} onUpdate={setUserCalendarList} />;
+    return (
+      <div>
+        {!userInFlock && <p className={styles.joinSidebarFlockPrompt}>Please join flock to add your availabilities</p>}
+        <CalendarList
+          calendars={calendarList}
+          disabled={!userInFlock}
+          ids={availabilityIds}
+          setIds={setAvailabilityIds}
+        />
+      </div>
+    );
   };
 
   const getFlockContent = () => {
