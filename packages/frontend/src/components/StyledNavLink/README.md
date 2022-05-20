@@ -8,3 +8,9 @@ Wrapper around the React router `NavLink`. It's bold when the link is active, an
 
 - type: `string`
 - description: The route to navigate to.
+
+`colored` - _optional_
+
+- type: `boolean`
+- default: `false`
+- description: If it should be the Flocker primary color or not.

@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  width: 100%;
+  background-color: white;
+}
+
+.input {
+  margin: 0.5em 0 1em 0;
+}
+
+.logo {
+  position: fixed;
+  bottom: 1.5em;
+}
+
+.title {
+  color: var(--flocker-color-primary);
+  text-align: center;
+}
