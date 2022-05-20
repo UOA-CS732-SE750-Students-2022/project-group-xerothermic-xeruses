@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GetCurrentFlockResult, GetFlockInput, GET_FLOCK_NAME } from '../../apollo';
