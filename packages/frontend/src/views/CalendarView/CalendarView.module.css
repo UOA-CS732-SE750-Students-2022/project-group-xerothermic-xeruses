@@ -6,38 +6,6 @@
 
 .timeMatcher {
   width: 60vw;
-  height: 70vh;
-}
-
-h3 {
-  font-size: var(--flocker-font-size-small);
-  font-weight: var(--flocker-font-weight-light);
-  margin: 0 1em 0 0.5em;
-}
-
-.legend {
-  margin-top: 1em;
-  display: flex;
-  align-items: center;
-}
-
-.circleAvailability {
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: var(--flocker-circle-availability-color);
-  opacity: 70%;
-  border-radius: 50%;
-}
-.circleBothAvailable {
-  background-color: var(--flocker-color-tertiary);
-}
-
-.circleUserAvailable {
-  background-color: var(--flocker-color-secondary);
-}
-
-.circleFlockAvailable {
-  background-color: var(--flocker-color-primary);
 }
 
 .sidebarDivider {

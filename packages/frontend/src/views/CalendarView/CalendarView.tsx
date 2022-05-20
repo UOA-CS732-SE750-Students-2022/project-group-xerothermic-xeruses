@@ -58,40 +58,6 @@ type FlockParams = {
 
 const FIFTEEN_MINUTES = 15 * 60000;
 
-type FlockProps = {
-  datesPicked: Date[];
-  timeRange: [Date, Date];
-  userAvailability: Availability[];
-  othersAvailability: Availability[];
-};
-
-const Flock: React.FC<FlockProps> = ({ datesPicked, timeRange, userAvailability, othersAvailability }) => {
-  return (
-    <div className={styles.timeMatcher}>
-      <Timematcher
-        datesPicked={datesPicked}
-        timeRange={timeRange}
-        userAvailability={userAvailability}
-        othersAvailability={othersAvailability}
-      />
-      <Legend />
-    </div>
-  );
-};
-
-const Legend: React.FC = () => {
-  return (
-    <div className={styles.legend}>
-      <div className={`${styles.circleAvailability} ${styles.circleBothAvailable}`} />
-      <h3>All available</h3>
-      <div className={`${styles.circleAvailability} ${styles.circleUserAvailable}`} />
-      <h3>You're available</h3>
-      <div className={`${styles.circleAvailability} ${styles.circleFlockAvailable}`} />
-      <h3>Others available</h3>
-    </div>
-  );
-};
-
 const Participants: React.FC<{ flockCode: string }> = ({ flockCode }) => {
   const participants = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_FLOCK_PARTICIPANTS, {
     variables: { flockCode },
@@ -355,7 +321,7 @@ const CalendarView: React.FC = () => {
     return (
       <div className={styles.flock}>
         {content}
-        <Flock
+        <Timematcher
           datesPicked={datesPicked}
           timeRange={timeRange}
           userAvailability={userAvailabilities}
