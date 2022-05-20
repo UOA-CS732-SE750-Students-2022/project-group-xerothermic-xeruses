@@ -6,7 +6,7 @@ import TitleLayout from '../../layouts/TitleLayout';
 import LabeledContainerLayout from '../../layouts/LabeledContainerLayout';
 import styles from './CreateMeetingView.module.css';
 import { useQuery, useMutation } from '@apollo/client';
-// import { useNavigate } from 'react-router-dom'; // TODO: Uncomment this when the meeting view becomes available
+import { useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { FlockDayDTO } from '@flocker/api-types';
 import {
@@ -29,7 +29,7 @@ export const CreateMeeting: React.FC = () => {
   const [datesPicked, setDatesPicked] = useState<Date[]>([]);
   const [startTime, setStartTime] = useState<Date>(new Date(0, 0, 0, NINE_AM));
   const [endTime, setEndTime] = useState<Date>(new Date(0, 0, 0, FIVE_PM));
-  // const navigate = useNavigate(); // TODO: Uncomment this when the meeting view becomes available
+  const navigate = useNavigate();
 
   const { loading: userLoading, data: userData } = useQuery<GetCurrentUserResult>(GET_CURRENT_USER_NAME);
   const [createFlock, { loading: addFlockLoading }] = useMutation<AddFlockResult, AddFlockInput>(CREATE_FLOCK, {
@@ -37,8 +37,7 @@ export const CreateMeeting: React.FC = () => {
     onError: () => setErrorText("Sorry, we couldn't create your meeting"),
   });
   const [joinFlock, { loading: joinFlockLoading }] = useMutation<JoinFlockResult, JoinFlockInput>(JOIN_FLOCK, {
-    // onCompleted: (data) => navigate(`/meeting/${data.joinFlock.flockCode}`), // TODO: Uncomment this when the meeting view becomes available
-    onCompleted: () => alert('Successfully created. Meeting view coming soon'), // TODO: Delete this when meeting view becomes available
+    onCompleted: (data) => navigate(`/meeting/${data.joinFlock.flockCode}`),
     onError: () => setErrorText("Sorry, we couldn't create your meeting"),
   });
 
