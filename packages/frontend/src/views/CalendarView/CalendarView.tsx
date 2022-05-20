@@ -367,6 +367,7 @@ const CalendarView: React.FC = () => {
 
   return (
     <SidebarLayout
+      returnTo={{ route: '/dashboard', name: 'Dashboard' }}
       sidebarContent={
         <div>
           <h1 className={styles.sidebarHeadings}>Participants</h1>

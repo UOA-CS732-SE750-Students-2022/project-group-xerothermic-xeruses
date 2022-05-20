@@ -12,9 +12,10 @@ import ImportCalModal from '../ImportCalModal';
 
 type SidebarProps = {
   username?: string | null | undefined;
+  returnTo?: { route: string; name: string };
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
+const Sidebar: React.FC<SidebarProps> = ({ username, returnTo, children }) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const handleModalOpen = () => setModalOpen(true);
   const handleModalClose = () => setModalOpen(false);
@@ -40,6 +41,11 @@ const Sidebar: React.FC<SidebarProps> = ({ username, children }) => {
         <div className={styles.content}>
           <div className={styles.header}>
             {getTitle()}
+            {returnTo && (
+              <StyledNavLink to={returnTo.route}>
+                {'<'} Return to {returnTo.name}
+              </StyledNavLink>
+            )}
             <div className={styles.divider}>
               <Line />
             </div>
