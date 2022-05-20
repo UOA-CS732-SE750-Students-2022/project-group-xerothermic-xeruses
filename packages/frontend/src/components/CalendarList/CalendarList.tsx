@@ -6,7 +6,7 @@ import { FormControlLabel, FormGroup } from '@mui/material';
 type CalendarListProps = {
   calendars: Calendar[];
   disabled: boolean;
-  onUpdate?: (calendars: Calendar[]) => void;
+  onUpdate: (calendars: Calendar[]) => void;
 };
 
 type Calendar = {
@@ -16,7 +16,7 @@ type Calendar = {
   onEnabledChanged: (id: string, enabled: boolean) => void;
 };
 
-const CalendarList: React.FC<CalendarListProps> = ({ calendars, disabled, onUpdate = () => {} }) => {
+const CalendarList: React.FC<CalendarListProps> = ({ calendars, disabled, onUpdate }) => {
   const handleChange = (checked: boolean, calendar: Calendar) => {
     calendar.enabled = checked;
     calendar.onEnabledChanged(calendar.id, checked);
