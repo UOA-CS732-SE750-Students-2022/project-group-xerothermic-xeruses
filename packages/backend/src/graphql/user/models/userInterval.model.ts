@@ -6,8 +6,8 @@ export class UserIntervalGraphQLModel implements UserIntervalDTO {
   @Field({ nullable: false })
   id!: string;
 
-  @Field(() => Boolean, { nullable: false })
-  available!: boolean;
+  @Field(() => Boolean, { nullable: true })
+  available!: boolean | undefined;
 
   @Field(() => Boolean, { nullable: false })
   manual!: boolean;

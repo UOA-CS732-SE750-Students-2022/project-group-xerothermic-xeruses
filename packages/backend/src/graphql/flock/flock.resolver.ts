@@ -1,4 +1,4 @@
-import { UserIntervalDTO } from '@flocker/api-types';
+import { UserFlockIntervalDTO } from '@flocker/api-types';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Args, Query, Parent, ResolveField, Mutation } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql';
@@ -7,7 +7,7 @@ import { FlockDocument } from '~/database/flock/flock.schema';
 import { FlockService } from '~/database/flock/flock.service';
 import { UserDocument } from '~/database/user/user.schema';
 import { UserService } from '~/database/user/user.service';
-import { UserAvailability } from '~/database/user/userAvailability.schema';
+import { UserAvailabilityDocument } from '~/database/user/userAvailability.schema';
 import { Auth } from '~/decorators/auth.decorator';
 import { User } from '~/decorators/user.decorator';
 import { CalendarUtil } from '~/util/calendar.util';
@@ -198,7 +198,7 @@ export class FlockResolver {
   ): Promise<{
     availabilities: {
       userId: Types.ObjectId;
-      intervals: UserIntervalDTO[];
+      intervals: UserFlockIntervalDTO[];
     }[];
   }> {
     const flock = await this.flockService.findOneByCode(flockCode);
@@ -213,7 +213,7 @@ export class FlockResolver {
     const userAvailabilities = await this.userService.findManyUserAvailability(availabilitiesToCheck);
 
     // Create map of userId => userAvailabilities.
-    const availabilitiesByUser = new Map<Types.ObjectId, UserAvailability[]>();
+    const availabilitiesByUser = new Map<Types.ObjectId, UserAvailabilityDocument[]>();
     for (const { userId, availabilityDocument } of userAvailabilities) {
       const availabilities = availabilitiesByUser.get(userId) || [];
       availabilities.push(availabilityDocument);
@@ -223,15 +223,27 @@ export class FlockResolver {
     const { intervals } = flockAvailabilityIntervalInput;
 
     // Given a user's id & availability sources, return the user's calculated availability after applying manual overrides.
-    const getUserAvailability = async ([userId, availabilityDocuments]: [Types.ObjectId, UserAvailability[]]) => {
+    const getUserAvailability = async ([userId, availabilityDocuments]: [
+      Types.ObjectId,
+      UserAvailabilityDocument[],
+    ]) => {
       const manualAvailability = flock.userManualAvailability.find((availability) => availability.user.equals(userId));
+      const availabilities = await this.calendarUtil.getAvailabilityIntervals(
+        intervals,
+        availabilityDocuments,
+        manualAvailability,
+      );
       return {
         userId,
-        intervals: await this.calendarUtil.getAvailabilityIntervals(
-          intervals,
-          availabilityDocuments,
-          manualAvailability?.intervals,
-        ),
+        intervals: availabilities.map((availability) => {
+          const available = availability.availability.some((availability) => availability.available);
+
+          return {
+            start: availability.start,
+            end: availability.end,
+            available,
+          };
+        }),
       };
     };
 

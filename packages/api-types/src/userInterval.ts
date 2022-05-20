@@ -7,6 +7,15 @@ export interface UserIntervalInputDTO {
 }
 
 /**
+ * Represents a users availability for a given date, split into 15 minute intervals from the start hour to the end hour.
+ */
+export interface UserFlockIntervalDTO {
+  start: Date;
+  end: Date;
+  available: boolean;
+}
+
+/**
  * Supply information to obtain a users interval availability.
  */
 export interface UserAvailabilityIntervalInputDTO {
@@ -18,7 +27,7 @@ export interface UserAvailabilityIntervalInputDTO {
  */
 export interface UserIntervalDTO {
   id: string;
-  available: boolean;
+  available: boolean | undefined;
   manual: boolean;
 }
 

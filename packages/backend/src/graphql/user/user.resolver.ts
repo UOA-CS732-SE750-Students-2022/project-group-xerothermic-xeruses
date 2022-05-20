@@ -91,11 +91,10 @@ export class UserResolver {
   @Query(() => UserAvailabilityIntervalGraphQLModel)
   async getUserIntervals(
     @User() user: UserDocument,
-    @Args('availabilityIds', { type: () => [GraphQLString] }) availabilityIds: string[],
     @Args('flockCode', { type: () => [GraphQLString] }) flockCode: string,
     @Args('userIntervalInput', { type: () => UserAvailabilityIntervalInput })
     userAvailabilityIntervalInput: UserAvailabilityIntervalInput,
-  ): Promise<UserAvailabilityIntervalDTO> {
+  ): Promise<UserAvailabilityIntervalDTO[]> {
     const flock = await this.flockService.findOneByCode(flockCode);
     if (!flock) {
       throw new NotFoundException(`Invalid flock code: ${flockCode}`);
@@ -103,21 +102,10 @@ export class UserResolver {
       throw new BadRequestException('User is not in this flock');
     }
 
-    const results = await Promise.all(
-      availabilityIds.map((availabilityId) => this.userService.findUserAvailability(user._id, availabilityId)),
-    );
-    const userAvailabilities = results.flatMap((userDocument) => userDocument?.availability ?? []);
-
     const { intervals } = userAvailabilityIntervalInput;
 
     const manualAvailability = flock.userManualAvailability.find((availability) => availability.user.equals(user._id));
-    const availabilityResults = await this.calendarUtil.getAvailabilityIntervals(
-      intervals,
-      userAvailabilities,
-      manualAvailability,
-    );
-
-    return availabilityResults;
+    return this.calendarUtil.getAvailabilityIntervals(intervals, user.availability, manualAvailability);
   }
 
   @Auth()

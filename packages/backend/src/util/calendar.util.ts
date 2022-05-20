@@ -8,7 +8,7 @@ import { UserAvailability, UserAvailabilityDocument } from '~/database/user/user
 import { UserAvailabilityGoogleCalendarDocument } from '~/database/user/userAvailabilityGoogleCalendar.schema';
 import { UserAvailabilityICalDocument } from '~/database/user/userAvailabilityICal.schema';
 import { GoogleCalendarService } from '~/googleCalendar/googleCalendar.service';
-import { Availability, AvailabilityInterval, Interval, ManualAvailabilityInterval } from './models';
+import { Availability, AvailabilityInterval, Interval } from './models';
 import { Types } from 'mongoose';
 
 // Timezone handling, see https://day.js.org/docs/en/plugin/timezone.
@@ -38,7 +38,7 @@ export class CalendarUtil {
 
     const availability: AvailabilityInterval[] = intervals.map((interval) => ({
       ...interval,
-      availability: calendars.map(({ _id }) => ({ id: _id, available: true, manual: false })),
+      availability: calendars.map(({ _id }) => ({ id: _id.toString(), available: true, manual: false })),
     }));
 
     let i = 0;
@@ -104,10 +104,10 @@ export class CalendarUtil {
   calculateManualAvailability(
     manualAvailability: UserManualAvailabilityDocument,
     intervals: Interval[],
-  ): ManualAvailabilityInterval[] {
-    const availabilities: ManualAvailabilityInterval[] = intervals.map((interval) => ({
+  ): AvailabilityInterval[] {
+    const availabilities: AvailabilityInterval[] = intervals.map((interval) => ({
       ...interval,
-      availability: [{ id: manualAvailability._id, available: undefined, manual: true }],
+      availability: [{ id: manualAvailability._id.toString(), available: undefined, manual: true }],
     }));
 
     let i = 0;
@@ -218,7 +218,7 @@ export class CalendarUtil {
     const availabilities = intervals.map((interval) => ({
       ...interval,
       availability: idCalendarIdWithRefreshTokens.map(([id]) => ({
-        id,
+        id: id.toString(),
         available: true,
         manual: false,
       })),

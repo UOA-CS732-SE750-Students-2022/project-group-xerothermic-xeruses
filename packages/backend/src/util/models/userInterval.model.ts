@@ -1,5 +1,3 @@
-import { Types } from 'mongoose';
-
 /**
  * Used to represent an interval we wish to know the availability for.
  */
@@ -18,28 +16,10 @@ export interface AvailabilityInterval {
 }
 
 /**
- * Record a manual interval availability.
- */
-export interface ManualAvailabilityInterval {
-  start: Date;
-  end: Date;
-  availability: ManualAvailability[];
-}
-
-/**
  * Record a interval availability.
  */
 export interface Availability {
-  id: Types.ObjectId;
-  available: boolean | undefined;
-  manual: boolean;
-}
-
-/**
- * Record a interval availability.
- */
-export interface ManualAvailability {
-  id: Types.ObjectId;
+  id: string;
   available: boolean | undefined;
   manual: boolean;
 }
