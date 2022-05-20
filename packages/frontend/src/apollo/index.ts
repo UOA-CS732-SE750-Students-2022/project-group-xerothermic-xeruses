@@ -48,6 +48,9 @@ export const useApolloClient = (user: User | null) => {
               getFlockByCode: {
                 merge: true,
               },
+              getCurrentUser: {
+                merge: true,
+              },
             },
           },
         },

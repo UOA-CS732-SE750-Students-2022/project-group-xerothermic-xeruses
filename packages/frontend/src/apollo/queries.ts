@@ -5,7 +5,11 @@ import { gql } from '@apollo/client';
 export const GET_CURRENT_USER_NAME = gql`
   query Query {
     getCurrentUser {
+      id
       name
+      flocks {
+        flockCode
+      }
     }
   }
 `;
@@ -162,6 +166,14 @@ export const ADD_ICAL = gql`
         uri
         calendarId
       }
+    }
+  }
+`;
+
+export const LEAVE_FLOCK = gql`
+  mutation Mutation($flockCode: String!) {
+    leaveFlock(flockCode: $flockCode) {
+      id
     }
   }
 `;
