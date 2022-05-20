@@ -9,26 +9,21 @@
   height: 70vh;
 }
 
-h2 {
-  font-size: var(--flocker-font-size-body);
-  font-weight: var(--flocker-font-weight-light);
-  padding: 16px 0 8px 0;
-}
-
 h3 {
   font-size: var(--flocker-font-size-small);
   font-weight: var(--flocker-font-weight-light);
-  padding: 0 10px;
+  margin: 0 1em 0 0.5em;
 }
 
-.legendKeys {
+.legend {
+  margin-top: 1em;
   display: flex;
   align-items: center;
 }
 
 .circleAvailability {
-  width: 2rem;
-  height: 2rem;
+  width: 1.5rem;
+  height: 1.5rem;
   background-color: var(--flocker-circle-availability-color);
   opacity: 70%;
   border-radius: 50%;
@@ -49,17 +44,16 @@ h3 {
   margin-top: 8px;
 }
 
-.joinFlockButton {
-  margin-top: 8px;
-  margin-bottom: 30px;
-}
-
-.joinFlockPrompt {
+.joinSidebarFlockPrompt {
   font-size: var(--flocker-font-size-small);
-  max-width: 20em;
+  max-width: 15em;
+  margin-bottom: 0.5em;
+  font-style: italic;
 }
 
-.leaveFlockButton {
-  margin-top: 100px;
-  margin-bottom: 30px;
+.joinLeaveFlock {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-bottom: 16px;
 }

@@ -7,6 +7,9 @@ export const GET_CURRENT_USER_NAME = gql`
     getCurrentUser {
       id
       name
+      flocks {
+        flockCode
+      }
     }
   }
 `;

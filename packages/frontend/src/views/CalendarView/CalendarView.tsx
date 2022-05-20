@@ -32,9 +32,7 @@ import ParticipantList from '../../components/ParticipantList';
 import Line from '../../components/Line';
 import { UserAvailabilityPartialDTO, UserIntervalInputDTO } from '@flocker/api-types';
 import CalendarList from '../../components/CalendarList';
-import { start } from 'repl';
 import Button from '../../components/Button';
-import { errorPrefix } from '@firebase/util';
 
 type Availability = {
   start: Date;
@@ -83,23 +81,32 @@ const Flock: React.FC<FlockProps> = ({ datesPicked, timeRange, userAvailability,
 
 const Legend: React.FC = () => {
   return (
-    <div>
-      <h2>Legend</h2>
-      <div className={styles.legendKeys}>
-        <div className={`${styles.circleAvailability} ${styles.circleBothAvailable}`} />
-        <h3>All available</h3>
-        <div className={`${styles.circleAvailability} ${styles.circleUserAvailable}`} />
-        <h3>You're available</h3>
-        <div className={`${styles.circleAvailability} ${styles.circleFlockAvailable}`} />
-        <h3>Others available</h3>
-      </div>
+    <div className={styles.legend}>
+      <div className={`${styles.circleAvailability} ${styles.circleBothAvailable}`} />
+      <h3>All available</h3>
+      <div className={`${styles.circleAvailability} ${styles.circleUserAvailable}`} />
+      <h3>You're available</h3>
+      <div className={`${styles.circleAvailability} ${styles.circleFlockAvailable}`} />
+      <h3>Others available</h3>
     </div>
   );
 };
 
-const CalendarView: React.FC = () => {
-  let userInFlock = true;
+const Participants: React.FC<{ flockCode: string }> = ({ flockCode }) => {
+  const participants = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_FLOCK_PARTICIPANTS, {
+    variables: { flockCode },
+  });
+  const participantList: Participant[] = (participants.data?.getFlockByCode?.users ?? []).map(({ id, name }) => ({
+    id,
+    name,
+  }));
 
+  if (participants.loading) return <CircularProgress />;
+  if (participants.error) return <p>Sorry, an error occured</p>;
+  return <ParticipantList participants={participantList} />;
+};
+
+const CalendarView: React.FC = () => {
   const { flockCode } = useParams<FlockParams>();
 
   const flock = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_USER_FLOCK, {
@@ -108,23 +115,9 @@ const CalendarView: React.FC = () => {
 
   const user = useQuery<GetCurrentUserResult>(GET_CURRENT_USER_NAME);
 
-  const participants = useQuery<GetCurrentFlockResult, GetFlockInput>(GET_FLOCK_PARTICIPANTS, {
-    variables: { flockCode: flockCode as string },
-  });
   const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS);
 
-  const participantList: Participant[] = (participants.data?.getFlockByCode?.users ?? []).map(({ id, name }) => ({
-    id,
-    name,
-  }));
-
-  if (participants.data && user.data) {
-    const { users } = participants.data.getFlockByCode;
-    const { id } = user.data.getCurrentUser;
-    if (!users.find((user) => user.id === id)) {
-      userInFlock = false;
-    }
-  }
+  const userInFlock = !!user.data?.getCurrentUser.flocks.find((flock) => flock.flockCode === flockCode);
 
   const [updateCalendarEnablement, { reset: updateCalendarEnablementReset }] = useMutation<
     UpdateCalendarEnablementResult,
@@ -282,7 +275,6 @@ const CalendarView: React.FC = () => {
     });
   }
 
-  const flockAvailabilityMap = new Map<Date, boolean>();
   let flockAvailabilityIds: string[] = [];
 
   if (!userInFlock) {
@@ -304,8 +296,7 @@ const CalendarView: React.FC = () => {
   const [errorText, setErrorText] = useState('');
 
   const [joinFlock] = useMutation<JoinFlockResult, JoinFlockInput>(JOIN_FLOCK, {
-    // onCompleted: (data) => navigate(`/meeting/${data.joinFlock.flockCode}`), // TODO: Uncomment this when the meeting view becomes available
-    onCompleted: () => alert('Successfully created. Meeting view coming soon'), // TODO: Delete this when meeting view becomes available
+    onCompleted: () => window.location.reload(),
     onError: () => setErrorText("Sorry, we couldn't add you to the meeting"),
   });
 
@@ -314,19 +305,12 @@ const CalendarView: React.FC = () => {
   };
 
   const [leaveFlock] = useMutation<LeaveFlockResult, LeaveFlockInput>(LEAVE_FLOCK, {
-    // onCompleted: (data) => navigate(`/meeting/${data.joinFlock.flockCode}`), // TODO: Uncomment this when the meeting view becomes available
-    onCompleted: () => alert('Successfully created. Meeting view coming soon'), // TODO: Delete this when meeting view becomes available
-    onError: () => setErrorText("Sorry, we couldn't add you to the meeting"),
+    onCompleted: () => window.location.reload(),
+    onError: () => setErrorText("Sorry, we couldn't remove you from the meeting"),
   });
 
   const handleLeaveFlock = () => {
     leaveFlock({ variables: { flockCode: flockCode as string } });
-  };
-
-  const getParticipantsContent = () => {
-    if (participants.loading) return <CircularProgress />;
-    if (participants.error) return <p>Sorry, an error occured</p>;
-    return <ParticipantList participants={participantList} />;
   };
 
   const getUserCalendarsContent = () => {
@@ -335,7 +319,7 @@ const CalendarView: React.FC = () => {
     if (!userInFlock)
       return (
         <div>
-          <p className={styles.joinFlockPrompt}>Please join flock to add your availabilities :)</p>
+          <p className={styles.joinSidebarFlockPrompt}>Please join flock to add your availabilities</p>
           <CalendarList calendars={calendarList} disabled={true} onUpdate={setUserCalendarList} />
         </div>
       );
@@ -345,33 +329,38 @@ const CalendarView: React.FC = () => {
   const getFlockContent = () => {
     if (flock.loading || userIntervals.loading || flockIntervals.loading) return <CircularProgress />;
     if (flock.error || userIntervals.error || flockIntervals.error) return <p>Sorry, an error occured</p>;
-    if (!userInFlock)
-      return (
-        <div>
-          <p className={styles.joinFlockPrompt}>You are not part of this flock</p>
-          <div className={styles.joinFlockButton}>
-            <Button color="primary" children={'Join Flock'} onClick={handleJoinFlock} />
-          </div>
-          <Flock
-            datesPicked={datesPicked}
-            timeRange={timeRange}
-            userAvailability={userAvailabilities}
-            othersAvailability={flockAvailabilities}
-          />
+
+    let content;
+
+    if (!userInFlock) {
+      content = (
+        <div className={styles.joinLeaveFlock}>
+          <p>You are not part of this flock</p>
+          <Button color="primary" onClick={handleJoinFlock}>
+            Join Flock
+          </Button>
         </div>
       );
+    } else {
+      content = (
+        <div className={styles.joinLeaveFlock}>
+          {errorText && <p>{errorText}</p>}
+          <Button color="primary" onClick={handleLeaveFlock}>
+            Leave Flock
+          </Button>
+        </div>
+      );
+    }
+
     return (
-      <div>
-        <p className={styles.joinFlockPrompt}>{errorText}</p>
+      <div className={styles.flock}>
+        {content}
         <Flock
           datesPicked={datesPicked}
           timeRange={timeRange}
           userAvailability={userAvailabilities}
           othersAvailability={flockAvailabilities}
         />
-        <div className={styles.leaveFlockButton}>
-          <Button color="primary" children={'Leave Flock'} onClick={handleLeaveFlock} />
-        </div>
       </div>
     );
   };
@@ -381,7 +370,7 @@ const CalendarView: React.FC = () => {
       sidebarContent={
         <div>
           <h1 className={styles.sidebarHeadings}>Participants</h1>
-          {getParticipantsContent()}
+          <Participants flockCode={flockCode as string} />
           <div className={styles.sidebarDivider}>
             <Line />
           </div>
