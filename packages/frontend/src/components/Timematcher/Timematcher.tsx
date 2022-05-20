@@ -112,6 +112,11 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
     return styles.nooneAvailable;
   };
 
+  const hourClass = (time: Date) => {
+    if (time.getMinutes() === 0) return styles.hour;
+    return '';
+  };
+
   return (
     <>
       <TableContainer component={Paper} className={styles.table}>
@@ -131,12 +136,21 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
           <TableBody sx={{ '.MuiTableCell-root': { padding: '0.2em 1em' } }}>
             {Array.from(times.keys()).map((time) => (
               <TableRow key={rowKey++}>
-                <TableCell className={styles.leftCol} align="left" component="th" scope="row" key={cellKey++}>
+                <TableCell
+                  className={`${styles.leftCol} ${hourClass(times.get(time) as Date)}`}
+                  align="left"
+                  component="th"
+                  scope="row"
+                  key={cellKey++}
+                >
                   {time}
                 </TableCell>
                 {Array.from(dates.keys()).map((date) => (
                   <TableCell
-                    className={`${styles.cell} ${tableCellColour(times.get(time) as Date, dates.get(date) as Date)}`}
+                    className={`${styles.cell} ${tableCellColour(
+                      times.get(time) as Date,
+                      dates.get(date) as Date,
+                    )} ${hourClass(times.get(time) as Date)}`}
                     key={cellKey++}
                     data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
                   />
