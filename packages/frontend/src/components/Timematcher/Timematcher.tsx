@@ -103,7 +103,7 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
       <Table stickyHeader className={styles.tableContent}>
         <TableHead>
           <TableRow className={styles.headerRow} key={rowKey++}>
-            <TableCell className={(styles.dates, styles.time)} key={cellKey++}>
+            <TableCell className={styles.time} key={cellKey++}>
               Time
             </TableCell>
             {Array.from(dates.keys()).map((date) => (

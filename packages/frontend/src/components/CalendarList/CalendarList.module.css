@@ -2,3 +2,9 @@
   color: white;
   font-size: var(--flocker-font-size-small);
 }
+
+.calendarName {
+  font-size: var(--flocker-font-size-small);
+  font-weight: var(--flocker-font-weight-light);
+  word-wrap: break-word;
+}
