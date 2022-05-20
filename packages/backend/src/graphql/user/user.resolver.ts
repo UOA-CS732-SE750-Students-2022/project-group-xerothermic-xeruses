@@ -111,13 +111,13 @@ export class UserResolver {
     const { intervals } = userAvailabilityIntervalInput;
 
     const manualAvailability = flock.userManualAvailability.find((availability) => availability.user.equals(user._id));
-    const availability = await this.calendarUtil.getAvailabilityIntervals(
+    const availabilityResults = await this.calendarUtil.getAvailabilityIntervals(
       intervals,
       userAvailabilities,
       manualAvailability,
     );
 
-    return { availability };
+    return availabilityResults;
   }
 
   @Auth()

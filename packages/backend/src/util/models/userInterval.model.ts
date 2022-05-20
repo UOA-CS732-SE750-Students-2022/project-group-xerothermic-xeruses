@@ -23,7 +23,7 @@ export interface AvailabilityInterval {
 export interface ManualAvailabilityInterval {
   start: Date;
   end: Date;
-  available: boolean | null;
+  availability: ManualAvailability[];
 }
 
 /**
@@ -31,6 +31,15 @@ export interface ManualAvailabilityInterval {
  */
 export interface Availability {
   id: Types.ObjectId;
-  available: boolean;
+  available: boolean | undefined;
+  manual: boolean;
+}
+
+/**
+ * Record a interval availability.
+ */
+export interface ManualAvailability {
+  id: Types.ObjectId;
+  available: boolean | undefined;
   manual: boolean;
 }

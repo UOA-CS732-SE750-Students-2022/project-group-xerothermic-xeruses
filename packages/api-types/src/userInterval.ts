@@ -17,14 +17,16 @@ export interface UserAvailabilityIntervalInputDTO {
  * Represents a users availability for a given date, split into 15 minute intervals from the start hour to the end hour.
  */
 export interface UserIntervalDTO {
-  start: Date;
-  end: Date;
+  id: string;
   available: boolean;
+  manual: boolean;
 }
 
 /**
  * Used to return the users availability for all dates.
  */
 export interface UserAvailabilityIntervalDTO {
+  start: Date;
+  end: Date;
   availability: UserIntervalDTO[];
 }

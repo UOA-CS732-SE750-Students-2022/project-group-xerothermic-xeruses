@@ -102,30 +102,27 @@ export class CalendarUtil {
   }
 
   calculateManualAvailability(
-    manualAvailability: UserManualAvailabilityDocument[],
+    manualAvailability: UserManualAvailabilityDocument,
     intervals: Interval[],
   ): ManualAvailabilityInterval[] {
     const availabilities: ManualAvailabilityInterval[] = intervals.map((interval) => ({
       ...interval,
-      available: null,
+      availability: [{ id: manualAvailability._id, available: undefined, manual: true }],
     }));
 
-    const availability: AvailabilityInterval[] = intervals.map((interval) => ({
-      ...interval,
-      availability: calendars.map(({ _id }) => ({ id: _id, available: true, manual: false })),
-    }));
-
-    for (const mAvailability of manualAvailability) {
+    let i = 0;
+    for (const mAvailability of manualAvailability.intervals) {
       const { start, end, available } = mAvailability;
 
-      for (const availability of availabilities) {
+      availabilities.forEach((availability, index) => {
         const eventDuration = end.getTime() - start.getTime();
 
         // Check if the event occurs during the interval
         if (this.isDuringInterval(start, availability.start, availability.end, eventDuration)) {
-          availability.available = available;
+          availabilities[index].availability[i].available = available;
         }
-      }
+      });
+      i++;
     }
     return availabilities;
   }
@@ -182,22 +179,12 @@ export class CalendarUtil {
     }
 
     return intervals.map((interval, i) => {
-      const intervalAvailability = { ...interval, availability: [] };
-      const icalAvailabilityInterval = icalAvailability[i];
-      const googleAvailabilityInterval = googleAvailability[i];
-      const manualAvailabilityInterval = overrideAvailability && overrideAvailability[i];
-
+      const availability: Availability[] = [];
       if (overrideAvailability?.[i]) {
-        intervalAvailability.availability.push({
-          ...overrideAvailability[i],
-        });
+        availability.push(...overrideAvailability?.[i].availability);
       }
-
-      return {
-        ...interval,
-        available:
-          overrideAvailability?.[i].available ?? (icalAvailability[i].available && googleAvailability[i].available),
-      };
+      availability.push(...icalAvailability[i].availability, ...googleAvailability[i].availability);
+      return { ...interval, availability };
     });
   }
 

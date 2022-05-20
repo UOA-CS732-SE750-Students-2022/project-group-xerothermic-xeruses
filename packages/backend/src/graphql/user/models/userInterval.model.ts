@@ -1,14 +1,14 @@
 import { UserIntervalDTO } from '@flocker/api-types';
-import { Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class UserIntervalGraphQLModel implements UserIntervalDTO {
-  @Field(() => GraphQLISODateTime, { nullable: false })
-  start!: Date;
-
-  @Field(() => GraphQLISODateTime, { nullable: false })
-  end!: Date;
+  @Field({ nullable: false })
+  id!: string;
 
   @Field(() => Boolean, { nullable: false })
   available!: boolean;
+
+  @Field(() => Boolean, { nullable: false })
+  manual!: boolean;
 }
