@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 
 const Navigation = () => (
   <nav className={styles.nav}>
-    <StyledNavLink to="meetings">My Meeting</StyledNavLink>
+    <StyledNavLink to="meetings">My Meetings</StyledNavLink>
     <StyledNavLink to="create-meeting">Create New Meeting</StyledNavLink>
     <StyledNavLink to="join">Join Meeting</StyledNavLink>
   </nav>
