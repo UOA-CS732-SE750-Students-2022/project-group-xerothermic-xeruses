@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './CalendarList.module.css';
 import Checkbox from '@mui/material/Checkbox';
 import { FormControlLabel, FormGroup } from '@mui/material';
-import { ClassNames } from '@emotion/react';
 
 type CalendarListProps = {
   calendars: Calendar[];
