@@ -51,7 +51,7 @@ const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
     >
       <div className={styles.modal}>
         <div className={showSignUp ? '' : styles.hide}>
-          <h1>Sign Up</h1>
+          <h1 className={styles.title}>Sign Up</h1>
           <p className={styles.errorText}>{signUpErrorText}</p>
           <form className={styles.form} onSubmit={signUp}>
             <div>
@@ -98,7 +98,7 @@ const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
         </div>
 
         <div className={showSignUp ? styles.hide : ''}>
-          <h1>Sign In</h1>
+          <h1 className={styles.title}>Sign In</h1>
           <p className={styles.errorText}>{signInErrorText}</p>
           <form className={styles.form} onSubmit={signIn}>
             <div>
