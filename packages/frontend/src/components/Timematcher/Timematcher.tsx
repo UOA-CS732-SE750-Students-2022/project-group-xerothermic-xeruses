@@ -143,10 +143,10 @@ const Timematcher = ({
         e.currentTarget.classList.add(styles.nooneAvailable);
       } else if (e.currentTarget.classList.contains(styles.bothAvailable)) {
         e.currentTarget.classList.remove(styles.bothAvailable);
-        e.currentTarget.classList.add(styles.othersAvailable);
+        e.currentTarget.classList.add(styles.userAvailable);
       } else if (e.currentTarget.classList.contains(styles.othersAvailable)) {
         e.currentTarget.classList.remove(styles.othersAvailable);
-        e.currentTarget.classList.add(styles.bothAvailable);
+        e.currentTarget.classList.add(styles.userAvailable);
       } else if (e.currentTarget.classList.contains(styles.nooneAvailable)) {
         e.currentTarget.classList.remove(styles.nooneAvailable);
         e.currentTarget.classList.add(styles.userAvailable);
