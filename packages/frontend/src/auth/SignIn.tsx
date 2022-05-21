@@ -39,7 +39,7 @@ const SignIn: React.FC = () => {
         navigate('/', { replace: true }); // TODO: redirect to an "account could not be created" page
       }
     },
-    [createFlockerUser, getCurrentUser, navigate, user, userCreated],
+    [createFlockerUser, getCurrentUser, navigate, user],
   );
 
   const handleSuccess = useCallback(() => navigate('/dashboard', { replace: true }), [navigate]);
