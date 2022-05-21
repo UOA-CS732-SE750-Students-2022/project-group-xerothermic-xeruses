@@ -250,7 +250,6 @@ const CalendarView: React.FC = () => {
     if (calendars.error) return <p>Sorry, an error occured</p>;
     return (
       <div>
-        {!userInFlock && <p className={styles.joinSidebarFlockPrompt}>Please join flock to add your availabilities</p>}
         <CalendarList
           calendars={calendarList}
           disabled={!userInFlock}
@@ -304,7 +303,7 @@ const CalendarView: React.FC = () => {
     <SidebarLayout
       returnTo={{ route: '/dashboard', name: 'Dashboard' }}
       sidebarContent={
-        <div>
+        <>
           <h1 className={styles.sidebarHeadings}>Participants</h1>
           <Participants flockCode={flockCode as string} />
           <div className={styles.sidebarDivider}>
@@ -312,7 +311,7 @@ const CalendarView: React.FC = () => {
           </div>
           <h1 className={styles.sidebarHeadings}>Calendars</h1>
           {getUserCalendarsContent()}
-        </div>
+        </>
       }
       bodyContent={<TitleLayout title={flockName} content={getFlockContent()} />}
     />

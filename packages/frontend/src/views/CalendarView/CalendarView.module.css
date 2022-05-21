@@ -1,7 +1,7 @@
 .sidebarHeadings {
-  font-size: var(--flocker-font-size-medium);
-  font-weight: var(--flocker-font-weight-light);
-  margin-top: 16px;
+  font-size: var(--flocker-font-size-body);
+  font-weight: var(--flocker-font-weight-medium);
+  margin-bottom: 8px;
 }
 
 .timeMatcher {
@@ -9,14 +9,7 @@
 }
 
 .sidebarDivider {
-  margin-top: 8px;
-}
-
-.joinSidebarFlockPrompt {
-  font-size: var(--flocker-font-size-small);
-  max-width: 15em;
-  margin-bottom: 0.5em;
-  font-style: italic;
+  margin: 1em 0;
 }
 
 .joinLeaveFlock {
