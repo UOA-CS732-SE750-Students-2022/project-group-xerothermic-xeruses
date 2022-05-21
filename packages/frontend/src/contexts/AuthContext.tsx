@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
     // Returns function to stop the listener
     const clearListener = auth.onAuthStateChanged((user) => {
       setUser(user);
-      setAuthLoaded(true);
+      if (user?.displayName || !user) setAuthLoaded(true);
     });
 
     return clearListener;
@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
         user,
         setUser,
         authLoaded,
-        signedIn: !!user,
+        signedIn: !!user && !!user.displayName,
       }}
     >
       {children}
