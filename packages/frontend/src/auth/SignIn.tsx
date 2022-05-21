@@ -1,6 +1,6 @@
 import { useMutation, useLazyQuery, ApolloError } from '@apollo/client';
 import { User } from 'firebase/auth';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GET_CURRENT_USER_NAME, CREATE_NEW_USER } from '../apollo/queries';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,6 +8,7 @@ import BeforeFirstLoadView from '../views/BeforeFirstLoadView';
 
 const SignIn: React.FC = () => {
   const [createUser] = useMutation(CREATE_NEW_USER);
+  const [getCurrentUser, { data, error }] = useLazyQuery(GET_CURRENT_USER_NAME);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -33,14 +34,22 @@ const SignIn: React.FC = () => {
     }
   };
 
-  const [getCurrentUser] = useLazyQuery(GET_CURRENT_USER_NAME, {
-    onCompleted: () => navigate('/dashboard', { replace: true }),
-    onError: handleError,
-  });
+  const handleSuccess = () => navigate('/dashboard', { replace: true });
+
+  const errorCallback = useCallback(handleError, []);
+  const successCallback = useCallback(handleSuccess, []);
 
   useEffect(() => {
     getCurrentUser();
-  }, [user, getCurrentUser]);
+  }, []);
+
+  useEffect(() => {
+    if (error) errorCallback(error);
+  }, [error, errorCallback]);
+
+  useEffect(() => {
+    if (data) successCallback();
+  }, [data, successCallback]);
 
   return <BeforeFirstLoadView />;
 };

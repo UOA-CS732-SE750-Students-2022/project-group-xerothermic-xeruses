@@ -29,6 +29,9 @@ export const signInWithGoogle = () => {
 export const signUpWithEmail = async (email: string, password: string, displayName: string) => {
   const user = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(user.user, { displayName });
+  // TODO: Hacky way to trigger onAuthLoaded() after updating profile. Please fix!
+  await auth.signOut();
+  await signInWithEmail(email, password);
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
