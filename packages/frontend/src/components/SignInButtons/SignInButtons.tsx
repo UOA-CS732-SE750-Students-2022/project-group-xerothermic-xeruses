@@ -14,7 +14,7 @@ type ModalProps = {
 const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
   const [showSignUp, setShowSignUp] = useState<boolean>(true);
 
-  const [signUpUsername, setSignUpUsername] = useState<string>('');
+  const [signUpName, setSignUpName] = useState<string>('');
   const [signUpEmail, setSignUpEmail] = useState<string>('');
   const [signUpPassword, setSignUpPassword] = useState<string>('');
   const [signUpErrorText, setSignUpErrorText] = useState<string>('');
@@ -27,7 +27,7 @@ const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
     e.preventDefault();
 
     setSignUpErrorText('');
-    signUpWithEmail(signUpEmail, signUpPassword, signUpUsername).catch((err: FirebaseError) => {
+    signUpWithEmail(signUpEmail, signUpPassword, signUpName).catch((err: FirebaseError) => {
       if (err.code === 'auth/email-already-in-use') setSignUpErrorText('Email already in use');
       else setSignUpErrorText('An error occurred');
     });
@@ -50,88 +50,95 @@ const SignInModal: React.FC<ModalProps> = ({ open, onClose }) => {
       sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
     >
       <div className={styles.modal}>
-        <div className={showSignUp ? '' : styles.hide}>
-          <h1 className={styles.title}>Sign Up</h1>
-          <p className={styles.errorText}>{signUpErrorText}</p>
-          <form className={styles.form} onSubmit={signUp}>
-            <div>
-              <label htmlFor="sign-up-username">Username</label>
-              <input
-                type="text"
-                id="sign-up-username"
-                value={signUpUsername}
-                onChange={(e) => setSignUpUsername(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="sign-up-email">Email</label>
-              <input
-                type="email"
-                id="sign-up-email"
-                value={signUpEmail}
-                onChange={(e) => setSignUpEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="sign-up-password">Password</label>
-              <input
-                type="password"
-                id="sign-up-password"
-                minLength={6}
-                value={signUpPassword}
-                onChange={(e) => setSignUpPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button color="primary" type="submit">
-              Sign Up
-            </Button>
-            <p className={styles.modalFooterText}>
-              Already have an account?{' '}
-              <button className={styles.modalSignInLink} onClick={() => setShowSignUp(false)}>
-                Sign in
-              </button>
-            </p>
-          </form>
-        </div>
-
-        <div className={showSignUp ? styles.hide : ''}>
-          <h1 className={styles.title}>Sign In</h1>
-          <p className={styles.errorText}>{signInErrorText}</p>
-          <form className={styles.form} onSubmit={signIn}>
-            <div>
-              <label htmlFor="sign-in-email">Email</label>
-              <input
-                type="email"
-                id="sign-in-email"
-                value={signInEmail}
-                onChange={(e) => setSignInEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="sign-in-password">Password</label>
-              <input
-                type="password"
-                id="sign-in-password"
-                value={signInPassword}
-                onChange={(e) => setSignInPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button color="primary" type="submit">
-              Sign In
-            </Button>
-            <p className={styles.modalFooterText}>
-              Don't have an account?{' '}
-              <button className={styles.modalSignUpLink} onClick={() => setShowSignUp(true)}>
-                Sign up
-              </button>
-            </p>
-          </form>
-        </div>
+        {showSignUp ? (
+          <>
+            <h1>Sign Up</h1>
+            <p className={styles.errorText}>{signUpErrorText}</p>
+            <form className={styles.form} onSubmit={signUp}>
+              <div>
+                <label htmlFor="sign-up-name">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  id="sign-up-name"
+                  value={signUpName}
+                  onChange={(e) => setSignUpName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="sign-up-email">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  id="sign-up-email"
+                  value={signUpEmail}
+                  onChange={(e) => setSignUpEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="sign-up-password">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  id="sign-up-password"
+                  minLength={6}
+                  value={signUpPassword}
+                  onChange={(e) => setSignUpPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button color="primary" type="submit">
+                Sign Up
+              </Button>
+              <p className={styles.modalFooterText}>
+                Already have an account?{' '}
+                <button className={styles.modalSignInLink} onClick={() => setShowSignUp(false)}>
+                  Sign in
+                </button>
+              </p>
+            </form>
+          </>
+        ) : (
+          <>
+            <h1>Sign In</h1>
+            <p className={styles.errorText}>{signInErrorText}</p>
+            <form className={styles.form} onSubmit={signIn}>
+              <div>
+                <label htmlFor="sign-in-email">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  id="sign-in-email"
+                  value={signInEmail}
+                  onChange={(e) => setSignInEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="sign-in-password">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  id="sign-in-password"
+                  value={signInPassword}
+                  onChange={(e) => setSignInPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button color="primary" type="submit">
+                Sign In
+              </Button>
+              <p className={styles.modalFooterText}>
+                Don't have an account?{' '}
+                <button className={styles.modalSignUpLink} onClick={() => setShowSignUp(true)}>
+                  Sign up
+                </button>
+              </p>
+            </form>
+          </>
+        )}
       </div>
     </Modal>
   );

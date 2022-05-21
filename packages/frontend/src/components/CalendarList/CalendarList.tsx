@@ -40,43 +40,50 @@ const CalendarList: React.FC<CalendarListProps> = ({
     onUpdate(calendars);
   };
 
+  if (!disabled && !calendars.length) {
+    return <p className={styles.noCalendars}>You have not added any calendars</p>;
+  }
+
   return (
-    <FormGroup>
-      {calendars.map((calendar) => {
-        return (
-          <FormControlLabel
-            key={calendar.id}
-            className={styles.calendarList}
-            control={
-              <Checkbox
-                sx={{
+    <>
+      {disabled && <p className={styles.disabledPrompt}>Join this flock to add your availabilities</p>}
+      <FormGroup>
+        {calendars.map((calendar) => {
+          return (
+            <FormControlLabel
+              key={calendar.id}
+              className={styles.calendarList}
+              control={
+                <Checkbox
+                  sx={{
+                    color: 'white',
+                    '&.Mui-checked': {
+                      color: 'white',
+                    },
+                    '&.Mui-disabled': {
+                      color: 'white',
+                      opacity: '50%',
+                    },
+                  }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    handleChange(e.target.checked, calendar);
+                  }}
+                  checked={calendar.enabled}
+                  disabled={disabled}
+                />
+              }
+              sx={{
+                '&.MuiFormControlLabel-root .MuiFormControlLabel-label.Mui-disabled': {
                   color: 'white',
-                  '&.Mui-checked': {
-                    color: 'white',
-                  },
-                  '&.Mui-disabled': {
-                    color: 'white',
-                    opacity: '50%',
-                  },
-                }}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  handleChange(e.target.checked, calendar);
-                }}
-                checked={calendar.enabled}
-                disabled={disabled}
-              />
-            }
-            sx={{
-              '&.MuiFormControlLabel-root .MuiFormControlLabel-label.Mui-disabled': {
-                color: 'white',
-                opacity: '50%',
-              },
-            }}
-            label={<p className={styles.calendarName}>{calendar.name}</p>}
-          />
-        );
-      })}
-    </FormGroup>
+                  opacity: '50%',
+                },
+              }}
+              label={<p className={styles.calendarName}>{calendar.name}</p>}
+            />
+          );
+        })}
+      </FormGroup>
+    </>
   );
 };
 
