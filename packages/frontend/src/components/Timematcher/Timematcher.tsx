@@ -164,7 +164,11 @@ const Timematcher = ({
 
       availability.available = !availability.available;
 
-      const cell: ManualAvailabilityDTO = { start: cellStartDateTime, end: cellEndDateTime, available: true };
+      const cell: ManualAvailabilityDTO = {
+        start: cellStartDateTime,
+        end: cellEndDateTime,
+        available: availability.available,
+      };
       const tempManualAvailabilties = manualAvailabilities;
       if (tempManualAvailabilties.has(cell)) {
         tempManualAvailabilties.delete(cell);
@@ -178,12 +182,9 @@ const Timematcher = ({
 
   const handleSave = () => {
     onManualSave(Array.from(manualAvailabilities));
-    console.log(manualAvailabilities);
     setManualAvailabilities(new Set<ManualAvailabilityDTO>());
     setIsInManualMode(false);
   };
-
-  console.log(isInManualMode);
 
   return (
     <>
