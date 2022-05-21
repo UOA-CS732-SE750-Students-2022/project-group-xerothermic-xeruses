@@ -12,44 +12,47 @@ const SignIn: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const createFlockerUser = async (user: User) => {
-    const name = user.displayName;
-    await createUser({
-      variables: {
-        addUserInput: {
-          name,
+  const createFlockerUser = useCallback(
+    async (user: User) => {
+      const name = user.displayName;
+      await createUser({
+        variables: {
+          addUserInput: {
+            name,
+          },
         },
-      },
-    });
-  };
+      });
+    },
+    [createUser],
+  );
 
-  const handleError = async (err: ApolloError) => {
-    const errorCode = err.graphQLErrors[0].extensions.code;
-    if (errorCode === '404' && user) {
-      // User does not exist
-      await createFlockerUser(user);
-      getCurrentUser();
-    } else {
-      navigate('/', { replace: true }); // TODO: redirect to an "account could not be created" page
-    }
-  };
+  const handleError = useCallback(
+    async (err: ApolloError) => {
+      const errorCode = err.graphQLErrors[0].extensions.code;
+      if (errorCode === '404' && user) {
+        // User does not exist
+        await createFlockerUser(user);
+        getCurrentUser();
+      } else {
+        navigate('/', { replace: true }); // TODO: redirect to an "account could not be created" page
+      }
+    },
+    [createFlockerUser, getCurrentUser, navigate, user],
+  );
 
-  const handleSuccess = () => navigate('/dashboard', { replace: true });
-
-  const errorCallback = useCallback(handleError, []);
-  const successCallback = useCallback(handleSuccess, []);
+  const handleSuccess = useCallback(() => navigate('/dashboard', { replace: true }), [navigate]);
 
   useEffect(() => {
     getCurrentUser();
-  }, []);
+  }, [getCurrentUser]);
 
   useEffect(() => {
-    if (error) errorCallback(error);
-  }, [error, errorCallback]);
+    if (error) handleError(error);
+  }, [error, handleError]);
 
   useEffect(() => {
-    if (data) successCallback();
-  }, [data, successCallback]);
+    if (data) handleSuccess();
+  }, [data, handleSuccess]);
 
   return <BeforeFirstLoadView />;
 };
