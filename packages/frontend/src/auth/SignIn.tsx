@@ -1,6 +1,6 @@
 import { useMutation, useLazyQuery, ApolloError } from '@apollo/client';
 import { User } from 'firebase/auth';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GET_CURRENT_USER_NAME, CREATE_NEW_USER } from '../apollo/queries';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,6 +9,7 @@ import BeforeFirstLoadView from '../views/BeforeFirstLoadView';
 const SignIn: React.FC = () => {
   const [createUser] = useMutation(CREATE_NEW_USER);
   const [getCurrentUser, { data, error }] = useLazyQuery(GET_CURRENT_USER_NAME);
+  const [userCreated, setUserCreated] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -31,6 +32,7 @@ const SignIn: React.FC = () => {
       const errorCode = err.graphQLErrors[0].extensions.code;
       if (errorCode === '404' && user) {
         // User does not exist
+        setUserCreated(true);
         await createFlockerUser(user);
         getCurrentUser();
       } else {
@@ -47,8 +49,10 @@ const SignIn: React.FC = () => {
   }, [getCurrentUser]);
 
   useEffect(() => {
-    if (error) handleError(error);
-  }, [error, handleError]);
+    if (error && !userCreated) {
+      handleError(error);
+    }
+  }, [error, userCreated, handleError]);
 
   useEffect(() => {
     if (data) handleSuccess();
