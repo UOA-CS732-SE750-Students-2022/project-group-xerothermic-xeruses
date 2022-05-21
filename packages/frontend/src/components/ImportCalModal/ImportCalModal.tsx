@@ -31,7 +31,7 @@ const ImportCalModal: React.FC<ImportCalModalProps> = ({ open, onClose }) => {
       sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
     >
       <div className={styles.modal}>
-        <h1>Import Calendar</h1>
+        <h1 className={styles.title}>Import Calendar</h1>
         <p className={`${styles.successText} ${styles.statusText}`}>{importSuccessText}</p>
         <p className={`${styles.errorText} ${styles.statusText}`}>{importErrorText}</p>
         <form className={styles.form} onSubmit={importCalendar}>

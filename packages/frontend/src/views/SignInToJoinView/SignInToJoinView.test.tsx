@@ -4,7 +4,7 @@ import SignInToJoinView from './SignInToJoinView';
 
 it('should render', () => {
   render(<SignInToJoinView />);
-  expect(screen.getByText('Please sign in to join the meeting')).toBeVisible();
+  expect(screen.getByText('Please sign in to join a meeting')).toBeVisible();
   expect(screen.getByText('Sign in with Google')).toBeVisible();
   expect(screen.getByText('Continue with Email')).toBeVisible();
 });
