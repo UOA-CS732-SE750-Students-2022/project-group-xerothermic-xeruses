@@ -6,12 +6,17 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import styles from './Timematcher.module.css';
+import { useEffect, useState } from 'react';
+import Button from '../Button';
+import { ManualAvailabilityDTO } from '@flocker/api-types';
 
 type TimematcherProps = {
   datesPicked: Date[];
   timeRange: [Date, Date];
   userAvailability: Availability[];
   othersAvailability: Availability[];
+  isInManualMode?: Boolean;
+  onManualSave?: (manualAvailabilities: ManualAvailabilityDTO[]) => void;
 };
 
 type Availability = {
@@ -97,16 +102,35 @@ const Legend: React.FC = () => {
   );
 };
 
-const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailability }: TimematcherProps) => {
+const Timematcher = ({
+  datesPicked,
+  timeRange,
+  userAvailability,
+  othersAvailability,
+  onManualSave = () => {},
+}: TimematcherProps) => {
   const dates = generateDates(datesPicked);
   const times = generateTimes(timeRange);
   let cellKey = 0;
   let rowKey = 0;
 
+  const [cellColour, setCellColour] = useState<string>('styles.nooneAvailable');
+  const [isInManualMode, setIsInManualMode] = useState(false);
+  const [manualAvailabilities, setManualAvailabilities] = useState<Set<ManualAvailabilityDTO>>(
+    new Set<ManualAvailabilityDTO>(),
+  );
+
+  const toggleManualMode = () => {
+    setIsInManualMode(!isInManualMode);
+    if (!isInManualMode) {
+      onManualSave(Array.from(manualAvailabilities));
+    }
+  };
+
   const tableCellColour = (time: Date, date: Date) => {
     const { userAvailable, othersAvailable } = isAvailable(time, date, userAvailability, othersAvailability);
 
-    if (userAvailable && othersAvailable) return styles.bothAvailable;
+    if (userAvailable && othersAvailable) setCellColour(styles.bothAvailable);
     if (userAvailable) return styles.userAvailable;
     if (othersAvailable) return styles.othersAvailable;
     return styles.nooneAvailable;
@@ -117,8 +141,63 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
     return '';
   };
 
+  const handleCellClick = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>, time: Date, date: Date) => {
+    if (isInManualMode) {
+      if (e.currentTarget.classList.contains(styles.userAvailable)) {
+        e.currentTarget.classList.remove(styles.userAvailable);
+        e.currentTarget.classList.add(styles.nooneAvailable);
+      } else if (e.currentTarget.classList.contains(styles.bothAvailable)) {
+        e.currentTarget.classList.remove(styles.bothAvailable);
+        e.currentTarget.classList.add(styles.userAvailable); //even if they are already both available, the user should still be able see the click
+      } else if (e.currentTarget.classList.contains(styles.othersAvailable)) {
+        e.currentTarget.classList.remove(styles.othersAvailable);
+        e.currentTarget.classList.add(styles.userAvailable);
+      } else if (e.currentTarget.classList.contains(styles.nooneAvailable)) {
+        e.currentTarget.classList.remove(styles.nooneAvailable);
+        e.currentTarget.classList.add(styles.userAvailable);
+      }
+
+      const { cellStartDateTime, cellEndDateTime } = getCell(time, date);
+      const availability = userAvailability.find(
+        (avail) => avail.start.getTime() === cellStartDateTime.getTime(),
+      ) as Availability;
+
+      availability.available = !availability.available;
+
+      const cell: ManualAvailabilityDTO = { start: cellStartDateTime, end: cellEndDateTime, available: true };
+      const tempManualAvailabilties = manualAvailabilities;
+      if (tempManualAvailabilties.has(cell)) {
+        tempManualAvailabilties.delete(cell);
+      } else {
+        tempManualAvailabilties.add(cell);
+      }
+
+      setManualAvailabilities(tempManualAvailabilties);
+    }
+  };
+
+  const handleSave = () => {
+    onManualSave(Array.from(manualAvailabilities));
+    console.log(manualAvailabilities);
+    setManualAvailabilities(new Set<ManualAvailabilityDTO>());
+    setIsInManualMode(false);
+  };
+
+  console.log(isInManualMode);
+
   return (
     <>
+      <div>
+        {isInManualMode ? (
+          <Button variant="outlined" onClick={handleSave}>
+            Save
+          </Button>
+        ) : (
+          <Button variant="outlined" onClick={toggleManualMode}>
+            Add your availabilities manually
+          </Button>
+        )}
+      </div>
       <TableContainer component={Paper} className={styles.table}>
         <Table stickyHeader className={styles.tableContent}>
           <TableHead>
@@ -153,6 +232,7 @@ const Timematcher = ({ datesPicked, timeRange, userAvailability, othersAvailabil
                     )} ${hourClass(times.get(time) as Date)}`}
                     key={cellKey++}
                     data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
+                    onClick={(e) => handleCellClick(e, times.get(time) as Date, dates.get(date) as Date)}
                   />
                 ))}
               </TableRow>

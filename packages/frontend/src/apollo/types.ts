@@ -6,6 +6,7 @@ import {
   UserAvailabilityIntervalDTO,
   UserDTO,
   UserFlockAvailabilityInputDTO,
+  UserManualAvailabilityDTO,
 } from '@flocker/api-types';
 
 // Results
@@ -19,6 +20,7 @@ export type GoogleCalendarAuthUrlResult = { googleCalendarAuthUrl: string };
 export type UpdateCalendarEnablementResult = { updateAvailabilityEnablement: FlockDTO };
 export type AddiCalResult = { availability: UserAvailabilityDTO };
 export type LeaveFlockResult = { leaveFlock: UserDTO };
+export type AddManualAvailabilityResult = {};
 
 // Inputs
 export type AddFlockInput = { addFlockInput: AddFlockInputDTO };
@@ -30,3 +32,7 @@ export type UpdateCalendarEnablementInput = {
 };
 export type AddiCalInput = { userAvailabilitySources: { type: string; name: string; uri: string }[] };
 export type LeaveFlockInput = { flockCode: string };
+export type AddManualAvailability = {
+  flockCode: string;
+  manualAvailabilityIntervalInput: { intervals: { start: Date; end: Date; available: boolean }[] };
+};
