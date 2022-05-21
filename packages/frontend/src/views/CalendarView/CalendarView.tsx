@@ -84,16 +84,17 @@ const CalendarView: React.FC = () => {
   const [userInFlock, setUserInFlock] = useState<boolean>(false);
   const [calendarList, setCalendarList] = useState<Calendar[]>([]);
   const [availabilityIds, setAvailabilityIds] = useState<Set<string>>(new Set<string>());
-  const [availabilityIdsReady, setAvailibilityIdsReady] = useState<boolean>(false);
+  const [availabilityIdsReady, setAvailabilityIdsReady] = useState<boolean>(false);
+
   const onEnabledChanged = async (id: string, enabled: boolean) => {
-    setAvailibilityIdsReady(false);
+    setAvailabilityIdsReady(false);
     await updateCalendarEnablement({
       variables: {
         flockCode: flockCode as string,
         userFlockAvailabilityInput: { userAvailabilityId: id, enabled },
       },
     });
-    setAvailibilityIdsReady(true);
+    setAvailabilityIdsReady(true);
   };
 
   const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS, {
@@ -117,7 +118,7 @@ const CalendarView: React.FC = () => {
 
       setCalendarList(tempCalList);
       setAvailabilityIds(tempAvailabilityIds);
-      setAvailibilityIdsReady(true);
+      setAvailabilityIdsReady(true);
     },
   });
 
@@ -248,20 +249,24 @@ const CalendarView: React.FC = () => {
     leaveFlock({ variables: { flockCode: flockCode as string } });
   };
 
-  const [manualAvailabilities, setManualAvailabilities] = useState<ManualAvailabilityDTO[]>([]);
-
   const handleOnSave = async (manualAvailabilities: ManualAvailabilityDTO[]) => {
-    setManualAvailabilities(manualAvailabilities);
+    setAvailabilityIdsReady(false);
     await addManualAvailabilities({
       variables: {
         flockCode: flockCode as string,
         manualAvailabilityIntervalInput: { intervals: manualAvailabilities },
       },
     });
+    setAvailabilityIdsReady(true);
   };
 
   const [addManualAvailabilities] = useMutation<AddManualAvailabilityResult, AddManualAvailability>(
     ADD_MANUAL_AVAILABILITIES,
+    {
+      onCompleted: (data) => {
+        getUserIntervalsCallback();
+      },
+    },
   );
 
   const getUserCalendarsContent = () => {

@@ -89,3 +89,9 @@ h3 {
 .legend .circleFlockAvailable {
   background-color: var(--flocker-color-primary);
 }
+
+.manualAvailability {
+  display: inline;
+  float: right;
+  margin-bottom: 16px;
+}

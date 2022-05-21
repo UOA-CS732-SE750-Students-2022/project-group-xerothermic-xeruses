@@ -15,7 +15,6 @@ type TimematcherProps = {
   timeRange: [Date, Date];
   userAvailability: Availability[];
   othersAvailability: Availability[];
-  isInManualMode?: Boolean;
   onManualSave?: (manualAvailabilities: ManualAvailabilityDTO[]) => void;
 };
 
@@ -114,23 +113,19 @@ const Timematcher = ({
   let cellKey = 0;
   let rowKey = 0;
 
-  const [cellColour, setCellColour] = useState<string>('styles.nooneAvailable');
-  const [isInManualMode, setIsInManualMode] = useState(false);
+  const [inManualMode, setInManualMode] = useState(false);
   const [manualAvailabilities, setManualAvailabilities] = useState<Set<ManualAvailabilityDTO>>(
     new Set<ManualAvailabilityDTO>(),
   );
 
-  const toggleManualMode = () => {
-    setIsInManualMode(!isInManualMode);
-    if (!isInManualMode) {
-      onManualSave(Array.from(manualAvailabilities));
-    }
+  const handleEnterManualMode = () => {
+    setInManualMode(true);
   };
 
   const tableCellColour = (time: Date, date: Date) => {
     const { userAvailable, othersAvailable } = isAvailable(time, date, userAvailability, othersAvailability);
 
-    if (userAvailable && othersAvailable) setCellColour(styles.bothAvailable);
+    if (userAvailable && othersAvailable) return styles.bothAvailable;
     if (userAvailable) return styles.userAvailable;
     if (othersAvailable) return styles.othersAvailable;
     return styles.nooneAvailable;
@@ -142,61 +137,82 @@ const Timematcher = ({
   };
 
   const handleCellClick = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>, time: Date, date: Date) => {
-    if (isInManualMode) {
+    if (inManualMode) {
       if (e.currentTarget.classList.contains(styles.userAvailable)) {
         e.currentTarget.classList.remove(styles.userAvailable);
         e.currentTarget.classList.add(styles.nooneAvailable);
       } else if (e.currentTarget.classList.contains(styles.bothAvailable)) {
         e.currentTarget.classList.remove(styles.bothAvailable);
-        e.currentTarget.classList.add(styles.userAvailable); //even if they are already both available, the user should still be able see the click
+        e.currentTarget.classList.add(styles.othersAvailable);
       } else if (e.currentTarget.classList.contains(styles.othersAvailable)) {
         e.currentTarget.classList.remove(styles.othersAvailable);
-        e.currentTarget.classList.add(styles.userAvailable);
+        e.currentTarget.classList.add(styles.bothAvailable);
       } else if (e.currentTarget.classList.contains(styles.nooneAvailable)) {
         e.currentTarget.classList.remove(styles.nooneAvailable);
         e.currentTarget.classList.add(styles.userAvailable);
       }
 
       const { cellStartDateTime, cellEndDateTime } = getCell(time, date);
-      const availability = userAvailability.find(
-        (avail) => avail.start.getTime() === cellStartDateTime.getTime(),
-      ) as Availability;
+      const available = userAvailability.find((avail) => avail.start.getTime() === cellStartDateTime.getTime())
+        ?.available as boolean;
 
-      availability.available = !availability.available;
+      console.log(available);
 
       const cell: ManualAvailabilityDTO = {
         start: cellStartDateTime,
         end: cellEndDateTime,
-        available: availability.available,
+        available: !available,
       };
       const tempManualAvailabilties = manualAvailabilities;
-      if (tempManualAvailabilties.has(cell)) {
+
+      tempManualAvailabilties.forEach((avail) => {
+        if (avail.start.getTime() === cell.start.getTime()) {
+          if (avail.available) {
+            tempManualAvailabilties.delete(avail);
+            avail.available = false;
+
+            tempManualAvailabilties.add(avail);
+          } else {
+            tempManualAvailabilties.delete(avail);
+            avail.available = true;
+            tempManualAvailabilties.add(avail);
+          }
+        }
+      });
+
+      if (available) {
         tempManualAvailabilties.delete(cell);
       } else {
         tempManualAvailabilties.add(cell);
       }
+
+      console.log(tempManualAvailabilties);
 
       setManualAvailabilities(tempManualAvailabilties);
     }
   };
 
   const handleSave = () => {
+    setInManualMode(false);
     onManualSave(Array.from(manualAvailabilities));
     setManualAvailabilities(new Set<ManualAvailabilityDTO>());
-    setIsInManualMode(false);
   };
 
   return (
     <>
-      <div>
-        {isInManualMode ? (
-          <Button variant="outlined" onClick={handleSave}>
-            Save
-          </Button>
+      <div className={styles.manualAvailability}>
+        {inManualMode ? (
+          <div className={styles.save}>
+            <Button color="primary" onClick={handleSave}>
+              Save
+            </Button>
+          </div>
         ) : (
-          <Button variant="outlined" onClick={toggleManualMode}>
-            Add your availabilities manually
-          </Button>
+          <div className={styles.addManualAvailability}>
+            <Button variant="outlined" onClick={handleEnterManualMode}>
+              Add your availabilities manually
+            </Button>
+          </div>
         )}
       </div>
       <TableContainer component={Paper} className={styles.table}>
