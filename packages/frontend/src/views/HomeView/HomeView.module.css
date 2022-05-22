@@ -33,13 +33,13 @@
 }
 
 .goose1 {
-  transform: rotate(220deg);
-  left: clamp(-130px, -20vw, 0px);
-  top: -15vh;
+  transform: rotate(200deg);
+  left: clamp(-100px, -15vw, 0px);
+  top: -10vh;
 }
 
 .goose2 {
   transform: rotate(30deg);
-  right: clamp(-80px, -10vw, 0px);
+  right: clamp(-100px, -15vw, 0px);
   bottom: -5vh;
 }
