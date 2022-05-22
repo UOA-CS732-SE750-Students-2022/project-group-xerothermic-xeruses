@@ -24,12 +24,15 @@ import {
   LeaveFlockResult,
   LeaveFlockInput,
   LEAVE_FLOCK,
+  AddManualAvailabilityResult,
+  AddManualAvailabilityInput,
+  ADD_MANUAL_AVAILABILITIES,
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import ParticipantList from '../../components/ParticipantList';
 import Line from '../../components/Line';
-import { UserAvailabilityPartialDTO, UserIntervalInputDTO } from '@flocker/api-types';
+import { ManualAvailabilityDTO, UserAvailabilityPartialDTO, UserIntervalInputDTO } from '@flocker/api-types';
 import CalendarList from '../../components/CalendarList';
 import Button from '../../components/Button';
 
@@ -81,16 +84,17 @@ const CalendarView: React.FC = () => {
   const [userInFlock, setUserInFlock] = useState<boolean>(false);
   const [calendarList, setCalendarList] = useState<Calendar[]>([]);
   const [availabilityIds, setAvailabilityIds] = useState<Set<string>>(new Set<string>());
-  const [availabilityIdsReady, setAvailibilityIdsReady] = useState<boolean>(false);
+  const [availabilityIdsReady, setAvailabilityIdsReady] = useState<boolean>(false);
+
   const onEnabledChanged = async (id: string, enabled: boolean) => {
-    setAvailibilityIdsReady(false);
+    setAvailabilityIdsReady(false);
     await updateCalendarEnablement({
       variables: {
         flockCode: flockCode as string,
         userFlockAvailabilityInput: { userAvailabilityId: id, enabled },
       },
     });
-    setAvailibilityIdsReady(true);
+    setAvailabilityIdsReady(true);
   };
 
   const calendars = useQuery<GetCurrentUserResult>(GET_USER_CALENDARS, {
@@ -114,7 +118,7 @@ const CalendarView: React.FC = () => {
 
       setCalendarList(tempCalList);
       setAvailabilityIds(tempAvailabilityIds);
-      setAvailibilityIdsReady(true);
+      setAvailabilityIdsReady(true);
     },
   });
 
@@ -245,6 +249,24 @@ const CalendarView: React.FC = () => {
     leaveFlock({ variables: { flockCode: flockCode as string } });
   };
 
+  const handleOnSave = async (manualAvailabilities: ManualAvailabilityDTO[]) => {
+    setAvailabilityIdsReady(false);
+    await addManualAvailabilities({
+      variables: {
+        flockCode: flockCode as string,
+        manualAvailabilityIntervalInput: { intervals: manualAvailabilities },
+      },
+    });
+    setAvailabilityIdsReady(true);
+  };
+
+  const [addManualAvailabilities] = useMutation<AddManualAvailabilityResult, AddManualAvailabilityInput>(
+    ADD_MANUAL_AVAILABILITIES,
+    {
+      onCompleted: getUserIntervalsCallback,
+    },
+  );
+
   const getUserCalendarsContent = () => {
     if (calendars.loading) return <CircularProgress />;
     if (calendars.error) return <p>Sorry, an error occured</p>;
@@ -285,7 +307,6 @@ const CalendarView: React.FC = () => {
         </div>
       );
     }
-
     return (
       <div className={styles.flock}>
         {content}
@@ -294,6 +315,8 @@ const CalendarView: React.FC = () => {
           timeRange={timeRange}
           userAvailability={userAvailabilities}
           othersAvailability={flockAvailabilities}
+          userInFlock={userInFlock}
+          onManualSave={handleOnSave}
         />
       </div>
     );

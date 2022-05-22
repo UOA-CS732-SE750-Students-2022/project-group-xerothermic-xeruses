@@ -181,3 +181,17 @@ export const GET_FLOCK_NAME = gql`
     }
   }
 `;
+
+export const ADD_MANUAL_AVAILABILITIES = gql`
+  mutation SetManualAvailabilityForFlock(
+    $flockCode: String!
+    $manualAvailabilityIntervalInput: ManualAvailabilityIntervalInput!
+  ) {
+    setManualAvailabilityForFlock(
+      flockCode: $flockCode
+      manualAvailabilityIntervalInput: $manualAvailabilityIntervalInput
+    ) {
+      id
+    }
+  }
+`;
