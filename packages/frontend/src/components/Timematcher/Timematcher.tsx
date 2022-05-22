@@ -6,7 +6,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import styles from './Timematcher.module.css';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '../Button';
 import { ManualAvailabilityDTO } from '@flocker/api-types';
 
@@ -15,6 +15,7 @@ type TimematcherProps = {
   timeRange: [Date, Date];
   userAvailability: Availability[];
   othersAvailability: Availability[];
+  userInFlock: boolean;
   onManualSave?: (manualAvailabilities: ManualAvailabilityDTO[]) => void;
 };
 
@@ -106,6 +107,7 @@ const Timematcher = ({
   timeRange,
   userAvailability,
   othersAvailability,
+  userInFlock,
   onManualSave = () => {},
 }: TimematcherProps) => {
   const dates = generateDates(datesPicked);
@@ -125,10 +127,10 @@ const Timematcher = ({
   const tableCellColour = (time: Date, date: Date) => {
     const { userAvailable, othersAvailable } = isAvailable(time, date, userAvailability, othersAvailability);
 
-    if (userAvailable && othersAvailable) return styles.bothAvailable;
+    if (userAvailable && othersAvailable) return `${styles.userAvailable} ${styles.othersAvailable}`;
     if (userAvailable) return styles.userAvailable;
     if (othersAvailable) return styles.othersAvailable;
-    return styles.nooneAvailable;
+    return '';
   };
 
   const hourClass = (time: Date) => {
@@ -138,83 +140,43 @@ const Timematcher = ({
 
   const handleCellClick = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>, time: Date, date: Date) => {
     if (inManualMode) {
-      if (e.currentTarget.classList.contains(styles.userAvailable)) {
-        e.currentTarget.classList.remove(styles.userAvailable);
-        e.currentTarget.classList.add(styles.nooneAvailable);
-      } else if (e.currentTarget.classList.contains(styles.bothAvailable)) {
-        e.currentTarget.classList.remove(styles.bothAvailable);
-        e.currentTarget.classList.add(styles.userAvailable);
-      } else if (e.currentTarget.classList.contains(styles.othersAvailable)) {
-        e.currentTarget.classList.remove(styles.othersAvailable);
-        e.currentTarget.classList.add(styles.userAvailable);
-      } else if (e.currentTarget.classList.contains(styles.nooneAvailable)) {
-        e.currentTarget.classList.remove(styles.nooneAvailable);
-        e.currentTarget.classList.add(styles.userAvailable);
-      }
+      // Changes colour of cell
+      e.currentTarget.classList.toggle(styles.userAvailable);
 
+      // Handling maintaining state of manual availability
       const { cellStartDateTime, cellEndDateTime } = getCell(time, date);
       const available = userAvailability.find((avail) => avail.start.getTime() === cellStartDateTime.getTime())
         ?.available as boolean;
-
-      console.log(available);
 
       const cell: ManualAvailabilityDTO = {
         start: cellStartDateTime,
         end: cellEndDateTime,
         available: !available,
       };
-      const tempManualAvailabilties = manualAvailabilities;
+      const tempManualAvailabilties = new Set(manualAvailabilities);
 
-      tempManualAvailabilties.forEach((avail) => {
+      for (const avail of Array.from(tempManualAvailabilties)) {
         if (avail.start.getTime() === cell.start.getTime()) {
-          if (avail.available) {
-            tempManualAvailabilties.delete(avail);
-            avail.available = false;
-
-            tempManualAvailabilties.add(avail);
-          } else {
-            tempManualAvailabilties.delete(avail);
-            avail.available = true;
-            tempManualAvailabilties.add(avail);
-          }
+          avail.available = !available;
+          setManualAvailabilities(tempManualAvailabilties);
+          return;
         }
-      });
-
-      if (available) {
-        tempManualAvailabilties.delete(cell);
-      } else {
-        tempManualAvailabilties.add(cell);
       }
-
-      console.log(tempManualAvailabilties);
-
+      tempManualAvailabilties.add(cell);
       setManualAvailabilities(tempManualAvailabilties);
     }
   };
 
   const handleSave = () => {
     setInManualMode(false);
-    onManualSave(Array.from(manualAvailabilities));
-    setManualAvailabilities(new Set<ManualAvailabilityDTO>());
+    if (manualAvailabilities.size) {
+      onManualSave(Array.from(manualAvailabilities));
+      setManualAvailabilities(new Set<ManualAvailabilityDTO>());
+    }
   };
 
   return (
     <>
-      <div className={styles.manualAvailability}>
-        {inManualMode ? (
-          <div className={styles.save}>
-            <Button color="primary" onClick={handleSave}>
-              Save
-            </Button>
-          </div>
-        ) : (
-          <div className={styles.addManualAvailability}>
-            <Button variant="outlined" onClick={handleEnterManualMode}>
-              Add your availabilities manually
-            </Button>
-          </div>
-        )}
-      </div>
       <TableContainer component={Paper} className={styles.table}>
         <Table stickyHeader className={styles.tableContent}>
           <TableHead>
@@ -257,7 +219,32 @@ const Timematcher = ({
           </TableBody>
         </Table>
       </TableContainer>
-      <Legend />
+      <div className={styles.tableFooter}>
+        <Legend />
+        {userInFlock ? (
+          inManualMode ? (
+            <>
+              <div className={styles.manualMode}>
+                <div className={styles.backgroundIsolation}></div>
+
+                <div className={styles.save}>
+                  <Button color="white" onClick={handleSave}>
+                    Save
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className={styles.addManualAvailability}>
+              <Button variant="outlined" onClick={handleEnterManualMode}>
+                Add manual availabilities
+              </Button>
+            </div>
+          )
+        ) : (
+          <></>
+        )}
+      </div>
     </>
   );
 };

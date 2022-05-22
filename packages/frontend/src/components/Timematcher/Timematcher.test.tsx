@@ -29,6 +29,7 @@ it('should render', () => {
       timeRange={[time1, time2]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
+      userInFlock
     />,
   );
   expect(container).toBeVisible();
@@ -66,6 +67,7 @@ it('should render multiple dates', () => {
       timeRange={[time1, time1]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
+      userInFlock
     />,
   );
 
@@ -111,6 +113,7 @@ it('should render multiple times', () => {
       timeRange={[time1, time3]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
+      userInFlock
     />,
   );
 
@@ -144,6 +147,7 @@ it('should show both available cell when both user and others are available', ()
       timeRange={[time1, time1]}
       userAvailability={freeTimes}
       othersAvailability={freeTimes}
+      userInFlock
     />,
   );
 
@@ -181,6 +185,7 @@ it('should show user available cell when user is available but others are not', 
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
       othersAvailability={othersAvailabilities}
+      userInFlock
     />,
   );
 
@@ -218,6 +223,7 @@ it('should show others available cell when others are available but user is not'
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
       othersAvailability={othersAvailabilities}
+      userInFlock
     />,
   );
 
@@ -255,6 +261,7 @@ it('should show no one available cell when neither user or others are available'
       timeRange={[time1, time1]}
       userAvailability={userAvailabilities}
       othersAvailability={othersAvailabilities}
+      userInFlock
     />,
   );
 

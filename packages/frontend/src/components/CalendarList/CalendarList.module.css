@@ -8,7 +8,6 @@
 .disabledPrompt {
   font-size: var(--flocker-font-size-small);
   font-weight: var(--flocker-font-weight-light);
-  font-style: italic;
   word-wrap: break-word;
   max-width: 16em;
 }
@@ -16,4 +15,5 @@
 .noCalendars,
 .disabledPrompt {
   margin-bottom: 0.5em;
+  font-style: italic;
 }

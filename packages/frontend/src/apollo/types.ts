@@ -6,7 +6,6 @@ import {
   UserAvailabilityIntervalDTO,
   UserDTO,
   UserFlockAvailabilityInputDTO,
-  UserManualAvailabilityDTO,
 } from '@flocker/api-types';
 
 // Results
