@@ -151,7 +151,7 @@ it('should show both available cell when both user and others are available', ()
     />,
   );
 
-  const bothAvailable = screen.getAllByTestId('bothAvailable');
+  const bothAvailable = screen.getAllByTestId('userAvailable othersAvailable');
   expect(bothAvailable).toHaveLength(1);
 });
 

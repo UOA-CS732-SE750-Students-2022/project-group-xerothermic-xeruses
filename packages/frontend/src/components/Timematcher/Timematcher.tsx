@@ -124,13 +124,13 @@ const Timematcher = ({
     setInManualMode(true);
   };
 
-  const tableCellColour = (time: Date, date: Date) => {
+  const tableCellClass = (time: Date, date: Date) => {
     const { userAvailable, othersAvailable } = isAvailable(time, date, userAvailability, othersAvailability);
 
     if (userAvailable && othersAvailable) return `${styles.userAvailable} ${styles.othersAvailable}`;
     if (userAvailable) return styles.userAvailable;
     if (othersAvailable) return styles.othersAvailable;
-    return '';
+    return styles.nooneAvailable;
   };
 
   const hourClass = (time: Date) => {
@@ -210,12 +210,12 @@ const Timematcher = ({
                 </TableCell>
                 {Array.from(dates.keys()).map((date) => (
                   <TableCell
-                    className={`${styles.cell} ${tableCellColour(
+                    className={`${styles.cell} ${tableCellClass(
                       times.get(time) as Date,
                       dates.get(date) as Date,
                     )} ${hourClass(times.get(time) as Date)}`}
                     key={cellKey++}
-                    data-testid={tableCellColour(times.get(time) as Date, dates.get(date) as Date)}
+                    data-testid={tableCellClass(times.get(time) as Date, dates.get(date) as Date)}
                     onClick={(e) => handleCellClick(e, times.get(time) as Date, dates.get(date) as Date)}
                   />
                 ))}
