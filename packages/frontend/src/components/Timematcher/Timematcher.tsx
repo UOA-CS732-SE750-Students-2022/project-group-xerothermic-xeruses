@@ -145,19 +145,24 @@ const Timematcher = ({
 
       // Handling maintaining state of manual availability
       const { cellStartDateTime, cellEndDateTime } = getCell(time, date);
-      const available = userAvailability.find((avail) => avail.start.getTime() === cellStartDateTime.getTime())
-        ?.available as boolean;
+      const availability = userAvailability.find((avail) => avail.start.getTime() === cellStartDateTime.getTime());
+
+      let newAvailable = false;
+      if (availability) {
+        newAvailable = !availability.available;
+        availability.available = newAvailable;
+      }
 
       const cell: ManualAvailabilityDTO = {
         start: cellStartDateTime,
         end: cellEndDateTime,
-        available: !available,
+        available: newAvailable,
       };
       const tempManualAvailabilties = new Set(manualAvailabilities);
 
       for (const avail of Array.from(tempManualAvailabilties)) {
         if (avail.start.getTime() === cell.start.getTime()) {
-          avail.available = !available;
+          avail.available = newAvailable;
           setManualAvailabilities(tempManualAvailabilties);
           return;
         }
