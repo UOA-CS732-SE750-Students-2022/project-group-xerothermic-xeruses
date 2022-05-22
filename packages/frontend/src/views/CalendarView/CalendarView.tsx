@@ -316,7 +316,7 @@ const CalendarView: React.FC = () => {
           userAvailability={userAvailabilities}
           othersAvailability={flockAvailabilities}
           userInFlock={userInFlock}
-          onManualSave={(manualAvailabilities) => handleOnSave(manualAvailabilities)}
+          onManualSave={handleOnSave}
         />
       </div>
     );
