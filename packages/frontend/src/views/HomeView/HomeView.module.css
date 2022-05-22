@@ -34,12 +34,12 @@
 
 .goose1 {
   transform: rotate(220deg);
-  left: clamp(-120px, -10vw, 0px);
+  left: clamp(-130px, -20vw, 0px);
   top: -15vh;
 }
 
 .goose2 {
   transform: rotate(30deg);
-  right: clamp(-100px, -15vw, 0px);
-  bottom: -15vh;
+  right: clamp(-80px, -10vw, 0px);
+  bottom: -5vh;
 }
