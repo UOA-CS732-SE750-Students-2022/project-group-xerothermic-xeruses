@@ -31,7 +31,7 @@ export type UpdateCalendarEnablementInput = {
 };
 export type AddiCalInput = { userAvailabilitySources: { type: string; name: string; uri: string }[] };
 export type LeaveFlockInput = { flockCode: string };
-export type AddManualAvailability = {
+export type AddManualAvailabilityInput = {
   flockCode: string;
   manualAvailabilityIntervalInput: { intervals: { start: Date; end: Date; available: boolean }[] };
 };

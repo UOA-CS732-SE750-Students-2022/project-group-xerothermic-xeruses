@@ -25,7 +25,7 @@ import {
   LeaveFlockInput,
   LEAVE_FLOCK,
   AddManualAvailabilityResult,
-  AddManualAvailability,
+  AddManualAvailabilityInput,
   ADD_MANUAL_AVAILABILITIES,
 } from '../../apollo';
 import { CircularProgress } from '@mui/material';
@@ -260,12 +260,10 @@ const CalendarView: React.FC = () => {
     setAvailabilityIdsReady(true);
   };
 
-  const [addManualAvailabilities] = useMutation<AddManualAvailabilityResult, AddManualAvailability>(
+  const [addManualAvailabilities] = useMutation<AddManualAvailabilityResult, AddManualAvailabilityInput>(
     ADD_MANUAL_AVAILABILITIES,
     {
-      onCompleted: (data) => {
-        getUserIntervalsCallback();
-      },
+      onCompleted: getUserIntervalsCallback,
     },
   );
 
