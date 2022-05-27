@@ -1,9 +1,6 @@
 # Dependencies
 node_modules/
 
-# Environmental variables
-.env
-
 # Build output
 dist/
 *.tsbuildinfo

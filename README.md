@@ -43,6 +43,9 @@ To run or test the front and backend in isolation, consult the relevant READMEs.
 
 1. Install packages
    `npm install`
+   
+2. Build packages
+   `npm run build`
 
 ### How to run
 
